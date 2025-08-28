@@ -1,0 +1,249 @@
+.modal-overlay {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+}
+
+/* Modal container */
+.modal-content.form-modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 680px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.form-modal h2 {
+  margin-top: 0;
+}
+
+/* Inputs (default rule you had) */
+.form-modal input[type="text"],
+.form-modal input[type="number"] {
+  width: 50%;
+  padding: 8px;
+  margin: 6px 0 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+}
+
+/* Section divider */
+.section {
+  margin-top: 14px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+/* Row layout */
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Buttons */
+.small-danger {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-btn-inline {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #4cafef;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Checkbox layout */
+.lab-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Action buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.save-btn {
+  background: #1e1e2f;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #ddd;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* -------------------------
+   Subtle layout & visual improvements
+   (added below — does not rename existing classes)
+   ------------------------- */
+
+/* Uniform label styling and spacing */
+.form-modal label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  font-size: 13px;
+  user-select: none;
+}
+
+/* Make input fields flexible inside row containers */
+.form-modal .row input[type="text"],
+.form-modal .row input[type="number"],
+.form-modal input {
+  width: 100%;
+  max-width: none;
+  padding: 10px 12px;
+  margin: 0; /* spacing controlled by row/label */
+  border: 1.5px solid #cfcfcf;
+  border-radius: 12px;
+  font-size: 14px;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.08s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* focus state */
+.form-modal input:focus {
+  border-color: #4cafef;
+  box-shadow: 0 6px 18px rgba(76, 175, 239, 0.12);
+  transform: translateY(-1px);
+}
+
+/* spacing tweaks for sections and headings */
+.form-modal h4 {
+  margin: 6px 0 10px 0;
+  font-weight: 700;
+  color: #222;
+  font-size: 15px;
+}
+
+/* slightly larger and more readable modal heading */
+.form-modal h2 {
+  margin-bottom: 18px;
+  font-weight: 800;
+  color: #111;
+  font-size: 20px;
+}
+
+/* nicer shadow for rows with multiple controls (assignments, labs) */
+.form-modal .row {
+  gap: 10px;
+  align-items: center;
+}
+
+/* make the small-danger buttons a bit less harsh on small screens */
+.small-danger {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* responsive: stack fields on very narrow screens */
+@media (max-width: 560px) {
+  .modal-content.form-modal {
+    width: calc(100% - 32px);
+    padding: 16px;
+  }
+
+  .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-modal label {
+    margin-bottom: 8px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .save-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}
+
+.form-error {
+  color: #d32f2f;
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.form-error {
+  color: #d32f2f;
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.save-btn {
+  background: #1e1e2f;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.save-btn:hover {
+  background: #2e2e42;
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  color: #333;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}

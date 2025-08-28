@@ -1,0 +1,39 @@
+.sidebar {
+  width: 80px;
+  background: #3398db;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.nav-item:hover {
+  background-color: #3398db;
+}
+
+.nav-item.active {
+  background-color: #2978b5;
+}
+
+.icon {
+  color: white;
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+.label {
+  color: white;
+  font-size: 12px;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}

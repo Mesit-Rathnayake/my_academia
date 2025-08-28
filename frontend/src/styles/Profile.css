@@ -1,0 +1,241 @@
+.profile {
+    background-image: url('../images/BG.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-layout {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.profile-content {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 80px;
+    min-height: calc(100vh - 60px);
+}
+
+.profile-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.profile-header h1 {
+    color: #0067ff;
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.profile-card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.user-info {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.user-info h2 {
+    color: #0067ff;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.user-details p {
+    margin: 0;
+    font-size: 16px;
+    color: #2c3e50;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.user-details strong {
+    color: #0067ff;
+    font-weight: 600;
+}
+
+.modules-section h2 {
+    color: #0067ff;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.no-modules {
+    color: #7f8c8d;
+    font-style: italic;
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.modules-list {
+    display: grid;
+    gap: 20px;
+}
+
+.module-item {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 15px;
+    border-left: 5px solid #3498db;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.module-item:hover {
+    background: #e8f4ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+    border-left: 5px solid #0067ff;
+}
+
+.module-item h3 {
+    color: #1e1e2f;
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 600;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.module-code {
+    color: #b33a3a;
+    background: #f7d6d0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.module-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+    color: #666;
+    flex-wrap: wrap;
+}
+
+.module-stats span {
+    background: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.loading {
+    text-align: center;
+    padding: 60px;
+    font-size: 18px;
+    color: #7f8c8d;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+/* Sidebar compatibility fixes */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 80px;
+    background: #1e1e2f;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .profile-content {
+        margin-left: 0;
+        padding: 20px;
+        padding-left: 90px;
+    }
+    
+    .profile-card {
+        padding: 25px;
+    }
+    
+    .module-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .module-item {
+        padding: 20px;
+    }
+    
+    .profile-header h1 {
+        font-size: 32px;
+    }
+    
+    .user-info h2,
+    .modules-section h2 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-content {
+        padding: 15px;
+        padding-left: 80px;
+    }
+    
+    .profile-card {
+        padding: 20px;
+    }
+    
+    .module-item {
+        padding: 15px;
+    }
+    
+    .module-stats span {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

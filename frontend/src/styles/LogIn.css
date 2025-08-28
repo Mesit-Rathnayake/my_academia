@@ -1,0 +1,124 @@
+.login {
+    background-image: url('../images/BG.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-wrapper {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    height: calc(100vh - 60px); /* Assuming footer is 60px tall */
+}
+
+.login-image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-image {
+    height: 85vh;               /* Increased size */
+    max-height: 800px;
+    object-fit: contain;
+}
+
+.login-form-container {
+    max-width: 50%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;    /* Vertical centering */
+    align-items: center;        /* Horizontal centering */
+    padding: 1% 0;              /* Reduced padding to save space */
+}
+
+.title {
+    color: #0067ff;
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.loginform {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 380px;
+    align-items: center;       /* Align inputs and button */
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    transition: 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.log {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.log button {
+    width: 140px;
+    padding: 8px 18px;
+    border-radius: 18px;
+    font-weight: bold;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.log button:hover {
+    background-color: #2980b9;
+}
+
+.signup-prompt {
+    margin-top: 14px;
+    font-size: 14px;
+    color: #2c3e50;
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.signup-prompt a {
+    color: #0067ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.signup-prompt a:hover {
+    text-decoration: underline;
+}
+
+Footer {
+    z-index: 3;
+}
