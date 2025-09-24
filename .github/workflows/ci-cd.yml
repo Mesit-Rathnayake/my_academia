@@ -28,7 +28,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '22'
+        node-version: '18' # Use the same Node.js version as deploy for consistency
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
 
@@ -40,17 +40,17 @@ jobs:
     - name: Run unit tests
       run: |
         cd backend
-        npm test -- --coverage
+        npm test -- --coverage # Make sure this script exists in package.json
 
     - name: Run API tests
       run: |
         cd backend
-        npm run test:api -- --coverage
+        npm run test:api -- --coverage # Make sure this script exists in package.json
 
     - name: Run BDD tests
       run: |
         cd backend
-        npm run test:bdd
+        npm run test:bdd # Make sure this script exists in package.json
 
   deploy:
     runs-on: ubuntu-latest
@@ -78,4 +78,6 @@ jobs:
     - name: Deploy to server
       run: |
         echo "Deploying to production with secured secrets"
-        # Add your actual deployment commands here
+        # TODO: Add your actual deployment commands here (e.g., scp, rsync, ssh, docker, etc.)
+        # Example:
+        # scp -r backend user@yourserver:/path/to/deploy
