@@ -28,7 +28,7 @@ let testUser;
 
 
 // Clean up before each scenario
-Before(async function () {
+Before({ timeout: 20000 }, async function () {
   await User.deleteMany({});
   await Module.deleteMany({});
   
