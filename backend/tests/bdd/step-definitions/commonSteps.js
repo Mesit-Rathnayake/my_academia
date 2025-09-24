@@ -1,20 +1,4 @@
-// Start in-memory MongoDB before all tests
-BeforeAll({ timeout: 20000 }, async function () {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
-});
 
-// Stop in-memory MongoDB after all tests
-AfterAll(async function () {
-  await mongoose.disconnect();
-  if (mongoServer) {
-    await mongoServer.stop();
-  }
-});
 const { 
   Given, 
   When, 
@@ -32,6 +16,24 @@ const app = require('../../../server');
 const User = require('../../../models/User');
 const Module = require('../../../models/Module');
 const jwt = require('jsonwebtoken');
+
+// Start in-memory MongoDB before all tests
+BeforeAll({ timeout: 20000 }, async function () {
+  mongoServer = await MongoMemoryServer.create();
+  const uri = mongoServer.getUri();
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+});
+
+// Stop in-memory MongoDB after all tests
+AfterAll(async function () {
+  await mongoose.disconnect();
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+});
 
 let mongoServer;
 let response;
