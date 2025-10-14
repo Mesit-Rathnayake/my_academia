@@ -25,7 +25,15 @@ beforeAll(async () => {
   await testUser.save();
   
   // Generate token
-  authToken = jwt.sign({ _id: testUser._id }, process.env.JWT_SECRET);
+  authToken = jwt.sign(
+    { _id: testUser._id }, 
+    process.env.JWT_SECRET, 
+    { 
+      algorithm: 'HS256',
+      issuer: 'my-academia',
+      audience: 'my-academia-users'
+    }
+  );
 }, 30000);
 
 afterAll(async () => {

@@ -24,7 +24,15 @@ beforeAll(async () => {
   await user.save();
   
   testUserId = user._id;
-  token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+  token = jwt.sign(
+    { _id: user._id }, 
+    process.env.JWT_SECRET, 
+    { 
+      algorithm: 'HS256',
+      issuer: 'my-academia',
+      audience: 'my-academia-users'
+    }
+  );
 }, 30000); // Increase timeout to 30 seconds for setup
 
 afterAll(async () => {

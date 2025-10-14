@@ -23,7 +23,7 @@ describe('User Registration - TDD', () => {
       .send({
         registrationNumber: 'EG/2020/1234',
         fullName: 'John Doe',
-        password: 'password123'
+        password: 'Password123'
       });
     
     expect(response.status).toBe(201);
@@ -36,18 +36,18 @@ describe('User Registration - TDD', () => {
     await request(app)
       .post('/api/auth/register')
       .send({
-        registrationNumber: 'EG/2020/1234',
+        registrationNumber: 'EG/2020/1235',
         fullName: 'John Doe',
-        password: 'password123'
+        password: 'Password123'
       });
 
     // Second registration with same number
     const response = await request(app)
       .post('/api/auth/register')
       .send({
-        registrationNumber: 'EG/2020/1234',
+        registrationNumber: 'EG/2020/1235',
         fullName: 'Jane Smith',
-        password: 'password456'
+        password: 'Password456'
       });
 
     expect(response.status).toBe(400);

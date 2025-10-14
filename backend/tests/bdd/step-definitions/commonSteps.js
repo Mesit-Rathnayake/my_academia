@@ -19,18 +19,22 @@ const jwt = require('jsonwebtoken');
 
 // Start in-memory MongoDB before all tests
 BeforeAll({ timeout: 20000 }, async function () {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  });
+  // Only connect if not already connected
+  if (mongoose.connection.readyState === 0) {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+  }
 });
 
 // Stop in-memory MongoDB after all tests
 AfterAll(async function () {
-  await mongoose.disconnect();
+  // Only disconnect if we created the connection
   if (mongoServer) {
+    await mongoose.disconnect();
     await mongoServer.stop();
   }
 });
@@ -60,7 +64,15 @@ Before({ timeout: 20000 }, async function () {
   await testUser.save();
   
   // Generate token
-  authToken = jwt.sign({ _id: testUser._id }, process.env.JWT_SECRET);
+  authToken = jwt.sign(
+    { _id: testUser._id }, 
+    process.env.JWT_SECRET, 
+    { 
+      algorithm: 'HS256',
+      issuer: 'my-academia',
+      audience: 'my-academia-users'
+    }
+  );
 });
 
 

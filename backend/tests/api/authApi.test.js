@@ -28,7 +28,7 @@ describe('Auth API Tests', () => {
       .send({
         registrationNumber: 'EG/2020/1234',
         fullName: 'John Doe',
-        password: 'password123'
+        password: 'Password123'
       });
     
     expect(response.status).toBe(201);
@@ -43,7 +43,7 @@ describe('Auth API Tests', () => {
       .send({
         registrationNumber: 'EG/2020/1234',
         fullName: 'John Doe',
-        password: 'password123'
+        password: 'Password123'
       });
 
     // Then login
@@ -51,7 +51,7 @@ describe('Auth API Tests', () => {
       .post('/api/auth/login')
       .send({
         registrationNumber: 'EG/2020/1234',
-        password: 'password123'
+        password: 'Password123'
       });
     
     expect(response.status).toBe(200);
