@@ -14,7 +14,16 @@ exports.register = async (req, res) => {
     const user = new User({ registrationNumber, fullName, password });
     await user.save();
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign(
+      { _id: user._id }, 
+      process.env.JWT_SECRET, 
+      { 
+        expiresIn: '1d',
+        algorithm: 'HS256',
+        issuer: 'my-academia',
+        audience: 'my-academia-users'
+      }
+    );
 
     res.status(201).json({ 
       token,
@@ -25,7 +34,8 @@ exports.register = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong', error: error.message });
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Something went wrong' });
   }
 };
 
@@ -44,7 +54,16 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign(
+      { _id: user._id }, 
+      process.env.JWT_SECRET, 
+      { 
+        expiresIn: '1d',
+        algorithm: 'HS256',
+        issuer: 'my-academia',
+        audience: 'my-academia-users'
+      }
+    );
 
     res.json({ 
       token,
@@ -55,7 +74,8 @@ exports.login = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong', error: error.message });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Something went wrong' });
   }
 };
 

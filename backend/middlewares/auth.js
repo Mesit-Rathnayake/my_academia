@@ -11,7 +11,11 @@ const auth = async (req, res, next) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      algorithm: 'HS256',
+      issuer: 'my-academia',
+      audience: 'my-academia-users'
+    });
     
     // Find user by id from token
     const user = await User.findById(decoded._id);
