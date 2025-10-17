@@ -1,6 +1,6 @@
 const { body, validationResult } = require('express-validator');
 
-// Validation middleware to handle errors
+// 🔒 SECURITY MEASURE: Validation middleware to handle input validation errors
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -12,16 +12,19 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-// Registration validation rules
+// 🔒 SECURITY MEASURE: Registration validation rules (OWASP A03:2021 - Injection Prevention)
 const validateRegistration = [
+  // 🔒 Registration number format validation
   body('registrationNumber')
     .isLength({ min: 5, max: 20 })
     .matches(/^[A-Z]{2}\/[0-9]{4}\/[0-9]{4}$/)
     .withMessage('Registration number must be in format: EG/2020/1234'),
+  // 🔒 Full name sanitization
   body('fullName')
     .isLength({ min: 2, max: 100 })
     .matches(/^[a-zA-Z\s]+$/)
     .withMessage('Full name must contain only letters and spaces'),
+  // 🔒 Strong password requirements
   body('password')
     .isLength({ min: 8 })
     .withMessage('Password must be at least 8 characters long')

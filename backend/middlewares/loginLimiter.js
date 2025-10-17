@@ -1,9 +1,9 @@
 const rateLimit = require('express-rate-limit');
 
-// Limit repeated failed requests to auth endpoints
+// 🔒 SECURITY MEASURE: Rate limiting to prevent brute force attacks (OWASP A07:2021 - Authentication Failures)
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Limit each IP to 10 login requests per windowMs
+  windowMs: 15 * 60 * 1000, // 🔒 15 minutes window
+  max: 10, // 🔒 Limit each IP to 10 login requests per window
   message: {
     message: 'Too many login attempts from this IP, please try again after 15 minutes.'
   },

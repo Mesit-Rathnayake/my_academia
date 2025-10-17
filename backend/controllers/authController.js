@@ -14,14 +14,15 @@ exports.register = async (req, res) => {
     const user = new User({ registrationNumber, fullName, password });
     await user.save();
 
+    // 🔒 SECURITY ENHANCEMENT: JWT token generation with enhanced security claims
     const token = jwt.sign(
       { _id: user._id }, 
       process.env.JWT_SECRET, 
       { 
         expiresIn: '1d',
-        algorithm: 'HS256',
-        issuer: 'my-academia',
-        audience: 'my-academia-users'
+        algorithm: 'HS256',          // 🔒 Explicit algorithm specification
+        issuer: 'my-academia',       // 🔒 Token issuer claim
+        audience: 'my-academia-users' // 🔒 Token audience claim
       }
     );
 
@@ -34,8 +35,9 @@ exports.register = async (req, res) => {
       }
     });
   } catch (error) {
+    // 🔒 SECURITY MEASURE: Secure error handling (OWASP A09:2021 - Information Disclosure Fix)
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(500).json({ message: 'Something went wrong' }); // 🔒 Generic error message
   }
 };
 
@@ -54,14 +56,15 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // 🔒 SECURITY ENHANCEMENT: JWT token generation with enhanced security claims
     const token = jwt.sign(
       { _id: user._id }, 
       process.env.JWT_SECRET, 
       { 
         expiresIn: '1d',
-        algorithm: 'HS256',
-        issuer: 'my-academia',
-        audience: 'my-academia-users'
+        algorithm: 'HS256',          // 🔒 Explicit algorithm specification
+        issuer: 'my-academia',       // 🔒 Token issuer claim
+        audience: 'my-academia-users' // 🔒 Token audience claim
       }
     );
 
@@ -74,8 +77,9 @@ exports.login = async (req, res) => {
       }
     });
   } catch (error) {
+    // 🔒 SECURITY MEASURE: Secure error handling (OWASP A09:2021 - Information Disclosure Fix)
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(500).json({ message: 'Something went wrong' }); // 🔒 Generic error message
   }
 };
 
@@ -90,6 +94,8 @@ exports.getCurrentUser = async (req, res) => {
       createdAt: req.user.createdAt
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    // 🔒 SECURITY MEASURE: Secure error handling - no sensitive information exposed
+    console.error('Get current user error:', error);
+    res.status(500).json({ message: 'Something went wrong' }); // 🔒 Generic error message
   }
 };

@@ -20,7 +20,11 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "selenium-demo": "node tests/selenium/demo-test.js",
+    "selenium-login": "node tests/selenium/login-test.js",
+    "selenium-addmodule": "node tests/selenium/addModule-test.js",
+    "selenium-all": "npm run selenium-login && npm run selenium-addmodule"
   },
   "eslintConfig": {
     "extends": [
@@ -46,8 +50,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@wdio/selenium-standalone-service": "^8.14.0",
     "autoprefixer": "^10.4.21",
+    "chromedriver": "^141.0.3",
+    "jest": "^27.5.1",
     "postcss": "^8.5.6",
+    "selenium-webdriver": "^4.36.0",
     "tailwindcss": "^4.1.11"
   }
 }
