@@ -40,16 +40,22 @@ jobs:
     - name: Run unit tests
       run: |
         cd backend
+        # Ensure test binaries are executable (fixes "jest: Permission denied" on some runners)
+        chmod +x node_modules/.bin/* || true
         npm test -- --coverage # Make sure this script exists in package.json
 
     - name: Run API tests
       run: |
         cd backend
+        # Ensure test binaries are executable
+        chmod +x node_modules/.bin/* || true
         npm run test:api -- --coverage # Make sure this script exists in package.json
 
     - name: Run BDD tests
       run: |
         cd backend
+        # Ensure test binaries are executable
+        chmod +x node_modules/.bin/* || true
         npm run test:bdd # Make sure this script exists in package.json
 
   deploy:
