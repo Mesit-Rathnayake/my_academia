@@ -35,7 +35,7 @@ jobs:
     - name: Install dependencies
       run: |
         cd backend
-        npm ci
+        npm install --no-audit --no-fund
 
     - name: Run unit tests
       run: |
@@ -73,7 +73,7 @@ jobs:
     - name: Install production dependencies
       run: |
         cd backend
-        npm ci --only=production
+        npm install --only=production --no-audit --no-fund
 
     - name: Deploy to server
       run: |
