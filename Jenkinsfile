@@ -4,19 +4,20 @@ pipeline {
     environment {
         // Docker Hub credentials (configure in Jenkins)
         DOCKER_REGISTRY = 'docker.io'
+        DOCKER_USERNAME = 'mesith-30'
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         
         // Application configuration
         APP_NAME = 'my-academia'
-        BACKEND_IMAGE = "${DOCKER_REGISTRY}/${env.DOCKER_USERNAME}/${APP_NAME}-backend"
-        FRONTEND_IMAGE = "${DOCKER_REGISTRY}/${env.DOCKER_USERNAME}/${APP_NAME}-frontend"
+        BACKEND_IMAGE = "${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${APP_NAME}-backend"
+        FRONTEND_IMAGE = "${DOCKER_REGISTRY}/${DOCKER_USERNAME}/${APP_NAME}-frontend"
         
         // Versioning
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         
         // Deployment server (configure as needed)
-        DEPLOY_SERVER = 'your-server-ip-or-hostname'
-        DEPLOY_USER = 'your-deploy-user'
+        DEPLOY_SERVER = '192.168.1.105'
+        DEPLOY_USER = 'mesith'
     }
     
     stages {
