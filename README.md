@@ -4,14 +4,35 @@ A comprehensive student management system demonstrating enterprise-level Quality
 
 ## 🚀 Quick Start
 
-### Backend
+### Option 1: Using Docker (Recommended)
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Start all services (Frontend, Backend, MongoDB)
+docker compose up -d
+
+# View logs
+docker compose logs -f
+```
+
+Access at:
+- **Frontend**: http://localhost:3000
+- **Backend**: http://localhost:5000
+- **MongoDB**: localhost:27017
+
+For detailed Docker setup, see **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)**
+
+### Option 2: Manual Setup
+
+#### Backend
 ```bash
 cd backend
 npm install
 npm start
 ```
 
-### Frontend  
+#### Frontend  
 ```bash
 cd frontend
 npm install
@@ -30,6 +51,36 @@ cd ../frontend
 npm run selenium-login     # Selenium UI tests
 ```
 
+## 🐳 Docker & CI/CD
+
+This project includes complete Docker containerization and Jenkins CI/CD pipeline:
+
+### Docker Files
+- `Dockerfile` (Backend & Frontend) - Multi-stage optimized builds
+- `docker-compose.yml` - Local development orchestration
+- `docker-compose.prod.yml` - Production configuration
+- `Jenkinsfile` - Complete CI/CD pipeline
+
+### Quick Commands
+```bash
+# Using Docker Compose
+docker compose up -d          # Start all services
+docker compose logs -f        # View logs
+docker compose down           # Stop services
+
+# Using Makefile (if available)
+make setup                    # Initial setup
+make start                    # Start services
+make logs                     # View logs
+
+# Using convenience scripts
+./docker-setup.sh            # Linux/Mac
+docker-setup.bat             # Windows
+```
+
+### Documentation
+- **[🚀 Deployment Guide](DEPLOYMENT_GUIDE.md)** - Complete Docker & Jenkins setup
+- **[⚡ Quick Reference](QUICK_REFERENCE.md)** - Common commands cheat sheet
 ## 📚 Complete Documentation
 
 **All comprehensive documentation is located in the [`documentation/`](documentation/) folder:**
@@ -55,11 +106,12 @@ npm run selenium-login     # Selenium UI tests
 
 ## 📊 Architecture
 
-- **Frontend**: React.js with modern UI components
+- **Frontend**: React.js with modern UI components (Nginx in production)
 - **Backend**: Node.js with Express.js
 - **Database**: MongoDB
 - **Testing**: Jest, Selenium, Cucumber, JMeter, SonarQube
-- **CI/CD**: GitHub Actions with automated quality gates
+- **CI/CD**: Jenkins with automated Docker builds and deployments
+- **Containerization**: Docker & Docker Compose for consistent environments
 
 ---
 
