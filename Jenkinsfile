@@ -32,11 +32,11 @@ pipeline {
                 sh '''
                     # Pull latest code
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_SERVER} \
-                    'cd /opt/${APP_NAME} && git pull origin main'
+                    "cd /opt/${APP_NAME} && git pull origin main"
                     
                     # Stop and restart containers
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_SERVER} \
-                    'cd /opt/${APP_NAME} && docker compose down && docker compose up -d'
+                    "cd /opt/${APP_NAME} && docker compose down && docker compose up -d"
                     
                     # Wait for services to start
                     sleep 10
