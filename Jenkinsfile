@@ -20,8 +20,8 @@ pipeline {
             steps {
                 echo '✓ Building Docker images...'
                 sh '''
-                    docker build -t ${DOCKER_USERNAME}/${APP_NAME}-backend:latest ./backend
-                    docker build -t ${DOCKER_USERNAME}/${APP_NAME}-frontend:latest ./frontend
+                    /usr/bin/docker build -t ${DOCKER_USERNAME}/${APP_NAME}-backend:latest ./backend
+                    /usr/bin/docker build -t ${DOCKER_USERNAME}/${APP_NAME}-frontend:latest ./frontend
                 '''
             }
         }
