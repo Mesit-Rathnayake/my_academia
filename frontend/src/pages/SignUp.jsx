@@ -6,6 +6,7 @@ import man2 from '../images/man2.png';
 import '../styles/SignUp.css';
 
 function SignUp() {
+  const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
   const [regNumber, setRegNumber] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +15,7 @@ function SignUp() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,6 +6,7 @@ import man3 from '../images/man3.png';
 import '../styles/LogIn.css';
 
 function LogIn() {
+  const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
   const [regNumber, setRegNumber] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate(); // ✅ create navigate function
@@ -14,7 +15,7 @@ function LogIn() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
