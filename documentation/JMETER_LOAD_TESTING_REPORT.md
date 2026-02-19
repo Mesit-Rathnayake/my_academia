@@ -9,7 +9,7 @@ Collected metrics: response time, throughput, errors
 - **POST /api/auth/login** – login user authentication
 
 ## Test Configuration
-- **Base URL**: http://localhost:5000
+- **Base URL**: http://localhost:5001
 - **Test User**: EG/2020/9999
 - **Password**: Password123
 - **Method**: POST requests with JSON payload

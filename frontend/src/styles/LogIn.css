@@ -16,8 +16,9 @@
     flex: 1;
     align-items: center;
     justify-content: space-between;
-    padding: 0 5%;
-    height: calc(100vh - 60px); /* Assuming footer is 60px tall */
+    padding: 20px 5%;
+    min-height: calc(100vh - 80px);
+    gap: 24px;
 }
 
 .login-image-container {
@@ -28,7 +29,7 @@
 }
 
 .login-image {
-    height: 85vh;               /* Increased size */
+    height: 85vh;
     max-height: 800px;
     object-fit: contain;
 }
@@ -38,9 +39,9 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;    /* Vertical centering */
-    align-items: center;        /* Horizontal centering */
-    padding: 1% 0;              /* Reduced padding to save space */
+    justify-content: center;
+    align-items: center;
+    padding: 1% 0;
 }
 
 .title {
@@ -121,4 +122,57 @@
 
 Footer {
     z-index: 3;
+}
+
+@media (max-width: 992px) {
+    .login-wrapper {
+        padding: 20px 4%;
+    }
+
+    .login-form-container {
+        max-width: 55%;
+    }
+
+    .login-image {
+        height: 70vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .login-wrapper {
+        flex-direction: column-reverse;
+        justify-content: center;
+        min-height: auto;
+        height: auto;
+        padding: 20px;
+    }
+
+    .login-form-container,
+    .login-image-container {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .login-image {
+        height: min(40vh, 300px);
+    }
+
+    .title {
+        font-size: 34px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 28px;
+    }
+
+    .loginform {
+        max-width: 100%;
+    }
+
+    .log button {
+        width: 100%;
+        max-width: 220px;
+    }
 }

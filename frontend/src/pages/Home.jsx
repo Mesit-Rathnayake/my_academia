@@ -10,6 +10,7 @@ function Home() {
   const [editModule, setEditModule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const apiBaseUrl = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     fetchModules();
@@ -19,7 +20,7 @@ function Home() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/modules', {
+      const response = await fetch(`${apiBaseUrl}/api/modules`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -58,8 +59,8 @@ function Home() {
       const token = localStorage.getItem('token');
       
       const url = editModule 
-        ? `http://localhost:5000/api/modules/${editModule._id}`
-        : 'http://localhost:5000/api/modules';
+        ? `${apiBaseUrl}/api/modules/${editModule._id}`
+        : `${apiBaseUrl}/api/modules`;
       
       const method = editModule ? 'PUT' : 'POST';
 
@@ -94,7 +95,7 @@ function Home() {
       }
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/modules/${moduleId}`, {
+      const response = await fetch(`${apiBaseUrl}/api/modules/${moduleId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -148,7 +149,7 @@ function Home() {
           prop === 'completed' ? !!value : value;
       }
 
-      const response = await fetch(`http://localhost:5000/api/modules/${moduleId}`, {
+      const response = await fetch(`${apiBaseUrl}/api/modules/${moduleId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

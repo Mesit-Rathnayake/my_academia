@@ -80,7 +80,7 @@ echo [OK] Services started successfully!
 echo.
 echo Access the application at:
 echo   Frontend: http://localhost:3000
-echo   Backend:  http://localhost:5000
+echo   Backend:  http://localhost:5001
 echo   MongoDB:  localhost:27017
 echo.
 echo To view logs, run: docker compose logs -f

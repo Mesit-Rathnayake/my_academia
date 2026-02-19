@@ -105,7 +105,7 @@ db-restore: ## Restore MongoDB database from backup
 # Maintenance Commands
 health: ## Check health of all services
 	@echo "Checking service health..."
-	@curl -f http://localhost:5000/api/health && echo "✓ Backend is healthy" || echo "✗ Backend is unhealthy"
+	@curl -f http://localhost:5001/api/health && echo "✓ Backend is healthy" || echo "✗ Backend is unhealthy"
 	@curl -f http://localhost:3000/health && echo "✓ Frontend is healthy" || echo "✗ Frontend is unhealthy"
 
 prune: ## Remove unused Docker resources
@@ -134,7 +134,7 @@ setup: ## Initial setup - copy .env and install dependencies
 docker-setup: setup build start ## Complete Docker setup
 	@echo "✓ Docker setup complete!"
 	@echo "Frontend: http://localhost:3000"
-	@echo "Backend:  http://localhost:5000"
+	@echo "Backend:  http://localhost:5001"
 
 # CI/CD Commands
 ci-test: ## Run CI tests

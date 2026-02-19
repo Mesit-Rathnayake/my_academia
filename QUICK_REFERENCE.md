@@ -60,7 +60,7 @@ make clean               # Remove everything
 | Service  | URL                        |
 |----------|----------------------------|
 | Frontend | http://localhost:3000      |
-| Backend  | http://localhost:5000      |
+| Backend  | http://localhost:5001      |
 | MongoDB  | mongodb://localhost:27017  |
 | Jenkins  | http://localhost:8080      |
 
@@ -161,8 +161,8 @@ docker inspect --format='{{.State.Health.Status}}' my-academia-backend
 ### Port Conflicts
 ```bash
 # Check what's using a port
-netstat -tulpn | grep :5000     # Linux
-netstat -ano | findstr :5000    # Windows
+netstat -tulpn | grep :5001     # Linux
+netstat -ano | findstr :5001    # Windows
 
 # Kill process on port
 kill -9 <PID>                   # Linux
@@ -254,7 +254,7 @@ docker system df -v
 ### Health Checks
 ```bash
 # Backend health
-curl http://localhost:5000/api/health
+curl http://localhost:5001/api/health
 
 # Frontend health
 curl http://localhost:3000/health
@@ -268,13 +268,13 @@ docker compose ps
 ### Required in .env
 ```env
 JWT_SECRET=your_secret_key_here
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5001
 ```
 
 ### Optional
 ```env
 NODE_ENV=production
-PORT=5000
+PORT=5001
 MONGODB_URI=mongodb://mongodb:27017/my-academia
 ```
 

@@ -2,9 +2,10 @@
   background-color: white;
   padding: 18px 22px;
   border-radius: 12px;
-  width: 320px;
+  width: 100%;
+  max-width: 360px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-  margin: 8px;
+  margin: 0;
   cursor: default;
   display: flex;
   flex-direction: column;
@@ -191,6 +192,7 @@
 @media (max-width: 360px) {
   .module-card {
     width: 100%;
+    max-width: 100%;
     padding: 16px;
   }
   

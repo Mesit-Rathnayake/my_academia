@@ -18,7 +18,7 @@ docker compose logs -f
 
 Access at:
 - **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:5000
+- **Backend**: http://localhost:5001
 - **MongoDB**: localhost:27017
 
 For detailed Docker setup, see **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)**

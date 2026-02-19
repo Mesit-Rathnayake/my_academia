@@ -6,6 +6,10 @@
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
 }
 
 .nav-item {
@@ -36,4 +40,28 @@
   color: white;
   font-size: 12px;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-height: 64px;
+    height: 64px;
+    padding: 6px 10px;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .nav-item {
+    width: auto;
+    padding: 8px 10px;
+  }
+
+  .icon {
+    margin-bottom: 2px;
+  }
+
+  .label {
+    font-size: 11px;
+  }
 }

@@ -6,7 +6,7 @@ import man2 from '../images/man2.png';
 import '../styles/SignUp.css';
 
 function SignUp() {
-  const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+  const apiBaseUrl = process.env.REACT_APP_API_URL || '';
   const [regNumber, setRegNumber] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');

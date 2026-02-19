@@ -59,7 +59,7 @@ nano .env
 Required environment variables:
 ```env
 JWT_SECRET=your_super_secure_jwt_secret_key_here
-REACT_APP_API_URL=http://localhost:5000
+REACT_APP_API_URL=http://localhost:5001
 ```
 
 ### Step 2: Build and Run
@@ -76,7 +76,7 @@ docker compose ps
 
 ### Step 3: Access the Application
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
+- **Backend API**: http://localhost:5001
 - **MongoDB**: localhost:27017
 
 ### Step 4: Stop the Application
@@ -98,7 +98,7 @@ cd backend
 docker build -t my-academia-backend:latest .
 docker run -d \
   --name backend \
-  -p 5000:5000 \
+   -p 5001:5001 \
   -e MONGODB_URI=mongodb://host.docker.internal:27017/my-academia \
   -e JWT_SECRET=your_secret_key \
   my-academia-backend:latest
@@ -388,7 +388,7 @@ docker build --no-cache -t my-academia-backend:latest ./backend
 docker compose logs
 
 # Check if ports are in use
-netstat -tulpn | grep :5000
+netstat -tulpn | grep :5001
 netstat -tulpn | grep :3000
 
 # Remove old containers
@@ -414,7 +414,7 @@ echo $MONGODB_URI
 
 **Solution**:
 1. Check `REACT_APP_API_URL` in `.env`
-2. Verify backend is running: `curl http://localhost:5000/api/health`
+2. Verify backend is running: `curl http://localhost:5001/api/health`
 3. Check CORS settings in backend
 4. Rebuild frontend with correct API URL
 
@@ -525,7 +525,7 @@ For issues or questions:
 
 - Default ports:
   - Frontend: 3000 (mapped to 80 in container)
-  - Backend: 5000
+   - Backend: 5001
   - MongoDB: 27017
   - Jenkins: 8080
 

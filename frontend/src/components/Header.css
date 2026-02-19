@@ -48,3 +48,27 @@
 .auth-button.secondary:hover {
   background-color: #f8f9fa;
 }
+
+@media (max-width: 768px) {
+  .header {
+    height: auto;
+    min-height: 72px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .auth-buttons {
+    gap: 8px;
+  }
+
+  .auth-button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}

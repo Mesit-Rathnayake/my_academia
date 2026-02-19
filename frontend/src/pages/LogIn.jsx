@@ -6,7 +6,7 @@ import man3 from '../images/man3.png';
 import '../styles/LogIn.css';
 
 function LogIn() {
-  const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+  const apiBaseUrl = process.env.REACT_APP_API_URL || '';
   const [regNumber, setRegNumber] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate(); // ✅ create navigate function

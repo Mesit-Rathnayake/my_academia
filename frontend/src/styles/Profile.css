@@ -32,7 +32,7 @@
 
 .profile-header h1 {
     color: #0067ff;
-    font-size: 42px;
+    font-size: clamp(28px, 3.2vw, 42px);
     font-weight: 700;
     margin-bottom: 16px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -165,27 +165,12 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-/* Sidebar compatibility fixes */
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: 80px;
-    background: #1e1e2f;
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 1000;
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
     .profile-content {
         margin-left: 0;
         padding: 20px;
-        padding-left: 90px;
+        padding-top: 92px;
     }
     
     .profile-card {
@@ -214,7 +199,7 @@
 @media (max-width: 480px) {
     .profile-content {
         padding: 15px;
-        padding-left: 80px;
+        padding-top: 82px;
     }
     
     .profile-card {

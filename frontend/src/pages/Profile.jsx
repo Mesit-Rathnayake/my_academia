@@ -8,6 +8,7 @@ function Profile() {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const apiBaseUrl = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     fetchUserData();
@@ -17,7 +18,7 @@ function Profile() {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/auth/me', {
+      const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -35,7 +36,7 @@ function Profile() {
   const fetchUserModules = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/modules', {
+      const response = await fetch(`${apiBaseUrl}/api/modules`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
