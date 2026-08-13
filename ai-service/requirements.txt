@@ -1,0 +1,6 @@
+fastapi[standard]
+pymupdf
+python-multipart
+chromadb
+sentence-transformers
+google-genai

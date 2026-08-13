@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/sidebar';
-import '../styles/Home.css';
 import ModuleCard from '../components/ModuleCard';
 import ModuleFormModal from '../components/ModuleFormModal';
+import { FaPlus, FaBookReader } from 'react-icons/fa';
 
 function Home() {
   const [modules, setModules] = useState([]);
@@ -127,9 +127,7 @@ function Home() {
 
       const updatedModule = { ...moduleToUpdate };
 
-      if (field === 'attendedHours' || field === 'lectureHours') {
-        updatedModule[field] = value;
-      } else if (field.startsWith('assignment:')) {
+      if (field.startsWith('assignment:')) {
         const [_, index, prop] = field.split(':');
         const assignmentIndex = parseInt(index);
         
@@ -137,7 +135,7 @@ function Home() {
         if (!updatedModule.assignments[assignmentIndex]) updatedModule.assignments[assignmentIndex] = {};
         
         updatedModule.assignments[assignmentIndex][prop] = 
-          prop === 'marks' ? (value === '' ? null : Number(value)) : value;
+          prop === 'marks' || prop === 'totalMarks' ? (value === '' ? null : Number(value)) : value;
       } else if (field.startsWith('lab:')) {
         const [_, index, prop] = field.split(':');
         const labIndex = parseInt(index);
@@ -145,8 +143,7 @@ function Home() {
         if (!updatedModule.labs) updatedModule.labs = [];
         if (!updatedModule.labs[labIndex]) updatedModule.labs[labIndex] = {};
         
-        updatedModule.labs[labIndex][prop] = 
-          prop === 'completed' ? !!value : value;
+        updatedModule.labs[labIndex][prop] = value;
       }
 
       const response = await fetch(`${apiBaseUrl}/api/modules/${moduleId}`, {
@@ -170,49 +167,72 @@ function Home() {
 
   if (loading) {
     return (
-      <div className="home">
+      <div className="flex h-screen overflow-hidden text-slate-100">
         <Sidebar />
-        <div className="home-content">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-          </div>
-        </div>
+        <main className="flex-1 p-8 ml-64 overflow-y-auto custom-scrollbar flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="home">
+    <div className="flex h-screen overflow-hidden text-slate-100">
       <Sidebar />
-      <div className="home-content">
-        <div className="home-header">
-          <h2>Welcome Back</h2>
-          <button className="add-module-btn" onClick={openAddModal}>+ Add Module</button>
-        </div>
+      
+      <main className="flex-1 p-8 lg:p-12 ml-64 overflow-y-auto custom-scrollbar relative">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
 
-        {error && (
-          <div className="error-message">
-            <p>{error}</p>
-            <button onClick={() => setError(null)}>Dismiss</button>
-          </div>
-        )}
+        <div className="max-w-7xl mx-auto space-y-10">
+          
+          <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-800/30 p-6 rounded-3xl border border-slate-700/50 shadow-lg">
+            <div>
+              <h2 className="text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400 drop-shadow-md">
+                Dashboard
+              </h2>
+              <p className="text-slate-400 mt-2 font-medium">Manage your academic progress and modules.</p>
+            </div>
+            <button onClick={openAddModal} className="glass-button px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 border border-slate-600/50 flex items-center gap-2">
+              <FaPlus /> Add Module
+            </button>
+          </header>
 
-        <div className="modules-grid">
+          {error && (
+            <div className="bg-red-900/30 border-2 border-red-500/50 text-red-200 px-6 py-4 rounded-xl flex justify-between items-center shadow-lg shadow-red-500/10">
+              <p className="font-semibold">{error}</p>
+              <button onClick={() => setError(null)} className="text-red-300 hover:text-white font-bold bg-red-500/20 px-3 py-1 rounded-lg">Dismiss</button>
+            </div>
+          )}
+
           {modules.length === 0 ? (
-            <div className="empty-note">No modules yet. Click <strong>Add Module</strong> to create one.</div>
+            <div className="glass-panel p-16 rounded-3xl flex flex-col items-center justify-center text-center mt-12 border-dashed border-2 border-slate-600/50 shadow-2xl">
+              <div className="bg-slate-800 p-6 rounded-full text-primary mb-6 shadow-[0_0_30px_rgba(14,165,233,0.3)] border border-slate-700">
+                <FaBookReader size={48} />
+              </div>
+              <h3 className="text-2xl font-bold mb-2">No Modules Found</h3>
+              <p className="text-slate-400 max-w-md mx-auto mb-8 font-medium">
+                Get started by adding your first module to track attendance, assignments, and upload lecture notes.
+              </p>
+              <button onClick={openAddModal} className="glass-button px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 border border-slate-600/50 flex items-center gap-2">
+                <FaPlus /> Create Module
+              </button>
+            </div>
           ) : (
-            modules.map((module) => (
-              <ModuleCard
-                key={module._id}
-                module={module}
-                onOpenEdit={() => openEditModal(module)}
-                onInlineUpdate={(field, value) => handleInlineUpdate(module._id, field, value)}
-                onDelete={(moduleId) => handleDeleteModule(moduleId)}
-              />
-            ))
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {modules.map((module) => (
+                <ModuleCard
+                  key={module._id}
+                  module={module}
+                  onOpenEdit={() => openEditModal(module)}
+                  onInlineUpdate={(field, value) => handleInlineUpdate(module._id, field, value)}
+                  onDelete={(moduleId) => handleDeleteModule(moduleId)}
+                />
+              ))}
+            </div>
           )}
         </div>
-      </div>
+      </main>
 
       {isModalOpen && (
         <ModuleFormModal

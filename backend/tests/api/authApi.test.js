@@ -1,24 +1,14 @@
 const request = require('supertest');
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../../server');
-const User = require('../../models/User');
-
-let mongoServer;
-
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri);
-}, 30000);
-
-afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
-});
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 beforeEach(async () => {
-  await User.deleteMany({});
+  // Clear the database before each test
+  try {
+    await prisma.user.deleteMany({});
+  } catch(e) {
+    console.log("Ensure PostgreSQL is running for tests to pass");
+  }
 });
 
 describe('Auth API Tests', () => {

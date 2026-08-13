@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 // 🔒 SECURITY MEASURE: JWT Authentication middleware (OWASP A02:2021 - Cryptographic Failures Fix)
 const auth = async (req, res, next) => {
@@ -19,7 +20,7 @@ const auth = async (req, res, next) => {
     });
     
     // 🔒 Verify user still exists in database
-    const user = await User.findById(decoded._id);
+    const user = await prisma.user.findUnique({ where: { id: decoded._id } });
     if (!user) {
       return res.status(401).json({ message: 'Token is not valid' });
     }

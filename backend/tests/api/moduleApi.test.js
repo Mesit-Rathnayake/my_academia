@@ -1,48 +1,50 @@
 const request = require('supertest');
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../../server');
-const User = require('../../models/User');
-const Module = require('../../models/Module');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
 
-let mongoServer;
 let authToken;
 let testUser;
 
 beforeAll(async () => {
-  // Setup in-memory MongoDB
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri);
-  
-  // Create test user
-  testUser = new User({
-    registrationNumber: 'EG/2020/1234',
-    fullName: 'API Test User',
-    password: 'password123'
-  });
-  await testUser.save();
-  
-  // Generate token
-  authToken = jwt.sign(
-    { _id: testUser._id }, 
-    process.env.JWT_SECRET, 
-    { 
-      algorithm: 'HS256',
-      issuer: 'my-academia',
-      audience: 'my-academia-users'
-    }
-  );
+  try {
+    // Clean up if exists
+    await prisma.user.deleteMany({ where: { registrationNumber: 'EG/2020/1234' } });
+    
+    // Create test user
+    testUser = await prisma.user.create({
+      data: {
+        registrationNumber: 'EG/2020/1234',
+        fullName: 'API Test User',
+        password: 'password123'
+      }
+    });
+    
+    // Generate token
+    authToken = jwt.sign(
+      { _id: testUser.id }, 
+      process.env.JWT_SECRET, 
+      { 
+        algorithm: 'HS256',
+        issuer: 'my-academia',
+        audience: 'my-academia-users'
+      }
+    );
+  } catch (e) {
+    console.log("Ensure PostgreSQL is running for tests to pass");
+  }
 }, 30000);
 
 afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
+  try {
+    await prisma.$disconnect();
+  } catch(e) {}
 });
 
 beforeEach(async () => {
-  await Module.deleteMany({});
+  try {
+    await prisma.module.deleteMany({});
+  } catch(e) {}
 });
 
 describe('Module API Tests', () => {
@@ -64,12 +66,14 @@ describe('Module API Tests', () => {
 
   it('should retrieve all modules via API', async () => {
     // First create a module
-    await Module.create({
-      moduleName: 'Web Development',
-      moduleCode: 'CS2050',
-      lectureHours: 30,
-      attendedHours: 0,
-      user: testUser._id
+    await prisma.module.create({
+      data: {
+        moduleName: 'Web Development',
+        moduleCode: 'CS2050',
+        lectureHours: 30,
+        attendedHours: 0,
+        userId: testUser.id
+      }
     });
 
     const response = await request(app)

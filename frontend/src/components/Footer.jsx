@@ -1,10 +1,9 @@
 import React from 'react';
-import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="footer">
-      <p>Powered by MeSUS Studios</p>
+    <footer className="w-full py-8 text-center text-slate-400 text-sm font-medium border-t border-slate-100 bg-white">
+      <p>Powered by <span className="text-primary font-bold">MeSUS Studios</span></p>
     </footer>
   );
 };

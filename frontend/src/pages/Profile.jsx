@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/sidebar';
-import '../styles/Profile.css';
+import { FaUserCircle, FaBookOpen, FaClipboardCheck, FaFlask, FaCalendarAlt, FaIdBadge } from 'react-icons/fa';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -59,64 +59,125 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="profile">
+      <div className="flex h-screen overflow-hidden text-slate-100">
         <Sidebar />
-        <div className="profile-content">
-          <div className="loading">Loading your profile...</div>
-        </div>
+        <main className="flex-1 p-8 ml-64 overflow-y-auto custom-scrollbar flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="profile">
+    <div className="flex h-screen overflow-hidden text-slate-100">
       <Sidebar />
-      <div className="profile-content">
-        <div className="profile-header">
-          <h1>Profile Details</h1>
-        </div>
+      <main className="flex-1 p-8 lg:p-12 ml-64 overflow-y-auto custom-scrollbar">
+        <div className="max-w-6xl mx-auto space-y-12">
+          
+          <header>
+            <h2 className="text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400">
+              Profile Details
+            </h2>
+            <p className="text-slate-400 mt-2">Manage your personal information and overview.</p>
+          </header>
 
-        <div className="profile-card fade-in">
-          <div className="user-info">
-            <h2>User Information</h2>
-            {user ? (
-              <div className="user-details">
-                <p><strong>Name:</strong> {user.fullName}</p>
-                <p><strong>Registration Number:</strong> {user.registrationNumber}</p>
-                <p><strong>Total Modules:</strong> {modules.length}</p>
-                <p><strong>Account Created:</strong> {new Date(user.createdAt).toLocaleDateString()}</p>
-              </div>
-            ) : (
-              <p className="no-modules">No user information available</p>
-            )}
-          </div>
-
-          <div className="modules-section">
-            <h2>My Modules ({modules.length})</h2>
-            {modules.length === 0 ? (
-              <p className="no-modules">No modules created yet. Start by adding your first module!</p>
-            ) : (
-              <div className="modules-list">
-                {modules.map((module) => (
-                  <div 
-                    key={module._id} 
-                    className="module-item fade-in"
-                    onClick={() => handleModuleClick(module._id)}
-                  >
-                    <h3>{module.moduleName}</h3>
-                    <p className="module-code">{module.moduleCode}</p>
-                    <div className="module-stats">
-                      <span>Attendance: {module.attendedHours}/{module.lectureHours}</span>
-                      <span>Assignments: {module.assignments?.length || 0}</span>
-                      <span>Labs: {module.labs?.length || 0}</span>
+          <div className="glass-panel p-8 md:p-12 rounded-3xl border border-slate-700/50 shadow-2xl relative overflow-hidden">
+            {/* Background Decorations */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/10 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>
+            
+            {/* User Info Section */}
+            <section className="mb-16">
+              <h3 className="text-xl font-bold text-slate-300 mb-6 flex items-center gap-3 border-b border-slate-700/50 pb-4">
+                <FaUserCircle className="text-primary text-2xl" /> User Information
+              </h3>
+              
+              {user ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4">
+                    <div className="p-3 bg-primary/20 rounded-xl text-primary"><FaUserCircle size={24} /></div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Full Name</p>
+                      <p className="text-lg font-semibold text-white">{user.fullName}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4">
+                    <div className="p-3 bg-secondary/20 rounded-xl text-secondary"><FaIdBadge size={24} /></div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Registration Number</p>
+                      <p className="text-lg font-semibold text-white">{user.registrationNumber}</p>
+                    </div>
+                  </div>
+                  <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4">
+                    <div className="p-3 bg-blue-500/20 rounded-xl text-blue-400"><FaBookOpen size={24} /></div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Total Modules</p>
+                      <p className="text-lg font-semibold text-white">{modules.length}</p>
+                    </div>
+                  </div>
+                  <div className="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 flex items-center gap-4">
+                    <div className="p-3 bg-accent/20 rounded-xl text-accent"><FaCalendarAlt size={24} /></div>
+                    <div>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Account Created</p>
+                      <p className="text-lg font-semibold text-white">{new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-slate-400 italic">No user information available.</p>
+              )}
+            </section>
+
+            {/* Modules Section */}
+            <section>
+              <h3 className="text-xl font-bold text-slate-300 mb-6 flex items-center gap-3 border-b border-slate-700/50 pb-4">
+                <FaBookOpen className="text-primary text-2xl" /> My Modules <span className="bg-slate-700 text-sm px-3 py-0.5 rounded-full text-slate-300">{modules.length}</span>
+              </h3>
+
+              {modules.length === 0 ? (
+                <div className="text-center py-12 bg-slate-800/30 rounded-2xl border border-dashed border-slate-700">
+                  <p className="text-slate-400">No modules created yet. Start by adding your first module on the Home page!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {modules.map((module) => (
+                    <div 
+                      key={module._id} 
+                      className="bg-slate-800/40 border border-slate-700/50 p-6 rounded-2xl hover:bg-slate-700/50 hover:border-slate-600 transition-all cursor-pointer group shadow-lg"
+                      onClick={() => handleModuleClick(module._id)}
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h4 className="text-xl font-bold text-white group-hover:text-primary transition-colors">{module.moduleName}</h4>
+                          <span className="inline-block mt-2 text-xs font-bold px-2 py-1 bg-slate-700 text-slate-300 rounded uppercase tracking-wider">
+                            {module.moduleCode}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-slate-700/50">
+                        <div className="flex flex-col gap-1 text-center">
+                          <span className="text-xs text-slate-400 font-bold uppercase"><FaClipboardCheck className="inline mr-1" /> Att</span>
+                          <span className="text-sm font-semibold text-slate-200">
+                            {module.attendedLectures || 0}/{module.conductedLectures || module.lectureHours || 0}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-1 text-center border-l border-r border-slate-700/50">
+                          <span className="text-xs text-slate-400 font-bold uppercase"><FaBookOpen className="inline mr-1" /> Asgn</span>
+                          <span className="text-sm font-semibold text-slate-200">{module.assignments?.length || 0}</span>
+                        </div>
+                        <div className="flex flex-col gap-1 text-center">
+                          <span className="text-xs text-slate-400 font-bold uppercase"><FaFlask className="inline mr-1" /> Labs</span>
+                          <span className="text-sm font-semibold text-slate-200">{module.labs?.length || 0}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

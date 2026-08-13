@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  registrationNumber String   @unique
+  fullName           String
+  password           String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  modules            Module[]
+}
+
+model Module {
+  id                String       @id @default(cuid())
+  moduleName        String       @db.VarChar(100)
+  moduleCode        String       @db.VarChar(20)
+  totalLectures     Int          @default(0)
+  conductedLectures Int          @default(0)
+  attendedLectures  Int          @default(0)
+  userId            String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  labs              Lab[]
+  assignments       Assignment[]
+  documents         Document[]
+  chatMessages      ChatMessage[]
+
+  @@unique([moduleCode, userId])
+}
+
+model Lab {
+  id         String    @id @default(cuid())
+  name       String
+  dueDate    DateTime?
+  status     String    @default("Pending") // Pending, Submitted, Graded
+  marks      Float?
+  totalMarks Float?
+  moduleId   String
+  module     Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Assignment {
+  id         String    @id @default(cuid())
+  name       String
+  dueDate    DateTime?
+  status     String    @default("Pending") // Pending, Submitted, Graded
+  marks      Float?
+  totalMarks Float?
+  moduleId   String
+  module     Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  name      String
+  filepath  String
+  moduleId  String
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  role      String   // "user" or "assistant"
+  content   String
+  sources   Json?    // Optional JSON array for the citations/sources
+  moduleId  String
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
