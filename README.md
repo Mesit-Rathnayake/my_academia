@@ -1,118 +1,63 @@
-# My Academia - QA Testing Project
+# My Academia - AI-Powered Student Management System
 
-A comprehensive student management system demonstrating enterprise-level Quality Assurance practices.
+A comprehensive student management system with a built-in AI Tutor to help you chat with your lecture notes.
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Local Setup)
 
-### Option 1: Using Docker (Recommended)
-```bash
-# Copy environment file
-cp .env.example .env
+### Prerequisites
+- Node.js (v18+)
+- PostgreSQL
+- Python 3.10+ (for AI Service)
 
-# Start all services (Frontend, Backend, MongoDB)
-docker compose up -d
-
-# View logs
-docker compose logs -f
-```
-
-Access at:
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:5001
-- **MongoDB**: localhost:27017
-
-For detailed Docker setup, see **[DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)**
-
-### Option 2: Manual Setup
-
-#### Backend
+### 1. Backend Setup
 ```bash
 cd backend
 npm install
+```
+- Configure the `.env` file with your PostgreSQL connection string (`DATABASE_URL`).
+- Apply the Prisma schema to your database:
+```bash
+npx prisma db push
+```
+- Start the backend server:
+```bash
 npm start
 ```
+*The backend runs on http://localhost:5001 by default.*
 
-#### Frontend  
+### 2. AI Service Setup
+```bash
+cd ai-service
+python -m venv .venv
+```
+- Activate the virtual environment (e.g. `.\.venv\Scripts\activate` on Windows).
+```bash
+pip install -r requirements.txt
+```
+- Configure `.env` with your `GEMINI_API_KEY`.
+- Start the service:
+```bash
+python -m uvicorn app.main:app --port 8000 --reload
+```
+*The AI service runs on http://localhost:8000.*
+
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm start
 ```
+*The frontend runs on http://localhost:3000.*
 
-## 🧪 Run Tests
+## 🎯 Features
 
-```bash
-cd backend
-npm test                    # TDD unit tests
-npm run test:bdd           # BDD cucumber tests  
-npm run test:api           # API integration tests
-
-cd ../frontend
-npm run selenium-login     # Selenium UI tests
-```
-
-## 🐳 Docker & CI/CD
-
-This project includes complete Docker containerization and Jenkins CI/CD pipeline:
-
-### Docker Files
-- `Dockerfile` (Backend & Frontend) - Multi-stage optimized builds
-- `docker-compose.yml` - Local development orchestration
-- `docker-compose.prod.yml` - Production configuration
-- `Jenkinsfile` - Complete CI/CD pipeline
-
-### Quick Commands
-```bash
-# Using Docker Compose
-docker compose up -d          # Start all services
-docker compose logs -f        # View logs
-docker compose down           # Stop services
-
-# Using Makefile (if available)
-make setup                    # Initial setup
-make start                    # Start services
-make logs                     # View logs
-
-# Using convenience scripts
-./docker-setup.sh            # Linux/Mac
-docker-setup.bat             # Windows
-```
-
-### Documentation
-- **[🚀 Deployment Guide](DEPLOYMENT_GUIDE.md)** - Complete Docker & Jenkins setup
-- **[⚡ Quick Reference](QUICK_REFERENCE.md)** - Common commands cheat sheet
-## 📚 Complete Documentation
-
-**All comprehensive documentation is located in the [`documentation/`](documentation/) folder:**
-
-- **[📋 Documentation Index](documentation/INDEX.md)** - Complete overview of all documents
-- **[🎤 Presentation Script](documentation/PRESENTATION_SCRIPT.md)** - Ready-to-use presentation with demo commands
-- **[🔧 CI/CD Pipeline Guide](documentation/CICD_PIPELINE_BRIEFING.md)** - Line-by-line pipeline explanation
-
-## 🎯 Key Achievements
-
-✅ **9 Testing Types**: TDD, BDD, Selenium, API, CI/CD, JMeter, Security, Quality Metrics, SonarQube  
-✅ **0.0 Defects per 1000 LOC** (industry benchmark: <10)  
-✅ **100% Test Coverage** on critical business logic  
-✅ **0 Critical Security Vulnerabilities**  
-✅ **~200ms Response Time** under load  
-
-## 🛡️ Security
-
-- OWASP Top 10 compliant
-- JWT-based authentication with rate limiting
-- Input validation and sanitization
-- Comprehensive security testing documented
+- **AI Tutor**: Upload your lecture PDFs, create multi-session chats, and interact with your notes using Retrieval-Augmented Generation (RAG).
+- **Module Management**: Organize your coursework, assignments, and labs.
+- **Progress Tracking**: Keep track of attendance and assignment grades.
 
 ## 📊 Architecture
 
-- **Frontend**: React.js with modern UI components (Nginx in production)
-- **Backend**: Node.js with Express.js
-- **Database**: MongoDB
-- **Testing**: Jest, Selenium, Cucumber, JMeter, SonarQube
-- **CI/CD**: Jenkins with automated Docker builds and deployments
-- **Containerization**: Docker & Docker Compose for consistent environments
-
----
-
-**For detailed documentation, demos, and presentation materials, see the [`documentation/`](documentation/) folder.**
+- **Frontend**: React.js with Tailwind CSS
+- **Backend**: Node.js, Express.js, Prisma ORM
+- **Database**: PostgreSQL
+- **AI Service**: FastAPI, LangChain, ChromaDB, Google Gemini API
