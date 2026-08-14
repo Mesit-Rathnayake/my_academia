@@ -31,7 +31,7 @@ model Module {
   labs              Lab[]
   assignments       Assignment[]
   documents         Document[]
-  chatMessages      ChatMessage[]
+  chatSessions      ChatSession[]
 
   @@unique([moduleCode, userId])
 }
@@ -71,12 +71,23 @@ model Document {
   createdAt DateTime @default(now())
 }
 
+model ChatSession {
+  id          String   @id @default(cuid())
+  title       String   @default("New Chat")
+  documentIds Json?    // JSON array of selected document IDs
+  moduleId    String
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  messages    ChatMessage[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model ChatMessage {
   id        String   @id @default(cuid())
   role      String   // "user" or "assistant"
   content   String
   sources   Json?    // Optional JSON array for the citations/sources
-  moduleId  String
-  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }

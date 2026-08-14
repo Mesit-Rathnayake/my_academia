@@ -45,9 +45,8 @@ class ChatRequest(BaseModel):
         max_length=2000,
     )
 
-    document_id: str | None = Field(
+    document_ids: list[str] | None = Field(
         default=None,
-        max_length=200,
     )
 
     top_k: int = Field(
@@ -69,7 +68,6 @@ class ChatRequest(BaseModel):
         "user_id",
         "module_id",
         "question",
-        "document_id",
         mode="before",
     )
     @classmethod
@@ -124,7 +122,7 @@ def chat_with_documents(
             user_id=request.user_id,
             module_id=request.module_id,
             question=request.question,
-            document_id=request.document_id,
+            document_ids=request.document_ids,
             top_k=request.top_k,
             conversation_history=history or None,
         )

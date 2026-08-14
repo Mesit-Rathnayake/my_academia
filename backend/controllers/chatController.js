@@ -1,8 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Get chat history for a module
-exports.getChatHistory = async (req, res) => {
+// Get all chat sessions for a module
+exports.getSessions = async (req, res) => {
   try {
     const { moduleId } = req.params;
 
@@ -15,8 +15,95 @@ exports.getChatHistory = async (req, res) => {
       return res.status(404).json({ message: 'Module not found' });
     }
 
-    const messages = await prisma.chatMessage.findMany({
+    const sessions = await prisma.chatSession.findMany({
       where: { moduleId },
+      orderBy: { updatedAt: 'desc' }
+    });
+
+    res.json(sessions);
+  } catch (error) {
+    console.error('Get sessions error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Create a new chat session
+exports.createSession = async (req, res) => {
+  try {
+    const { moduleId } = req.params;
+    const { title, documentIds } = req.body;
+
+    // Verify module belongs to user
+    const module = await prisma.module.findFirst({
+      where: { id: moduleId, userId: req.user.id }
+    });
+
+    if (!module) {
+      return res.status(404).json({ message: 'Module not found' });
+    }
+
+    const session = await prisma.chatSession.create({
+      data: {
+        title: title || 'New Chat',
+        documentIds: documentIds || null,
+        moduleId
+      }
+    });
+
+    res.status(201).json(session);
+  } catch (error) {
+    console.error('Create session error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Delete a session
+exports.deleteSession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    // Verify session belongs to user's module
+    const session = await prisma.chatSession.findFirst({
+      where: { 
+        id: sessionId,
+        module: { userId: req.user.id } 
+      }
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+
+    await prisma.chatSession.delete({
+      where: { id: sessionId }
+    });
+
+    res.json({ message: 'Session deleted successfully' });
+  } catch (error) {
+    console.error('Delete session error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+}
+
+// Get chat history for a session
+exports.getChatHistory = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+
+    // Verify session belongs to user's module
+    const session = await prisma.chatSession.findFirst({
+      where: { 
+        id: sessionId,
+        module: { userId: req.user.id }
+      }
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+
+    const messages = await prisma.chatMessage.findMany({
+      where: { sessionId },
       orderBy: { createdAt: 'asc' }
     });
 
@@ -30,20 +117,23 @@ exports.getChatHistory = async (req, res) => {
 // Save a new chat message
 exports.saveMessage = async (req, res) => {
   try {
-    const { moduleId } = req.params;
+    const { sessionId } = req.params;
     const { role, content, sources } = req.body;
 
     if (!role || !content) {
       return res.status(400).json({ message: 'Role and content are required' });
     }
 
-    // Verify module belongs to user
-    const module = await prisma.module.findFirst({
-      where: { id: moduleId, userId: req.user.id }
+    // Verify session belongs to user's module
+    const session = await prisma.chatSession.findFirst({
+      where: { 
+        id: sessionId,
+        module: { userId: req.user.id }
+      }
     });
 
-    if (!module) {
-      return res.status(404).json({ message: 'Module not found' });
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
     }
 
     const message = await prisma.chatMessage.create({
@@ -51,8 +141,14 @@ exports.saveMessage = async (req, res) => {
         role,
         content,
         sources: sources || null,
-        moduleId
+        sessionId
       }
+    });
+
+    // Update session updatedAt timestamp
+    await prisma.chatSession.update({
+      where: { id: sessionId },
+      data: { updatedAt: new Date() }
     });
 
     res.status(201).json(message);

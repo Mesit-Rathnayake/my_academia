@@ -7,10 +7,19 @@ const AI_SERVICE_URL = process.env.REACT_APP_AI_SERVICE_URL || 'http://localhost
 function Chat() {
   const [modules, setModules] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
+  
+  // Session states
+  const [sessions, setSessions] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [newChatTitle, setNewChatTitle] = useState('');
+  const [selectedDocs, setSelectedDocs] = useState([]);
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
@@ -37,16 +46,45 @@ function Chat() {
     fetchModules();
   }, [apiBaseUrl]);
 
-  // Fetch chat history when module changes
+  // Fetch sessions when module changes
+  useEffect(() => {
+    const fetchSessions = async () => {
+      if (!selectedModule) {
+        setSessions([]);
+        setSelectedSession(null);
+        return;
+      }
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setSessions(data);
+          if (data.length > 0) {
+            setSelectedSession(data[0]);
+          } else {
+            setSelectedSession(null);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch sessions:', err);
+      }
+    };
+    fetchSessions();
+  }, [selectedModule, apiBaseUrl]);
+
+  // Fetch chat history when session changes
   useEffect(() => {
     const fetchHistory = async () => {
-      if (!selectedModule) {
+      if (!selectedModule || !selectedSession) {
         setMessages([]);
         return;
       }
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/chat`, {
+        const response = await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${selectedSession.id}/chat`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
@@ -62,7 +100,7 @@ function Chat() {
       }
     };
     fetchHistory();
-  }, [selectedModule, apiBaseUrl]);
+  }, [selectedSession, selectedModule, apiBaseUrl]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -87,12 +125,41 @@ function Chat() {
     }));
   };
 
+  const handleCreateSession = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          title: newChatTitle || 'New Chat',
+          documentIds: selectedDocs.length > 0 ? selectedDocs : null
+        })
+      });
+      if (response.ok) {
+        const session = await response.json();
+        setSessions([session, ...sessions]);
+        setSelectedSession(session);
+        setShowNewChatModal(false);
+        setNewChatTitle('');
+        setSelectedDocs([]);
+      }
+    } catch (err) {
+      console.error('Failed to create session:', err);
+    }
+  };
+
   const handleSend = async () => {
     const question = input.trim();
     if (!question || isLoading) return;
 
     if (!selectedModule) {
       setError('Please select a module first.');
+      return;
+    }
+
+    if (!selectedSession) {
+      setError('Please create a chat session first.');
       return;
     }
 
@@ -112,7 +179,7 @@ function Chat() {
       const token = localStorage.getItem('token');
 
       // Save user message to backend
-      fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/chat`, {
+      fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${selectedSession.id}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,6 +209,7 @@ function Chat() {
           module_id: selectedModule._id,
           question: question,
           top_k: 5,
+          document_ids: selectedSession.documentIds || null,
           conversation_history: conversationHistory
         })
       });
@@ -162,7 +230,7 @@ function Chat() {
       setMessages(prev => [...prev, assistantMessage]);
 
       // Save AI message to backend
-      fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/chat`, {
+      fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${selectedSession.id}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -209,21 +277,48 @@ function Chat() {
             </label>
             <select
               id="module-select"
-              className="glass-input px-4 py-2 rounded-xl text-sm font-bold min-w-[200px] border-slate-600/50 shadow-sm shadow-black/20 focus:border-primary/50"
+              className="glass-input px-4 py-2 rounded-xl text-sm font-bold min-w-[150px] border-slate-600/50 shadow-sm shadow-black/20 focus:border-primary/50"
               value={selectedModule?._id || ''}
               onChange={(e) => {
                 const mod = modules.find(m => m._id === e.target.value);
                 setSelectedModule(mod || null);
-                setMessages([]);
+                setSelectedSession(null);
               }}
             >
-              {modules.length === 0 && <option value="">No modules found</option>}
+              {modules.length === 0 && <option value="">No modules</option>}
               {modules.map(mod => (
                 <option key={mod._id} value={mod._id}>
                   {mod.moduleCode ? `${mod.moduleCode} - ` : ''}{mod.moduleName}
                 </option>
               ))}
             </select>
+
+            {selectedModule && (
+              <>
+                <label className="text-sm font-bold text-slate-400 uppercase tracking-wider ml-4">
+                  Chat
+                </label>
+                <select
+                  className="glass-input px-4 py-2 rounded-xl text-sm font-bold min-w-[150px] max-w-[200px] border-slate-600/50 shadow-sm shadow-black/20 focus:border-primary/50"
+                  value={selectedSession?.id || ''}
+                  onChange={(e) => {
+                    const sess = sessions.find(s => s.id === e.target.value);
+                    setSelectedSession(sess || null);
+                  }}
+                >
+                  {sessions.length === 0 && <option value="">No chats yet</option>}
+                  {sessions.map(s => (
+                    <option key={s.id} value={s.id}>{s.title}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => setShowNewChatModal(true)}
+                  className="ml-2 bg-primary/20 text-primary hover:bg-primary/40 px-3 py-2 rounded-xl text-sm font-bold border border-primary/30 transition-colors whitespace-nowrap shadow-sm shadow-primary/10"
+                >
+                  + New
+                </button>
+              </>
+            )}
           </div>
         </header>
 
@@ -237,7 +332,6 @@ function Chat() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 relative">
-          {/* Subtle background glow */}
           <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
           <div className="max-w-4xl mx-auto space-y-10 pb-10">
@@ -246,10 +340,22 @@ function Chat() {
                 <div className="bg-slate-800 p-6 rounded-full mb-6 shadow-[0_0_30px_rgba(14,165,233,0.2)] border border-slate-700/50">
                   <FaRobot size={64} className="text-primary" />
                 </div>
-                <h2 className="text-3xl font-extrabold mb-3 drop-shadow-md">How can I help you?</h2>
+                <h2 className="text-3xl font-extrabold mb-3 drop-shadow-md">
+                  {!selectedSession ? 'Create a Chat Session' : 'How can I help you?'}
+                </h2>
                 <p className="text-slate-400 max-w-md text-lg font-medium">
-                  Ask questions based on your uploaded lecture notes. I will find the exact pages and cite my sources.
+                  {!selectedSession 
+                    ? 'Click "+ New" in the header to start a conversation and select your PDFs.' 
+                    : 'Ask questions based on your selected PDFs. I will cite my sources!'}
                 </p>
+                {!selectedSession && (
+                  <button 
+                    onClick={() => setShowNewChatModal(true)}
+                    className="mt-6 bg-gradient-to-br from-primary to-secondary text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
+                  >
+                    Start New Chat
+                  </button>
+                )}
               </div>
             ) : (
               messages.map((msg, index) => (
@@ -281,14 +387,14 @@ function Chat() {
               value={input}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question..."
+              placeholder={selectedSession ? "Ask a question..." : "Select or create a chat session first..."}
               rows={1}
-              disabled={isLoading}
-              className="w-full glass-input rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-600/50 shadow-inner shadow-black/20 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(14,165,233,0.1)] transition-all font-medium"
+              disabled={isLoading || !selectedSession}
+              className="w-full glass-input rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-600/50 shadow-inner shadow-black/20 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(14,165,233,0.1)] transition-all font-medium disabled:opacity-50"
             />
             <button
               onClick={handleSend}
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || !selectedSession}
               className="absolute right-3 bottom-3 p-3 rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_0_15px_rgba(14,165,233,0.3)] disabled:opacity-50 disabled:grayscale transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(14,165,233,0.5)] active:scale-95"
             >
               <FaPaperPlane size={16} />
@@ -300,6 +406,63 @@ function Chat() {
         </div>
 
       </div>
+
+      {/* New Chat Modal */}
+      {showNewChatModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-4">New Chat Session</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-bold text-slate-400 mb-2">Chat Title</label>
+              <input 
+                type="text" 
+                value={newChatTitle} 
+                onChange={(e) => setNewChatTitle(e.target.value)}
+                className="w-full glass-input px-4 py-2 rounded-xl text-slate-100 border-slate-600 focus:border-primary/50 bg-slate-900/50"
+                placeholder="e.g. Exam Prep"
+              />
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-slate-400 mb-2">Select PDFs to Include (Optional)</label>
+              <div className="max-h-40 overflow-y-auto space-y-2 custom-scrollbar">
+                {selectedModule?.documents?.length === 0 ? (
+                  <p className="text-sm text-slate-500 italic p-2">No documents uploaded to this module yet.</p>
+                ) : (
+                  selectedModule?.documents?.map(doc => (
+                    <label key={doc.id} className="flex items-center gap-3 p-2 bg-slate-900/50 rounded-lg cursor-pointer hover:bg-slate-700/50 transition border border-transparent hover:border-slate-600">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedDocs.includes(doc.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) setSelectedDocs([...selectedDocs, doc.id]);
+                          else setSelectedDocs(selectedDocs.filter(id => id !== doc.id));
+                        }}
+                        className="w-4 h-4 rounded text-primary focus:ring-primary/50 bg-slate-800 border-slate-600"
+                      />
+                      <span className="text-sm text-slate-200 truncate" title={doc.name}>{doc.name}</span>
+                    </label>
+                  ))
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-2">If none are selected, all module PDFs will be used.</p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => { setShowNewChatModal(false); setNewChatTitle(''); setSelectedDocs([]); }}
+                className="px-4 py-2 text-sm font-bold text-slate-400 hover:text-white transition"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleCreateSession}
+                className="bg-primary hover:bg-primary/80 text-white px-5 py-2 rounded-xl text-sm font-bold transition shadow-lg shadow-primary/20"
+              >
+                Create Chat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

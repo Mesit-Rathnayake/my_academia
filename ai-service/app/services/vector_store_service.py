@@ -67,7 +67,7 @@ def get_collection():
 def build_where_filter(
     user_id: str,
     module_id: str,
-    document_id: str | None = None,
+    document_ids: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Build a secure metadata filter.
@@ -88,11 +88,11 @@ def build_where_filter(
         },
     ]
 
-    if document_id:
+    if document_ids:
         conditions.append(
             {
                 "document_id": {
-                    "$eq": document_id,
+                    "$in": document_ids,
                 }
             }
         )
@@ -150,7 +150,7 @@ def index_document_chunks(
     where_filter = build_where_filter(
         user_id=user_id,
         module_id=module_id,
-        document_id=document_id,
+        document_ids=[document_id],
     )
 
     try:
@@ -241,7 +241,7 @@ def search_document_chunks(
     module_id: str,
     question: str,
     top_k: int = 5,
-    document_id: str | None = None,
+    document_ids: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """
     Retrieve the most relevant chunks for a question.
@@ -252,7 +252,7 @@ def search_document_chunks(
     where_filter = build_where_filter(
         user_id=user_id,
         module_id=module_id,
-        document_id=document_id,
+        document_ids=document_ids,
     )
 
     question_embedding = embed_query(question)

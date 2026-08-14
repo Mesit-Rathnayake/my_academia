@@ -113,7 +113,7 @@ def chat(
     user_id: str,
     module_id: str,
     question: str,
-    document_id: str | None = None,
+    document_ids: list[str] | None = None,
     top_k: int = 5,
     conversation_history: list[dict[str, str]] | None = None,
 ) -> dict[str, Any]:
@@ -136,7 +136,7 @@ def chat(
         module_id=module_id,
         question=question,
         top_k=top_k,
-        document_id=document_id,
+        document_ids=document_ids,
     )
 
     # --- Augment ---
