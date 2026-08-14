@@ -144,6 +144,8 @@ function Home() {
         if (!updatedModule.labs[labIndex]) updatedModule.labs[labIndex] = {};
         
         updatedModule.labs[labIndex][prop] = value;
+      } else if (field === 'attendedLectures' || field === 'conductedLectures') {
+        updatedModule[field] = value;
       }
 
       const response = await fetch(`${apiBaseUrl}/api/modules/${moduleId}`, {

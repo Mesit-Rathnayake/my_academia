@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTrash, FaEdit, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaCheckCircle, FaTimesCircle, FaClock, FaPlus } from 'react-icons/fa';
 
 const themes = [
   { name: 'rose', badge: 'bg-rose-500 shadow-rose-500/30', glow: 'from-rose-500/20 via-transparent to-orange-500/10' },
@@ -95,13 +95,27 @@ function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDele
         </div>
 
         <div className="flex justify-between text-xs text-slate-400 font-bold uppercase tracking-wide">
-          <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 rounded-l-lg border-r border-slate-700/50">
+          <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 rounded-l-lg border-r border-slate-700/50 relative group/btn">
             <span className="text-white text-xl font-black mb-1">{attendedLectures}</span>
             <span>Attended</span>
+            <button 
+              onClick={(e) => { e.stopPropagation(); onInlineUpdate('attendedLectures', attendedLectures + 1); }}
+              className={`absolute top-1 right-2 bg-slate-700 hover:bg-${theme.name}-500 text-white rounded-full p-1 opacity-0 group-hover/btn:opacity-100 transition-all shadow-md`}
+              title="Add Attended Lecture"
+            >
+              <FaPlus size={10} />
+            </button>
           </div>
-          <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 border-r border-slate-700/50">
+          <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 border-r border-slate-700/50 relative group/btn">
             <span className="text-white text-xl font-black mb-1">{conductedLectures}</span>
             <span>Conducted</span>
+            <button 
+              onClick={(e) => { e.stopPropagation(); onInlineUpdate('conductedLectures', conductedLectures + 1); }}
+              className={`absolute top-1 right-2 bg-slate-700 hover:bg-${theme.name}-500 text-white rounded-full p-1 opacity-0 group-hover/btn:opacity-100 transition-all shadow-md`}
+              title="Add Conducted Lecture"
+            >
+              <FaPlus size={10} />
+            </button>
           </div>
           <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 rounded-r-lg">
             <span className="text-white text-xl font-black mb-1">{totalLectures}</span>
