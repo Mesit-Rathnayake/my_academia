@@ -68,7 +68,7 @@ function Chat() {
           const data = await response.json();
           setSessions(data);
           if (data.length > 0) {
-            setSelectedSession(data[0]);
+            setSelectedSession(null);
           } else {
             setSelectedSession(null);
           }

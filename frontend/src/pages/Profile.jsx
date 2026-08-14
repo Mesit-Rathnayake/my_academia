@@ -71,7 +71,7 @@ function Profile() {
   return (
     <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
       <Navbar />
-      <main className="flex-1 pt-20 p-8 lg:p-12 overflow-y-auto custom-scrollbar z-0">
+      <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar z-0">
         <div className="max-w-6xl mx-auto space-y-12">
           
           <header>

@@ -180,7 +180,7 @@ function Home() {
     <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
       <Navbar />
       
-      <main className="flex-1 pt-20 p-8 lg:p-12 overflow-y-auto custom-scrollbar relative z-0">
+      <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar relative z-0">
         {/* Vibrant Background Blobs */}
         <div className="absolute top-10 right-20 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
         <div className="absolute bottom-20 left-10 w-[700px] h-[700px] bg-accent/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
