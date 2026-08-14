@@ -181,21 +181,22 @@ function Home() {
       <Navbar />
       
       <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar relative z-0">
-        {/* Vibrant Background Blobs */}
-        <div className="absolute top-10 right-20 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
-        <div className="absolute bottom-20 left-10 w-[700px] h-[700px] bg-accent/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-secondary/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
+        {/* Vibrant Multi-Color Background Blobs */}
+        <div className="absolute top-0 right-10 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
+        <div className="absolute top-1/4 left-10 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
+        <div className="absolute bottom-10 right-1/4 w-[700px] h-[700px] bg-violet-500/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-amber-500/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto space-y-10 relative z-10">
           
           <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-800/40 backdrop-blur-md p-8 rounded-3xl border border-slate-700/50 shadow-2xl">
             <div>
-              <h2 className="text-3xl lg:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400 drop-shadow-lg tracking-tight">
+              <h2 className="text-3xl lg:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-rose-300 to-fuchsia-400 drop-shadow-lg tracking-tight">
                 Dashboard
               </h2>
               <p className="text-slate-300 mt-3 font-semibold text-lg">Manage your academic progress and modules.</p>
             </div>
-            <button onClick={openAddModal} className="bg-gradient-to-br from-primary to-secondary text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-primary/30 hover:shadow-[0_0_25px_rgba(14,165,233,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+            <button onClick={openAddModal} className="bg-gradient-to-br from-rose-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-rose-500/30 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-rose-400/50">
               <FaPlus size={18} /> Add Module
             </button>
           </header>
@@ -209,23 +210,24 @@ function Home() {
 
           {modules.length === 0 ? (
             <div className="bg-slate-800/40 backdrop-blur-md p-16 rounded-3xl flex flex-col items-center justify-center text-center mt-12 border-dashed border-2 border-slate-600/50 shadow-2xl">
-              <div className="bg-gradient-to-br from-primary/20 to-secondary/20 p-8 rounded-full text-primary mb-8 shadow-[0_0_30px_rgba(14,165,233,0.3)] border border-primary/20">
+              <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-8 rounded-full text-emerald-400 mb-8 shadow-[0_0_30px_rgba(16,185,129,0.3)] border border-emerald-500/20">
                 <FaBookReader size={56} className="drop-shadow-lg" />
               </div>
               <h3 className="text-3xl font-extrabold mb-4 text-white drop-shadow-md">No Modules Found</h3>
               <p className="text-slate-300 max-w-md mx-auto mb-10 font-medium text-lg leading-relaxed">
                 Get started by adding your first module to track attendance, assignments, and upload lecture notes.
               </p>
-              <button onClick={openAddModal} className="bg-gradient-to-br from-primary to-secondary text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-primary/50">
+              <button onClick={openAddModal} className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-emerald-400/50">
                 <FaPlus /> Create Module
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {modules.map((module) => (
+              {modules.map((module, index) => (
                 <ModuleCard
                   key={module._id}
                   module={module}
+                  index={index}
                   onOpenEdit={() => openEditModal(module)}
                   onInlineUpdate={(field, value) => handleInlineUpdate(module._id, field, value)}
                   onDelete={(moduleId) => handleDeleteModule(moduleId)}

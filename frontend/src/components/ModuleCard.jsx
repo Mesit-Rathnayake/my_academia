@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FaTrash, FaEdit, FaCheckCircle, FaTimesCircle, FaClock } from 'react-icons/fa';
 
-function ModuleCard({ module = {}, onOpenEdit, onInlineUpdate, onDelete }) {
+const themes = [
+  { name: 'rose', badge: 'bg-rose-500 shadow-rose-500/30', glow: 'from-rose-500/20 via-transparent to-orange-500/10' },
+  { name: 'emerald', badge: 'bg-emerald-500 shadow-emerald-500/30', glow: 'from-emerald-500/20 via-transparent to-teal-500/10' },
+  { name: 'violet', badge: 'bg-violet-500 shadow-violet-500/30', glow: 'from-violet-500/20 via-transparent to-fuchsia-500/10' },
+  { name: 'amber', badge: 'bg-amber-500 shadow-amber-500/30', glow: 'from-amber-500/20 via-transparent to-yellow-500/10' },
+  { name: 'blue', badge: 'bg-blue-500 shadow-blue-500/30', glow: 'from-blue-500/20 via-transparent to-cyan-500/10' },
+];
+
+function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDelete }) {
   const {
     moduleName = 'Untitled',
     moduleCode = '',
@@ -12,6 +20,8 @@ function ModuleCard({ module = {}, onOpenEdit, onInlineUpdate, onDelete }) {
     labs = [],
     documents = []
   } = module;
+
+  const theme = themes[index % themes.length];
 
   const attendancePercentage = conductedLectures > 0 
     ? Math.round((attendedLectures / conductedLectures) * 100)
@@ -31,23 +41,23 @@ function ModuleCard({ module = {}, onOpenEdit, onInlineUpdate, onDelete }) {
 
   return (
     <div 
-      className="bg-slate-800/80 backdrop-blur-sm p-6 rounded-3xl flex flex-col gap-6 shadow-xl shadow-black/30 border-2 border-slate-700 hover:border-primary/60 hover:shadow-[0_0_30px_rgba(14,165,233,0.2)] transition-all duration-300 group cursor-pointer relative overflow-hidden transform hover:-translate-y-1"
+      className={`bg-slate-800/80 backdrop-blur-sm p-6 rounded-3xl flex flex-col gap-6 shadow-xl shadow-black/30 border-2 border-slate-700 hover:border-${theme.name}-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden transform hover:-translate-y-1`}
       onClick={onOpenEdit}
     >
       {/* Background glow effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      <div className={`absolute inset-0 bg-gradient-to-br ${theme.glow} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
 
       {/* Header */}
       <div className="flex justify-between items-start z-10">
         <div>
-          <span className="text-xs font-black tracking-widest text-white bg-primary px-3 py-1.5 rounded-lg mb-3 inline-block shadow-lg shadow-primary/30">
+          <span className={`text-xs font-black tracking-widest text-white px-3 py-1.5 rounded-lg mb-3 inline-block shadow-lg ${theme.badge}`}>
             {moduleCode || 'NO-CODE'}
           </span>
           <h3 className="text-2xl font-black text-white leading-tight drop-shadow-md">
             {moduleName}
           </h3>
         </div>
-        <div className="flex gap-2 bg-slate-900/50 p-1.5 rounded-xl border border-slate-700/50">
+        <div className="flex gap-2 bg-slate-900/50 p-1.5 rounded-xl border border-slate-700/50 hover:bg-slate-900/80 transition-colors">
           <button 
             onClick={(e) => { e.stopPropagation(); onDelete(module._id); }}
             className="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-red-500 shadow-sm"
