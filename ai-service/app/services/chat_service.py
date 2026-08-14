@@ -4,6 +4,7 @@ import os
 from typing import Any
 
 from google import genai
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from app.services.vector_store_service import (
     search_document_chunks,
@@ -108,6 +109,38 @@ def _build_messages(
     return messages
 
 
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    reraise=True
+)
+def _call_gemini_with_retry(client, model, messages, config):
+    """
+    Calls Gemini API with exponential backoff retries to handle 503 UNAVAILABLE errors.
+    """
+    return client.models.generate_content(
+        model=model,
+        contents=messages,
+        config=config,
+    )
+
+
+@retry(
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=2, max=10),
+    reraise=True
+)
+def _call_gemini_with_retry(client, model, messages, config):
+    """
+    Calls Gemini API with exponential backoff retries to handle 503 UNAVAILABLE errors.
+    """
+    return client.models.generate_content(
+        model=model,
+        contents=messages,
+        config=config,
+    )
+
+
 def chat(
     *,
     user_id: str,
@@ -151,9 +184,10 @@ def chat(
     try:
         client = genai.Client(api_key=GEMINI_API_KEY)
 
-        response = client.models.generate_content(
+        response = _call_gemini_with_retry(
+            client=client,
             model=GEMINI_MODEL_NAME,
-            contents=messages,
+            messages=messages,
             config={
                 "system_instruction": SYSTEM_PROMPT,
                 "temperature": 0.3,
