@@ -1,63 +1,46 @@
 # My Academia - AI-Powered Student Management System
 
-A comprehensive student management system with a built-in AI Tutor to help you chat with your lecture notes.
+A comprehensive, full-stack student management system featuring a built-in AI Tutor that allows users to chat directly with their lecture notes and course materials using Retrieval-Augmented Generation (RAG).
 
-## 🚀 Quick Start (Local Setup)
+## 🎯 Core Features
 
-### Prerequisites
-- Node.js (v18+)
-- PostgreSQL
-- Python 3.10+ (for AI Service)
+- **Context-Aware AI Tutor**: Upload lecture PDFs and instantly chat with them. The AI grounds its answers in the provided documents and cites specific pages for reference.
+- **Multi-Session Chat History**: Create multiple conversation threads for different topics (e.g., "Midterm Prep", "Assignment 1") and securely store your chat history.
+- **Module & Progress Management**: Organize coursework, track assignment grades, and monitor lecture attendance with dynamic visual indicators.
+- **Modern UI/UX**: Built with a vibrant, glassmorphic design system that features responsive layouts, smooth micro-animations, and dynamic color themes.
 
-### 1. Backend Setup
-```bash
-cd backend
-npm install
-```
-- Configure the `.env` file with your PostgreSQL connection string (`DATABASE_URL`).
-- Apply the Prisma schema to your database:
-```bash
-npx prisma db push
-```
-- Start the backend server:
-```bash
-npm start
-```
+---
 
+## 🧠 AI Engineering & Architecture
 
-### 2. AI Service Setup
-```bash
-cd ai-service
-python -m venv .venv
-```
-- Activate the virtual environment (e.g. `.\.venv\Scripts\activate` on Windows).
-```bash
-pip install -r requirements.txt
-```
-- Configure `.env` with your `GEMINI_API_KEY`.
-- Start the service:
-```bash
-python -m uvicorn app.main:app --port 8000 --reload
-```
+The standout feature of this application is its custom **Retrieval-Augmented Generation (RAG)** pipeline, built as an independent Python microservice.
 
+### AI Stack
+* **LLM & Embeddings**: Powered by **Google Gemini Pro** via the Gemini API. Used for generating highly accurate, context-aware responses and creating text embeddings for semantic search.
+* **Orchestration**: **LangChain** is used to seamlessly chain together the document loaders, vector stores, and the LLM prompts.
+* **Vector Database**: **ChromaDB** is implemented for efficient, local vector storage. It allows the system to perform blazing-fast similarity searches across thousands of embedded document chunks.
+* **Document Processing**: **PyMuPDF** (`fitz`) is utilized for robust PDF parsing and text extraction, which is then chunked into manageable semantic blocks before embedding.
+* **Microservice API**: The AI backend is built with **FastAPI**, providing a high-performance, asynchronous REST API for the core Node.js backend to communicate with.
 
-### 3. Frontend Setup
-```bash
-cd frontend
-npm install
-npm start
-```
+### Workflow Example:
+1. **Ingestion**: A user uploads a PDF. The Node.js backend saves it and triggers the FastAPI service.
+2. **Processing**: FastAPI extracts text via PyMuPDF, chunk it, embeds it via Gemini Embeddings, and stores it in ChromaDB.
+3. **Retrieval**: When a user asks a question, the query is embedded, and ChromaDB retrieves the most semantically relevant text chunks.
+4. **Generation**: The retrieved context and the user's question are formatted into a prompt and sent to Gemini, which generates a grounded response complete with source citations.
 
+---
 
-## 🎯 Features
+## 💻 Full-Stack Technologies
 
-- **AI Tutor**: Upload your lecture PDFs, create multi-session chats, and interact with your notes using Retrieval-Augmented Generation (RAG).
-- **Module Management**: Organize your coursework, assignments, and labs.
-- **Progress Tracking**: Keep track of attendance and assignment grades.
+Beyond the AI microservice, the application utilizes a modern, robust web stack:
 
-## 📊 Architecture
+### Frontend
+- **React.js**: Component-driven UI architecture.
+- **Tailwind CSS**: Utility-first styling with custom themes, gradients, and glassmorphism effects.
+- **React Markdown & KaTeX**: Injected into the chat interface to beautifully render AI-generated markdown and complex mathematical LaTeX equations.
 
-- **Frontend**: React.js with Tailwind CSS
-- **Backend**: Node.js, Express.js, Prisma ORM
-- **Database**: PostgreSQL
-- **AI Service**: FastAPI, LangChain, ChromaDB, Google Gemini API
+### Core Backend
+- **Node.js & Express.js**: Handles user authentication, file routing, and business logic.
+- **Prisma ORM**: Type-safe database access and schema management.
+- **PostgreSQL**: Relational database for storing user profiles, module data, and persistent chat session histories.
+- **JWT Authentication**: Secure, token-based user sessions.
