@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/sidebar';
+import Navbar from '../components/navbar';
 import { FaUserCircle, FaBookOpen, FaClipboardCheck, FaFlask, FaCalendarAlt, FaIdBadge } from 'react-icons/fa';
 
 function Profile() {
@@ -59,9 +59,9 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="flex h-screen overflow-hidden text-slate-100">
-        <Sidebar />
-        <main className="flex-1 p-8 ml-64 overflow-y-auto custom-scrollbar flex items-center justify-center">
+      <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+        <Navbar />
+        <main className="flex-1 pt-20 p-8 overflow-y-auto custom-scrollbar flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </main>
       </div>
@@ -69,9 +69,9 @@ function Profile() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden text-slate-100">
-      <Sidebar />
-      <main className="flex-1 p-8 lg:p-12 ml-64 overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+      <Navbar />
+      <main className="flex-1 pt-20 p-8 lg:p-12 overflow-y-auto custom-scrollbar z-0">
         <div className="max-w-6xl mx-auto space-y-12">
           
           <header>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Sidebar from '../components/sidebar';
+import Navbar from '../components/navbar';
 import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt, FaPlus, FaComments, FaTrash } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -280,12 +280,12 @@ function Chat() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden text-slate-100 bg-slate-900">
-      <Sidebar />
-      <div className="flex-1 ml-64 flex flex-row">
+    <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+      <Navbar />
+      <div className="flex-1 pt-20 flex flex-row h-full">
         
         {/* Secondary Sidebar: Modules & Chats */}
-        <div className="w-72 bg-slate-800/80 border-r border-slate-700/80 flex flex-col z-20 shadow-xl shrink-0">
+        <div className="w-72 bg-slate-800/80 border-r border-slate-700/80 flex flex-col z-20 shadow-xl shrink-0 h-full">
           <div className="p-6 border-b border-slate-700/80">
             <h2 className="text-xl font-extrabold text-white mb-6 drop-shadow-sm flex items-center gap-3">
               <div className="bg-gradient-to-br from-primary to-secondary p-2 rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)]">
