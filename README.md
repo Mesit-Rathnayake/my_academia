@@ -23,7 +23,7 @@ npx prisma db push
 ```bash
 npm start
 ```
-*The backend runs on http://localhost:5001 by default.*
+
 
 ### 2. AI Service Setup
 ```bash
@@ -39,7 +39,7 @@ pip install -r requirements.txt
 ```bash
 python -m uvicorn app.main:app --port 8000 --reload
 ```
-*The AI service runs on http://localhost:8000.*
+
 
 ### 3. Frontend Setup
 ```bash
@@ -47,7 +47,7 @@ cd frontend
 npm install
 npm start
 ```
-*The frontend runs on http://localhost:3000.*
+
 
 ## 🎯 Features
 
