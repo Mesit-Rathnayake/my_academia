@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../components/sidebar';
-import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt } from 'react-icons/fa';
+import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt, FaPlus, FaComments, FaTrash } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 const AI_SERVICE_URL = process.env.REACT_APP_AI_SERVICE_URL || 'http://localhost:8000';
 
@@ -149,6 +154,28 @@ function Chat() {
     }
   };
 
+  const handleDeleteSession = async (e, sessionId) => {
+    e.stopPropagation(); // Prevent selecting the session
+    if (!window.confirm("Are you sure you want to delete this chat session?")) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${sessionId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        setSessions(sessions.filter(s => s.id !== sessionId));
+        if (selectedSession?.id === sessionId) {
+          setSelectedSession(sessions.find(s => s.id !== sessionId) || null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete session:', err);
+    }
+  };
+
   const handleSend = async () => {
     const question = input.trim();
     if (!question || isLoading) return;
@@ -253,158 +280,197 @@ function Chat() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden text-slate-100">
+    <div className="flex h-screen overflow-hidden text-slate-100 bg-slate-900">
       <Sidebar />
-      <div className="flex-1 ml-64 flex flex-col relative bg-slate-900/50">
+      <div className="flex-1 ml-64 flex flex-row">
         
-        {/* Header */}
-        <header className="h-20 glass-panel border-b border-slate-600/50 shadow-md shadow-black/20 flex justify-between items-center px-8 z-10 shrink-0 relative">
-          <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-br from-primary to-secondary p-2.5 rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)]">
-              <FaGraduationCap size={24} className="text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 drop-shadow-sm">
-                AI Tutor
-              </h2>
-              <p className="text-xs text-slate-400 font-medium">Chat with your lecture notes</p>
+        {/* Secondary Sidebar: Modules & Chats */}
+        <div className="w-72 bg-slate-800/80 border-r border-slate-700/80 flex flex-col z-20 shadow-xl shrink-0">
+          <div className="p-6 border-b border-slate-700/80">
+            <h2 className="text-xl font-extrabold text-white mb-6 drop-shadow-sm flex items-center gap-3">
+              <div className="bg-gradient-to-br from-primary to-secondary p-2 rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+                <FaGraduationCap size={20} className="text-white" />
+              </div>
+              AI Tutor
+            </h2>
+            <div className="space-y-2">
+              <label htmlFor="module-select" className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Module
+              </label>
+              <select
+                id="module-select"
+                className="w-full glass-input px-4 py-2.5 rounded-xl text-sm font-bold border-slate-600/50 shadow-sm shadow-black/20 focus:border-primary/50 bg-slate-900/50"
+                value={selectedModule?._id || ''}
+                onChange={(e) => {
+                  const mod = modules.find(m => m._id === e.target.value);
+                  setSelectedModule(mod || null);
+                  setSelectedSession(null);
+                }}
+              >
+                {modules.length === 0 && <option value="">No modules found</option>}
+                {modules.map(mod => (
+                  <option key={mod._id} value={mod._id}>
+                    {mod.moduleCode ? `${mod.moduleCode} - ` : ''}{mod.moduleName}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <label htmlFor="module-select" className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-              Module
-            </label>
-            <select
-              id="module-select"
-              className="glass-input px-4 py-2 rounded-xl text-sm font-bold min-w-[150px] border-slate-600/50 shadow-sm shadow-black/20 focus:border-primary/50"
-              value={selectedModule?._id || ''}
-              onChange={(e) => {
-                const mod = modules.find(m => m._id === e.target.value);
-                setSelectedModule(mod || null);
-                setSelectedSession(null);
-              }}
-            >
-              {modules.length === 0 && <option value="">No modules</option>}
-              {modules.map(mod => (
-                <option key={mod._id} value={mod._id}>
-                  {mod.moduleCode ? `${mod.moduleCode} - ` : ''}{mod.moduleName}
-                </option>
-              ))}
-            </select>
-
-            {selectedModule && (
-              <>
-                <label className="text-sm font-bold text-slate-400 uppercase tracking-wider ml-4">
-                  Chat
-                </label>
-                <select
-                  className="glass-input px-4 py-2 rounded-xl text-sm font-bold min-w-[150px] max-w-[200px] border-slate-600/50 shadow-sm shadow-black/20 focus:border-primary/50"
-                  value={selectedSession?.id || ''}
-                  onChange={(e) => {
-                    const sess = sessions.find(s => s.id === e.target.value);
-                    setSelectedSession(sess || null);
-                  }}
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+            <div className="flex items-center justify-between px-2 mb-4 mt-2">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Chat Sessions</span>
+            </div>
+            
+            {sessions.map(s => (
+              <div
+                key={s.id}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all cursor-pointer ${
+                  selectedSession?.id === s.id 
+                    ? 'bg-primary/20 border border-primary/30 shadow-sm shadow-primary/10 text-white' 
+                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-white border border-transparent'
+                }`}
+                onClick={() => setSelectedSession(s)}
+              >
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <FaComments className={selectedSession?.id === s.id ? 'text-primary' : 'text-slate-500'} />
+                  <span className="text-sm font-bold truncate">{s.title}</span>
+                </div>
+                <button 
+                  onClick={(e) => handleDeleteSession(e, s.id)}
+                  className="text-slate-500 hover:text-red-400 transition-colors p-1"
+                  title="Delete Session"
                 >
-                  {sessions.length === 0 && <option value="">No chats yet</option>}
-                  {sessions.map(s => (
-                    <option key={s.id} value={s.id}>{s.title}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={() => setShowNewChatModal(true)}
-                  className="ml-2 bg-primary/20 text-primary hover:bg-primary/40 px-3 py-2 rounded-xl text-sm font-bold border border-primary/30 transition-colors whitespace-nowrap shadow-sm shadow-primary/10"
-                >
-                  + New
+                  <FaTrash size={12} />
                 </button>
-              </>
-            )}
-          </div>
-        </header>
-
-        {/* Error */}
-        {error && (
-          <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20 w-full max-w-lg bg-red-900/40 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl flex justify-between items-center shadow-xl shadow-red-500/10 backdrop-blur-md">
-            <p className="text-sm font-bold">⚠️ {error}</p>
-            <button onClick={() => setError(null)} className="text-red-300 hover:text-white bg-red-500/20 px-2 py-1 rounded">✕</button>
-          </div>
-        )}
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 relative">
-          <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
-
-          <div className="max-w-4xl mx-auto space-y-10 pb-10">
-            {messages.length === 0 && !isLoading ? (
-              <div className="flex flex-col items-center justify-center h-[50vh] text-center opacity-70 mt-10">
-                <div className="bg-slate-800 p-6 rounded-full mb-6 shadow-[0_0_30px_rgba(14,165,233,0.2)] border border-slate-700/50">
-                  <FaRobot size={64} className="text-primary" />
-                </div>
-                <h2 className="text-3xl font-extrabold mb-3 drop-shadow-md">
-                  {!selectedSession ? 'Create a Chat Session' : 'How can I help you?'}
-                </h2>
-                <p className="text-slate-400 max-w-md text-lg font-medium">
-                  {!selectedSession 
-                    ? 'Click "+ New" in the header to start a conversation and select your PDFs.' 
-                    : 'Ask questions based on your selected PDFs. I will cite my sources!'}
-                </p>
-                {!selectedSession && (
-                  <button 
-                    onClick={() => setShowNewChatModal(true)}
-                    className="mt-6 bg-gradient-to-br from-primary to-secondary text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
-                  >
-                    Start New Chat
-                  </button>
-                )}
               </div>
-            ) : (
-              messages.map((msg, index) => (
-                <MessageBubble key={index} message={msg} />
-              ))
-            )}
+            ))}
 
-            {isLoading && (
-              <div className="flex gap-4 p-4">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(14,165,233,0.3)]">
-                  <FaRobot className="text-white text-lg" />
-                </div>
-                <div className="glass-panel py-3 px-5 rounded-2xl rounded-tl-sm flex items-center gap-2 border border-slate-600/50 shadow-md">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                </div>
+            {sessions.length === 0 && selectedModule && (
+              <div className="text-center p-4">
+                <p className="text-sm text-slate-500 italic">No chats yet</p>
               </div>
             )}
-            <div ref={messagesEndRef} />
+            {!selectedModule && (
+              <div className="text-center p-4">
+                <p className="text-sm text-slate-500 italic">Select a module first</p>
+              </div>
+            )}
           </div>
-        </div>
 
-        {/* Input Area */}
-        <div className="p-6 bg-slate-900/90 backdrop-blur-xl border-t border-slate-700/80 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] shrink-0 relative z-10">
-          <div className="max-w-4xl mx-auto relative group">
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder={selectedSession ? "Ask a question..." : "Select or create a chat session first..."}
-              rows={1}
-              disabled={isLoading || !selectedSession}
-              className="w-full glass-input rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-600/50 shadow-inner shadow-black/20 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(14,165,233,0.1)] transition-all font-medium disabled:opacity-50"
-            />
+          <div className="p-4 border-t border-slate-700/80">
             <button
-              onClick={handleSend}
-              disabled={!input.trim() || isLoading || !selectedSession}
-              className="absolute right-3 bottom-3 p-3 rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_0_15px_rgba(14,165,233,0.3)] disabled:opacity-50 disabled:grayscale transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(14,165,233,0.5)] active:scale-95"
+              onClick={() => setShowNewChatModal(true)}
+              disabled={!selectedModule}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-secondary hover:scale-[1.02] active:scale-[0.98] transition-all text-white px-4 py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100"
             >
-              <FaPaperPlane size={16} />
+              <FaPlus /> New Chat
             </button>
           </div>
-          <div className="text-center text-xs text-slate-500 font-bold mt-4 tracking-wide uppercase">
-            AI can make mistakes. Always double-check your lecture notes.
-          </div>
         </div>
 
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col relative bg-slate-900/50">
+          
+          {/* Header */}
+          <header className="h-20 glass-panel border-b border-slate-600/50 shadow-md shadow-black/20 flex items-center px-8 z-10 shrink-0 relative">
+            {selectedSession ? (
+              <div>
+                <h2 className="text-lg font-bold text-white">{selectedSession.title}</h2>
+                <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
+                  <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                  {selectedSession.documentIds?.length ? `Filtered to ${selectedSession.documentIds.length} PDFs` : 'Using all module PDFs'}
+                </p>
+              </div>
+            ) : (
+              <div className="text-slate-400 font-bold">Select or create a chat session to start</div>
+            )}
+          </header>
+
+          {/* Error */}
+          {error && (
+            <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20 w-full max-w-lg bg-red-900/40 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl flex justify-between items-center shadow-xl shadow-red-500/10 backdrop-blur-md">
+              <p className="text-sm font-bold">⚠️ {error}</p>
+              <button onClick={() => setError(null)} className="text-red-300 hover:text-white bg-red-500/20 px-2 py-1 rounded">✕</button>
+            </div>
+          )}
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 relative">
+            <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+
+            <div className="max-w-4xl mx-auto space-y-10 pb-10">
+              {messages.length === 0 && !isLoading ? (
+                <div className="flex flex-col items-center justify-center h-[50vh] text-center opacity-70 mt-10">
+                  <div className="bg-slate-800 p-6 rounded-full mb-6 shadow-[0_0_30px_rgba(14,165,233,0.2)] border border-slate-700/50">
+                    <FaRobot size={64} className="text-primary" />
+                  </div>
+                  <h2 className="text-3xl font-extrabold mb-3 drop-shadow-md">
+                    {!selectedSession ? 'Create a Chat Session' : 'How can I help you?'}
+                  </h2>
+                  <p className="text-slate-400 max-w-md text-lg font-medium">
+                    {!selectedSession 
+                      ? 'Click "+ New Chat" on the left to start a conversation and select your PDFs.' 
+                      : 'Ask questions based on your selected PDFs. I will cite my sources!'}
+                  </p>
+                  {!selectedSession && selectedModule && (
+                    <button 
+                      onClick={() => setShowNewChatModal(true)}
+                      className="mt-6 bg-gradient-to-br from-primary to-secondary text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
+                    >
+                      Start New Chat
+                    </button>
+                  )}
+                </div>
+              ) : (
+                messages.map((msg, index) => (
+                  <MessageBubble key={index} message={msg} />
+                ))
+              )}
+
+              {isLoading && (
+                <div className="flex gap-4 p-4">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+                    <FaRobot className="text-white text-lg" />
+                  </div>
+                  <div className="glass-panel py-3 px-5 rounded-2xl rounded-tl-sm flex items-center gap-2 border border-slate-600/50 shadow-md">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+
+          {/* Input Area */}
+          <div className="p-6 bg-slate-900/90 backdrop-blur-xl border-t border-slate-700/80 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] shrink-0 relative z-10">
+            <div className="max-w-4xl mx-auto relative group">
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder={selectedSession ? "Ask a question..." : "Select or create a chat session first..."}
+                rows={1}
+                disabled={isLoading || !selectedSession}
+                className="w-full glass-input rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-600/50 shadow-inner shadow-black/20 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(14,165,233,0.1)] transition-all font-medium disabled:opacity-50"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || isLoading || !selectedSession}
+                className="absolute right-3 bottom-3 p-3 rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_0_15px_rgba(14,165,233,0.3)] disabled:opacity-50 disabled:grayscale transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(14,165,233,0.5)] active:scale-95"
+              >
+                <FaPaperPlane size={16} />
+              </button>
+            </div>
+            <div className="text-center text-xs text-slate-500 font-bold mt-4 tracking-wide uppercase">
+              AI can make mistakes. Always double-check your lecture notes.
+            </div>
+          </div>
+
+        </div>
       </div>
 
       {/* New Chat Modal */}
@@ -467,7 +533,6 @@ function Chat() {
   );
 }
 
-
 /* ── Message Bubble Sub-component ──────────────────────── */
 
 function MessageBubble({ message }) {
@@ -489,8 +554,13 @@ function MessageBubble({ message }) {
               ? 'bg-slate-700/80 rounded-3xl rounded-tr-sm text-white shadow-black/20' 
               : 'glass-panel rounded-3xl rounded-tl-sm text-slate-100 shadow-black/30'
           }`}
-          dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }}
-        />
+        >
+          <div className="prose prose-invert prose-slate prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl">
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+              {message.content}
+            </ReactMarkdown>
+          </div>
+        </div>
 
         {/* Sources */}
         {message.sources && message.sources.length > 0 && (
@@ -526,37 +596,6 @@ function MessageBubble({ message }) {
       </div>
     </div>
   );
-}
-
-
-/* ── Simple Markdown Formatter ──────────────────────────── */
-
-function formatMarkdown(text) {
-  if (!text) return '';
-
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em class="text-slate-300">$1</em>')
-    .replace(/`([^`]+)`/g, '<code class="bg-slate-900/80 px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-slate-700/50">$1</code>')
-    .replace(/^### (.+)$/gm, '<h3 class="text-lg font-extrabold text-white mt-5 mb-2">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="text-xl font-extrabold text-white mt-6 mb-3">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-extrabold text-white mt-8 mb-4">$1</h1>')
-    .replace(/\n/g, '<br/>');
-
-  // Simple bullet lists
-  html = html.replace(/((?:<br\/>)?- .+(?:<br\/>- .+)*)/g, (match) => {
-    const items = match
-      .split('<br/>')
-      .filter(line => line.startsWith('- '))
-      .map(line => `<li class="ml-4 mb-1.5 border-l-2 border-primary/50 pl-3">${line.substring(2)}</li>`)
-      .join('');
-    return `<ul class="my-4 space-y-1">${items}</ul>`;
-  });
-
-  return html;
 }
 
 export default Chat;

@@ -30,10 +30,10 @@ router.delete('/:moduleId/documents/:documentId', documentController.deleteDocum
 
 // Chat routes
 const chatController = require('../controllers/chatController');
-router.get('/:moduleId/sessions', chatController.getSessions);
-router.post('/:moduleId/sessions', chatController.createSession);
-router.delete('/:moduleId/sessions/:sessionId', chatController.deleteSession);
-router.get('/:moduleId/sessions/:sessionId/chat', chatController.getChatHistory);
-router.post('/:moduleId/sessions/:sessionId/chat', chatController.saveMessage);
+router.get('/:moduleId/sessions', auth, chatController.getSessions);
+router.post('/:moduleId/sessions', auth, chatController.createSession);
+router.get('/:moduleId/sessions/:sessionId/chat', auth, chatController.getChatHistory);
+router.post('/:moduleId/sessions/:sessionId/chat', auth, chatController.addMessage);
+router.delete('/:moduleId/sessions/:sessionId', auth, chatController.deleteSession);
 
 module.exports = router;

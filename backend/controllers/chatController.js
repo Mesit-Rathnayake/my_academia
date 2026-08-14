@@ -71,9 +71,15 @@ exports.deleteSession = async (req, res) => {
     });
 
     if (!session) {
-      return res.status(404).json({ message: 'Session not found' });
+      return res.status(404).json({ message: 'Session not found or access denied' });
     }
 
+    // Delete associated messages first
+    await prisma.chatMessage.deleteMany({
+      where: { sessionId: sessionId }
+    });
+
+    // Delete session
     await prisma.chatSession.delete({
       where: { id: sessionId }
     });
@@ -115,7 +121,7 @@ exports.getChatHistory = async (req, res) => {
 };
 
 // Save a new chat message
-exports.saveMessage = async (req, res) => {
+exports.addMessage = async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { role, content, sources } = req.body;
