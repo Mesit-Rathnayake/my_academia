@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/navbar';
-import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt, FaPlus, FaComments, FaTrash } from 'react-icons/fa';
+import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt, FaPlus, FaComments, FaTrash, FaEdit, FaRedo } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -99,6 +99,7 @@ function Chat() {
         if (response.ok) {
           const data = await response.json();
           setMessages(data.map(msg => ({
+            id: msg.id,
             role: msg.role,
             content: msg.content,
             sources: msg.sources || []
@@ -185,8 +186,8 @@ function Chat() {
     }
   };
 
-  const handleSend = async () => {
-    const question = input.trim();
+  const handleSend = async (overrideText = null) => {
+    const question = (typeof overrideText === 'string' ? overrideText : input).trim();
     if (!question || isLoading) return;
 
     if (!selectedModule) {
@@ -202,9 +203,10 @@ function Chat() {
     const currentSessionId = selectedSession.id;
 
     // Add user message
-    const userMessage = { role: 'user', content: question };
+    const tempId = Date.now().toString();
+    const userMessage = { id: tempId, role: 'user', content: question };
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    if (typeof overrideText !== 'string') setInput('');
     setError(null);
     setIsLoading(true);
 
@@ -224,7 +226,14 @@ function Chat() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ role: 'user', content: question })
-      }).catch(err => console.error('Failed to save user message:', err));
+      })
+      .then(res => res.json())
+      .then(savedMsg => {
+        if (activeSessionRef.current === currentSessionId) {
+           setMessages(prev => prev.map(m => m.id === tempId ? { ...m, id: savedMsg.id } : m));
+        }
+      })
+      .catch(err => console.error('Failed to save user message:', err));
 
       // Decode the JWT to get the user_id
       let userId = 'unknown';
@@ -259,7 +268,9 @@ function Chat() {
 
       const data = await response.json();
 
+      const assistantTempId = Date.now().toString() + 'ai';
       const assistantMessage = {
+        id: assistantTempId,
         role: 'assistant',
         content: data.answer,
         sources: data.sources || []
@@ -278,7 +289,14 @@ function Chat() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ role: 'assistant', content: data.answer, sources: data.sources || [] })
-      }).catch(err => console.error('Failed to save AI message:', err));
+      })
+      .then(res => res.json())
+      .then(savedMsg => {
+        if (activeSessionRef.current === currentSessionId) {
+           setMessages(prev => prev.map(m => m.id === assistantTempId ? { ...m, id: savedMsg.id } : m));
+        }
+      })
+      .catch(err => console.error('Failed to save AI message:', err));
     } catch (err) {
       if (activeSessionRef.current === currentSessionId) {
         setError(err.message);
@@ -287,6 +305,54 @@ function Chat() {
       if (activeSessionRef.current === currentSessionId) {
         setIsLoading(false);
       }
+    }
+  };
+
+  const handleEditMessage = async (msgId, newContent) => {
+    if (!selectedModule || !selectedSession || !msgId) return;
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${selectedSession.id}/messages/${msgId}/truncate`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const msgIndex = messages.findIndex(m => m.id === msgId);
+      if (msgIndex !== -1) {
+        setMessages(messages.slice(0, msgIndex));
+        handleSend(newContent);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRegenerateMessage = async (msgId) => {
+    if (!selectedModule || !selectedSession || !msgId) return;
+    try {
+      const token = localStorage.getItem('token');
+      const msgIndex = messages.findIndex(m => m.id === msgId);
+      if (msgIndex === -1) return;
+      
+      let userMsgIndex = -1;
+      for (let i = msgIndex - 1; i >= 0; i--) {
+        if (messages[i].role === 'user') {
+          userMsgIndex = i;
+          break;
+        }
+      }
+      
+      if (userMsgIndex === -1) return;
+      const userMsg = messages[userMsgIndex];
+
+      await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${selectedSession.id}/messages/${userMsg.id}/truncate`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      setMessages(messages.slice(0, userMsgIndex));
+      handleSend(userMsg.content);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -442,7 +508,12 @@ function Chat() {
                 </div>
               ) : (
                 messages.map((msg, index) => (
-                  <MessageBubble key={index} message={msg} />
+                  <MessageBubble 
+                    key={index} 
+                    message={msg} 
+                    onEdit={handleEditMessage} 
+                    onRegenerate={handleRegenerateMessage} 
+                  />
                 ))
               )}
 
@@ -553,19 +624,28 @@ function Chat() {
 
 /* ── Message Bubble Sub-component ──────────────────────── */
 
-function MessageBubble({ message }) {
+function MessageBubble({ message, onEdit, onRegenerate }) {
   const [showSources, setShowSources] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState(message.content);
   const isUser = message.role === 'user';
 
+  const handleSaveEdit = () => {
+    if (editContent.trim() !== '' && editContent !== message.content) {
+      onEdit(message.id, editContent);
+    }
+    setIsEditing(false);
+  };
+
   return (
-    <div className={`flex gap-5 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex gap-5 group ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${
         isUser ? 'bg-slate-700 border border-slate-600 text-slate-300' : 'bg-gradient-to-br from-primary to-secondary shadow-[0_0_15px_rgba(14,165,233,0.3)] text-white'
       }`}>
         {isUser ? <FaUser className="text-lg" /> : <FaRobot className="text-lg" />}
       </div>
       
-      <div className="flex flex-col max-w-[85%]">
+      <div className="flex flex-col max-w-[85%] relative">
         <div 
           className={`py-4 px-6 shadow-xl text-[15px] leading-relaxed border border-slate-600/50 ${
             isUser 
@@ -573,12 +653,42 @@ function MessageBubble({ message }) {
               : 'glass-panel rounded-3xl rounded-tl-sm text-slate-100 shadow-black/30'
           }`}
         >
-          <div className="prose prose-invert prose-slate prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl">
-            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
-              {message.content}
-            </ReactMarkdown>
-          </div>
+          {isEditing ? (
+            <div className="flex flex-col gap-3 min-w-[300px]">
+              <textarea 
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full bg-slate-900/50 border border-slate-500 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-primary resize-none custom-scrollbar"
+                rows={4}
+              />
+              <div className="flex justify-end gap-2">
+                <button onClick={() => setIsEditing(false)} className="text-xs text-slate-300 hover:text-white font-bold px-3 py-1">Cancel</button>
+                <button onClick={handleSaveEdit} className="text-xs bg-primary hover:bg-primary/80 text-white font-bold px-4 py-1.5 rounded-lg shadow-md">Save & Resubmit</button>
+              </div>
+            </div>
+          ) : (
+            <div className="prose prose-invert prose-slate prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl">
+              <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
+        
+        {/* Action Buttons (visible on hover) */}
+        {!isEditing && message.id && (
+          <div className={`absolute top-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${isUser ? '-left-12' : '-right-12'}`}>
+            {isUser ? (
+              <button onClick={() => { setIsEditing(true); setEditContent(message.content); }} className="p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded-full shadow-md transition-colors" title="Edit Message">
+                <FaEdit size={12} />
+              </button>
+            ) : (
+              <button onClick={() => onRegenerate(message.id)} className="p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded-full shadow-md transition-colors" title="Regenerate Response">
+                <FaRedo size={12} />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Sources */}
         {message.sources && message.sources.length > 0 && (

@@ -34,6 +34,7 @@ router.get('/:moduleId/sessions', auth, chatController.getSessions);
 router.post('/:moduleId/sessions', auth, chatController.createSession);
 router.get('/:moduleId/sessions/:sessionId/chat', auth, chatController.getChatHistory);
 router.post('/:moduleId/sessions/:sessionId/chat', auth, chatController.addMessage);
+router.delete('/:moduleId/sessions/:sessionId/messages/:messageId/truncate', auth, chatController.truncateChat);
 router.delete('/:moduleId/sessions/:sessionId', auth, chatController.deleteSession);
 
 module.exports = router;

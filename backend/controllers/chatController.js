@@ -163,3 +163,52 @@ exports.addMessage = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Truncate chat from a specific message ID onwards
+exports.truncateChat = async (req, res) => {
+  try {
+    const { sessionId, messageId } = req.params;
+
+    // Verify session belongs to user's module
+    const session = await prisma.chatSession.findFirst({
+      where: { 
+        id: sessionId,
+        module: { userId: req.user.id }
+      }
+    });
+
+    if (!session) {
+      return res.status(404).json({ message: 'Session not found' });
+    }
+
+    // Find the target message
+    const targetMessage = await prisma.chatMessage.findUnique({
+      where: { id: messageId }
+    });
+
+    if (!targetMessage || targetMessage.sessionId !== sessionId) {
+      return res.status(404).json({ message: 'Message not found in this session' });
+    }
+
+    // Delete all messages in the session created at or after the target message
+    const deleted = await prisma.chatMessage.deleteMany({
+      where: {
+        sessionId: sessionId,
+        createdAt: {
+          gte: targetMessage.createdAt
+        }
+      }
+    });
+
+    // Update session updatedAt timestamp
+    await prisma.chatSession.update({
+      where: { id: sessionId },
+      data: { updatedAt: new Date() }
+    });
+
+    res.json({ message: 'Chat truncated successfully', deletedCount: deleted.count });
+  } catch (error) {
+    console.error('Truncate chat error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
