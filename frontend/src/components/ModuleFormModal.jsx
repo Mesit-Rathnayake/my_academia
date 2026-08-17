@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaPlus, FaUpload, FaFilePdf } from 'react-icons/fa';
+import ConfirmModal from './ConfirmModal';
 
 function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
   const [moduleName, setModuleName] = useState('');
   const [moduleCode, setModuleCode] = useState('');
+  const [semester, setSemester] = useState(1);
   const [totalLectures, setTotalLectures] = useState(0);
   const [conductedLectures, setConductedLectures] = useState(0);
   const [attendedLectures, setAttendedLectures] = useState(0);
@@ -12,12 +14,14 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
   const [documents, setDocuments] = useState([]);
   const [error, setError] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [docToDelete, setDocToDelete] = useState(null);
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     if (initialData) {
       setModuleName(initialData.moduleName || '');
       setModuleCode(initialData.moduleCode || '');
+      setSemester(initialData.semester || 1);
       setTotalLectures(initialData.totalLectures || 0);
       setConductedLectures(initialData.conductedLectures || 0);
       setAttendedLectures(initialData.attendedLectures || 0);
@@ -27,6 +31,7 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
     } else {
       setModuleName('');
       setModuleCode('');
+      setSemester(1);
       setTotalLectures(0);
       setConductedLectures(0);
       setAttendedLectures(0);
@@ -83,18 +88,24 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
     }
   };
 
-  const handleDeleteDocument = async (docId) => {
-    if (!window.confirm('Delete this document?')) return;
+  const handleDeleteDocument = (docId) => {
+    setDocToDelete(docId);
+  };
+
+  const confirmDeleteDocument = async () => {
+    if (!docToDelete) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${apiBaseUrl}/api/modules/${initialData._id}/documents/${docId}`, {
+      const response = await fetch(`${apiBaseUrl}/api/modules/${initialData._id}/documents/${docToDelete}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) throw new Error('Failed to delete');
-      setDocuments(documents.filter(d => d.id !== docId));
+      setDocuments(documents.filter(d => d.id !== docToDelete));
     } catch (err) {
       setError(err.message);
+    } finally {
+      setDocToDelete(null);
     }
   };
 
@@ -114,6 +125,7 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
     const moduleData = {
       moduleName: moduleName.trim(),
       moduleCode: moduleCode.trim(),
+      semester: Number(semester) || 1,
       totalLectures: Number(totalLectures) || 0,
       conductedLectures: Number(conductedLectures) || 0,
       attendedLectures: Number(attendedLectures) || 0,
@@ -149,7 +161,7 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
           
           <form id="module-form" onSubmit={handleSubmit} className="space-y-8">
             {/* Core Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Module Name</label>
                 <input className="glass-input w-full px-4 py-3 rounded-xl" value={moduleName} onChange={(e) => setModuleName(e.target.value)} required placeholder="e.g. Data Structures" />
@@ -157,6 +169,14 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Module Code</label>
                 <input className="glass-input w-full px-4 py-3 rounded-xl" value={moduleCode} onChange={(e) => setModuleCode(e.target.value)} required placeholder="e.g. CS101" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">Semester</label>
+                <select className="glass-input w-full px-4 py-3 rounded-xl" value={semester} onChange={(e) => setSemester(e.target.value)}>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                    <option key={sem} value={sem}>Semester {sem}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -302,6 +322,18 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
           </button>
         </div>
       </div>
+      
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal 
+        isOpen={!!docToDelete}
+        title="Delete Document"
+        message="Are you sure you want to delete this document? This will remove it from the module."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDanger={true}
+        onConfirm={confirmDeleteDocument}
+        onCancel={() => setDocToDelete(null)}
+      />
     </div>
   );
 }

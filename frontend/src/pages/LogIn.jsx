@@ -8,6 +8,7 @@ function LogIn() {
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
   const [regNumber, setRegNumber] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -29,10 +30,11 @@ function LogIn() {
         localStorage.setItem('token', data.token);
         navigate('/Home');
       } else {
-        alert(data.message || 'Login failed');
+        setError(data.message || 'Login failed');
       }
-    } catch (error) {
-      console.error('Login error:', error);
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An error occurred. Please try again later.');
     }
   }
 
@@ -42,6 +44,14 @@ function LogIn() {
       <div className="flex-1 max-w-7xl mx-auto px-6 w-full flex flex-col md:flex-row items-center justify-center gap-12 py-12">
         <div className="flex-1 w-full max-w-md bg-white p-8 sm:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 relative z-10">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-8 tracking-tight">Welcome Back!</h2>
+          
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-bold flex items-center justify-between shadow-sm">
+              <span>⚠️ {error}</span>
+              <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 px-2 py-1">✕</button>
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <input

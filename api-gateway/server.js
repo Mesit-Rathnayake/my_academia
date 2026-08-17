@@ -15,36 +15,36 @@ app.use((req, res, next) => {
 
 // Proxy /ma-api/v1 -> Backend (Port 8294)
 app.use('/ma-api/v1', createProxyMiddleware({
-  target: 'http://localhost:8294',
+  target: 'http://127.0.0.1:8294',
   changeOrigin: true,
   pathRewrite: {
     '^/ma-api/v1': '/api', // Rewrite the path before forwarding
   },
   onProxyReq: (proxyReq, req, res) => {
-    console.log(`[PROXY -> Backend] ${req.method} ${req.url} -> http://localhost:8294${proxyReq.path}`);
+    console.log(`[PROXY -> Backend] ${req.method} ${req.url} -> http://127.0.0.1:8294${proxyReq.path}`);
   }
 }));
 
 // Proxy /ma-ai/v1 -> AI Service (Port 9142)
 app.use('/ma-ai/v1', createProxyMiddleware({
-  target: 'http://localhost:9142',
+  target: 'http://127.0.0.1:9142',
   changeOrigin: true,
   pathRewrite: {
     '^/ma-ai/v1': '/api/v1',
   },
   onProxyReq: (proxyReq, req, res) => {
-    console.log(`[PROXY -> AI Service] ${req.method} ${req.url} -> http://localhost:9142${proxyReq.path}`);
+    console.log(`[PROXY -> AI Service] ${req.method} ${req.url} -> http://127.0.0.1:9142${proxyReq.path}`);
   }
 }));
 
 // Proxy everything else (/) -> Frontend (Port 4721)
 app.use('/', createProxyMiddleware({
-  target: 'http://localhost:4721',
+  target: 'http://127.0.0.1:4721',
   changeOrigin: true,
   ws: true, // Proxy websockets for React hot-reloading
   onProxyReq: (proxyReq, req, res) => {
     if (!req.url.startsWith('/sockjs-node')) {
-      console.log(`[PROXY -> Frontend] ${req.method} ${req.url} -> http://localhost:4721${proxyReq.path}`);
+      console.log(`[PROXY -> Frontend] ${req.method} ${req.url} -> http://127.0.0.1:4721${proxyReq.path}`);
     }
   }
 }));

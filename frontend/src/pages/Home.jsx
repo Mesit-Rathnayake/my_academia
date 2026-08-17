@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/navbar';
 import ModuleCard from '../components/ModuleCard';
 import ModuleFormModal from '../components/ModuleFormModal';
+import DashboardWidgets from '../components/DashboardWidgets';
+import Footer from '../components/Footer';
 import { FaPlus, FaBookReader } from 'react-icons/fa';
 
 function Home() {
   const [modules, setModules] = useState([]);
+  const [timetable, setTimetable] = useState([]);
+  const [examSeries, setExamSeries] = useState([]);
+  const [activeTab, setActiveTab] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModule, setEditModule] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,18 +25,20 @@ function Home() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch(`${apiBaseUrl}/api/modules`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch modules');
-      }
+      const [modulesRes, timeRes, seriesRes] = await Promise.all([
+        fetch(`${apiBaseUrl}/api/modules`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${apiBaseUrl}/api/timetable`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${apiBaseUrl}/api/exam-series`, { headers: { 'Authorization': `Bearer ${token}` } })
+      ]);
       
-      const data = await response.json();
-      setModules(data);
+      if (!modulesRes.ok) throw new Error('Failed to fetch modules');
+      
+      setModules(await modulesRes.json());
+      
+      if (timeRes.ok) setTimetable(await timeRes.json());
+      if (seriesRes.ok) setExamSeries(await seriesRes.json());
+      
     } catch (err) {
       setError(err.message);
     } finally {
@@ -178,6 +185,19 @@ function Home() {
     );
   }
 
+  const groupedModules = modules.reduce((acc, module) => {
+    const sem = module.semester || 1;
+    if (!acc[sem]) acc[sem] = [];
+    acc[sem].push(module);
+    return acc;
+  }, {});
+
+  const allSemesters = [1, 2, 3, 4, 5, 6, 7, 8];
+  
+  const currentTab = activeTab && allSemesters.includes(Number(activeTab)) 
+    ? Number(activeTab) 
+    : 1;
+
   return (
     <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
       <Navbar />
@@ -204,40 +224,79 @@ function Home() {
           </header>
 
           {error && (
-            <div className="bg-red-900/30 backdrop-blur-sm border-2 border-red-500/50 text-red-100 px-6 py-4 rounded-2xl flex justify-between items-center shadow-lg shadow-red-500/20">
+            <div className="bg-red-900/30 backdrop-blur-sm border-2 border-red-500/50 text-red-100 px-6 py-4 rounded-2xl flex justify-between items-center shadow-lg shadow-red-500/20 z-10 relative">
               <p className="font-bold">{error}</p>
               <button onClick={() => setError(null)} className="text-red-300 hover:text-white font-bold bg-red-500/20 px-4 py-2 rounded-xl transition-colors">Dismiss</button>
             </div>
           )}
 
-          {modules.length === 0 ? (
-            <div className="bg-slate-800/40 backdrop-blur-md p-16 rounded-3xl flex flex-col items-center justify-center text-center mt-12 border-dashed border-2 border-slate-600/50 shadow-2xl">
-              <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-8 rounded-full text-emerald-400 mb-8 shadow-[0_0_30px_rgba(16,185,129,0.3)] border border-emerald-500/20">
-                <FaBookReader size={56} className="drop-shadow-lg" />
-              </div>
-              <h3 className="text-3xl font-extrabold mb-4 text-white drop-shadow-md">No Modules Found</h3>
-              <p className="text-slate-300 max-w-md mx-auto mb-10 font-medium text-lg leading-relaxed">
-                Get started by adding your first module to track attendance, assignments, and upload lecture notes.
-              </p>
-              <button onClick={openAddModal} className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white px-10 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-emerald-400/50">
-                <FaPlus /> Create Module
-              </button>
+          {/* Dashboard Summary Widgets */}
+          <div className="relative z-10 w-full">
+            <DashboardWidgets timetable={timetable} examSeries={examSeries} />
+          </div>
+
+          <div className="w-full">
+            {/* Folder Tabs */}
+            <div className="flex w-full px-2 sm:px-6 relative z-10">
+              {allSemesters.map(sem => {
+                const isActive = currentTab === sem;
+                return (
+                  <button
+                    key={sem}
+                    onClick={() => setActiveTab(sem)}
+                    className={`flex-1 py-3 sm:py-4 font-bold text-xs sm:text-sm md:text-base transition-all duration-300 relative border ${
+                      isActive 
+                        ? 'bg-slate-800 border-slate-600 border-b-slate-800 text-rose-400 rounded-t-2xl -mb-[1px] shadow-[0_-10px_20px_rgba(0,0,0,0.15)] z-20' 
+                        : 'bg-slate-900/60 border-slate-700/50 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 rounded-t-xl mt-2 border-b-transparent z-10'
+                    }`}
+                  >
+                    <span className="hidden sm:inline">Semester </span>
+                    <span className="sm:hidden">S</span>
+                    {sem}
+                    {isActive && <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-rose-500 to-orange-400 rounded-t-2xl"></div>}
+                  </button>
+                );
+              })}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-              {modules.map((module, index) => (
-                <ModuleCard
-                  key={module._id}
-                  module={module}
-                  index={index}
-                  onOpenEdit={() => openEditModal(module)}
-                  onInlineUpdate={(field, value) => handleInlineUpdate(module._id, field, value)}
-                  onDelete={(moduleId) => handleDeleteModule(moduleId)}
-                />
-              ))}
+
+            {/* Folder Content Box */}
+            <div className="bg-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-600 relative z-0">
+              {currentTab && (
+                <section className="animate-fadeIn">
+                  {!groupedModules[currentTab] || groupedModules[currentTab].length === 0 ? (
+                    <div className="bg-slate-900/40 border-dashed border-2 border-slate-700/50 p-12 sm:p-16 rounded-3xl flex flex-col items-center justify-center text-center shadow-inner">
+                      <div className="bg-gradient-to-br from-rose-500/20 to-orange-500/20 p-8 rounded-full text-rose-400 mb-8 shadow-[0_0_30px_rgba(244,63,94,0.2)] border border-rose-500/20">
+                        <FaBookReader size={56} className="drop-shadow-lg" />
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-extrabold mb-4 text-white drop-shadow-md">No Modules Found</h3>
+                      <p className="text-slate-400 max-w-md mx-auto mb-10 font-medium text-base sm:text-lg leading-relaxed">
+                        Get started by adding your first module to Semester {currentTab} to track attendance, assignments, and upload lecture notes.
+                      </p>
+                      <button onClick={openAddModal} className="bg-gradient-to-br from-rose-500 to-orange-500 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-2xl font-bold shadow-lg shadow-rose-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-rose-400/50">
+                        <FaPlus /> Create Module
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                      {groupedModules[currentTab].map((module, index) => (
+                        <ModuleCard
+                          key={module._id}
+                          module={module}
+                          index={index}
+                          onOpenEdit={() => openEditModal(module)}
+                          onInlineUpdate={(field, value) => handleInlineUpdate(module._id, field, value)}
+                          onDelete={(moduleId) => handleDeleteModule(moduleId)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )}
             </div>
-          )}
+          </div>
         </div>
+
+        <Footer />
       </main>
 
       {isModalOpen && (

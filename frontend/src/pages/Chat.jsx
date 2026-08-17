@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/navbar';
+import Footer from '../components/Footer';
 import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt, FaPlus, FaComments, FaTrash, FaEdit, FaRedo } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
+import InteractiveQuiz from '../components/InteractiveQuiz';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AI_SERVICE_URL = process.env.REACT_APP_AI_SERVICE_URL || 'http://localhost:8000';
 
@@ -19,6 +22,7 @@ function Chat() {
   const [showNewChatModal, setShowNewChatModal] = useState(false);
   const [newChatTitle, setNewChatTitle] = useState('');
   const [selectedDocs, setSelectedDocs] = useState([]);
+  const [sessionToDelete, setSessionToDelete] = useState(null);
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -164,10 +168,14 @@ function Chat() {
     }
   };
 
-  const handleDeleteSession = async (e, sessionId) => {
+  const handleDeleteSession = (e, sessionId) => {
     e.stopPropagation(); // Prevent selecting the session
-    if (!window.confirm("Are you sure you want to delete this chat session?")) return;
+    setSessionToDelete(sessionId);
+  };
 
+  const confirmDeleteSession = async () => {
+    if (!sessionToDelete) return;
+    const sessionId = sessionToDelete;
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${sessionId}`, {
@@ -183,6 +191,8 @@ function Chat() {
       }
     } catch (err) {
       console.error('Failed to delete session:', err);
+    } finally {
+      setSessionToDelete(null);
     }
   };
 
@@ -531,6 +541,8 @@ function Chat() {
               )}
               <div ref={messagesEndRef} />
             </div>
+            
+            <Footer />
           </div>
 
           {/* Input Area */}
@@ -544,12 +556,12 @@ function Chat() {
                 placeholder={selectedSession ? "Ask a question..." : "Select or create a chat session first..."}
                 rows={1}
                 disabled={isLoading || !selectedSession}
-                className="w-full glass-input rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-600/50 shadow-inner shadow-black/20 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(14,165,233,0.1)] transition-all font-medium disabled:opacity-50"
+                className="w-full bg-slate-800/80 text-white rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-600/50 shadow-inner shadow-black/20 focus:border-purple-500/60 focus:shadow-[0_0_20px_rgba(168,85,247,0.2)] focus:bg-slate-800 transition-all font-medium disabled:opacity-50 placeholder:text-slate-400"
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading || !selectedSession}
-                className="absolute right-3 bottom-3 p-3 rounded-xl bg-gradient-to-br from-primary to-secondary text-white shadow-[0_0_15px_rgba(14,165,233,0.3)] disabled:opacity-50 disabled:grayscale transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(14,165,233,0.5)] active:scale-95"
+                className="absolute right-3 bottom-3 p-3 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] disabled:opacity-50 disabled:grayscale transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(168,85,247,0.6)] active:scale-95"
               >
                 <FaPaperPlane size={16} />
               </button>
@@ -618,6 +630,18 @@ function Chat() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal 
+        isOpen={!!sessionToDelete}
+        title="Delete Chat Session"
+        message="Are you sure you want to delete this chat session? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isDanger={true}
+        onConfirm={confirmDeleteSession}
+        onCancel={() => setSessionToDelete(null)}
+      />
     </div>
   );
 }
@@ -640,17 +664,17 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
   return (
     <div className={`flex gap-5 group ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${
-        isUser ? 'bg-slate-700 border border-slate-600 text-slate-300' : 'bg-gradient-to-br from-primary to-secondary shadow-[0_0_15px_rgba(14,165,233,0.3)] text-white'
+        isUser ? 'bg-gradient-to-br from-purple-500 to-indigo-600 border border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)] text-white' : 'bg-gradient-to-br from-emerald-500 to-teal-600 border border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] text-white'
       }`}>
         {isUser ? <FaUser className="text-lg" /> : <FaRobot className="text-lg" />}
       </div>
       
       <div className="flex flex-col max-w-[85%] relative">
         <div 
-          className={`py-4 px-6 shadow-xl text-[15px] leading-relaxed border border-slate-600/50 ${
+          className={`py-4 px-6 shadow-xl text-[15px] leading-relaxed border ${
             isUser 
-              ? 'bg-slate-700/80 rounded-3xl rounded-tr-sm text-white shadow-black/20' 
-              : 'glass-panel rounded-3xl rounded-tl-sm text-slate-100 shadow-black/30'
+              ? 'bg-purple-900/40 border-purple-500/40 rounded-3xl rounded-tr-sm text-purple-50 shadow-purple-900/30' 
+              : 'bg-emerald-900/30 border-emerald-500/40 rounded-3xl rounded-tl-sm text-emerald-50 shadow-emerald-900/30'
           }`}
         >
           {isEditing ? (
@@ -667,8 +691,34 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
               </div>
             </div>
           ) : (
-            <div className="prose prose-invert prose-slate prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl">
-              <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+            <div className="prose prose-invert prose-slate prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl break-words whitespace-pre-wrap">
+              <ReactMarkdown 
+                  remarkPlugins={[remarkGfm, remarkMath]} 
+                  rehypePlugins={[rehypeKatex]}
+                  components={{
+                    code({node, inline, className, children, ...props}) {
+                      const match = /language-(\w+)/.exec(className || '');
+                      if (!inline && match && match[1] === 'quiz') {
+                        try {
+                          const quizData = JSON.parse(String(children).replace(/\n$/, ''));
+                          return <InteractiveQuiz questions={quizData} messageId={message.id} />;
+                        } catch(e) {
+                          return (
+                            <div className="bg-red-500/20 text-red-200 p-4 rounded-xl border border-red-500/50 my-4">
+                              <p className="font-bold">Error parsing interactive quiz:</p>
+                              <pre className="text-xs mt-2 overflow-x-auto">{e.message}</pre>
+                            </div>
+                          );
+                        }
+                      }
+                      return !inline ? (
+                        <pre className={className} {...props}>{children}</pre>
+                      ) : (
+                        <code className={className} {...props}>{children}</code>
+                      );
+                    }
+                  }}
+                >
                 {message.content}
               </ReactMarkdown>
             </div>
@@ -704,17 +754,17 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
             {showSources && (
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {message.sources.map((source, i) => (
-                  <div key={i} className="bg-slate-800/80 p-4 rounded-xl border-2 border-slate-600/50 text-sm shadow-lg shadow-black/20 hover:border-primary/40 transition-colors">
-                    <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-700">
+                  <div key={i} className={`p-4 rounded-xl border-2 text-sm shadow-lg shadow-black/20 transition-colors ${isUser ? 'bg-purple-900/30 border-purple-700/30 hover:border-purple-500/50' : 'bg-emerald-900/20 border-emerald-700/30 hover:border-emerald-500/50'}`}>
+                    <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-700/50">
                       <div className="flex items-center gap-2 text-slate-200 font-bold truncate">
-                        <FaFileAlt className="text-primary shrink-0 text-base" />
+                        <FaFileAlt className={`${isUser ? 'text-purple-400' : 'text-emerald-400'} shrink-0 text-base`} />
                         <span className="truncate" title={source.document_name}>{source.document_name}</span>
                       </div>
-                      <span className="text-xs bg-primary/20 text-primary px-2.5 py-1 rounded-full font-bold whitespace-nowrap border border-primary/20">
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap border ${isUser ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'}`}>
                         Pg {source.page_number}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 italic leading-relaxed line-clamp-4">"{source.text_preview}"</p>
+                    <p className="text-xs text-slate-300 italic leading-relaxed line-clamp-4">"{source.text_preview}"</p>
                   </div>
                 ))}
               </div>

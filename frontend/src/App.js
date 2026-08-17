@@ -5,6 +5,7 @@ import SignUp from './pages/SignUp';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Chat from './pages/Chat';
+import Schedule from './pages/Schedule';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/home" element={<Home/>}/>
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/chat" element={<Chat/>}/>
+        <Route path="/schedule" element={<Schedule/>}/>
       </Routes>
     </Router>
   );

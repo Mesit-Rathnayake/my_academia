@@ -9,9 +9,15 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Routes
+const timetableRoutes = require('./routes/timetableRoutes');
+const examRoutes = require('./routes/examRoutes');
+const examSeriesRoutes = require('./routes/examSeriesRoutes');
+
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/modules', require('./routes/moduleRoutes'));
+app.use('/api/timetable', timetableRoutes);
+app.use('/api/exams', examRoutes);
+app.use('/api/exam-series', examSeriesRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

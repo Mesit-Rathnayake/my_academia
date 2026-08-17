@@ -9,6 +9,7 @@ function SignUp() {
   const [regNumber, setRegNumber] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -31,10 +32,11 @@ function SignUp() {
         localStorage.setItem('token', data.token);
         navigate('/Home');
       } else {
-        alert(data.message || 'Sign up failed');
+        setError(data.message || 'Sign up failed');
       }
-    } catch (error) {
-      console.error('Error during signup:', error);
+    } catch (err) {
+      console.error('Error during signup:', err);
+      setError('An error occurred. Please try again later.');
     }
   }
 
@@ -52,6 +54,14 @@ function SignUp() {
         </div>
         <div className="flex-1 w-full max-w-md bg-white p-8 sm:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 relative z-10">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-8 tracking-tight">Create an Account</h2>
+          
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-bold flex items-center justify-between shadow-sm">
+              <span>⚠️ {error}</span>
+              <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 px-2 py-1">✕</button>
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <input 

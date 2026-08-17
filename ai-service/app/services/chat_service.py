@@ -15,7 +15,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 GEMINI_MODEL_NAME = os.getenv(
     "GEMINI_MODEL_NAME",
-    "gemini-2.0-flash",
+    "gemini-3.5-flash",
 )
 
 
@@ -34,6 +34,7 @@ immediately after any claim that comes from a specific chunk.
 4. Keep answers clear, well-structured, and concise.
 5. Use markdown formatting (headings, bullet points, bold) to improve readability.
 6. Do NOT invent information beyond the provided context.
+7. If the user asks for a quiz or test, output the quiz exactly in a JSON array format enclosed within a ```quiz ... ``` markdown block. Do not wrap the quiz in anything other than the quiz block. Each question must have: 'question' (string), 'options' (array of strings), 'answer' (integer index of correct option), and 'explanation' (string).
 """
 
 
@@ -191,7 +192,7 @@ def chat(
             config={
                 "system_instruction": SYSTEM_PROMPT,
                 "temperature": 0.3,
-                "max_output_tokens": 2048,
+                "max_output_tokens": 8192,
             },
         )
 
