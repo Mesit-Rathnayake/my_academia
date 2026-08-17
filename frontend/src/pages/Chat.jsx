@@ -24,6 +24,7 @@ function Chat() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const activeSessionRef = useRef(null);
   
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
@@ -82,9 +83,12 @@ function Chat() {
 
   // Fetch chat history when session changes
   useEffect(() => {
+    setMessages([]);
+    setIsLoading(false);
+    setError(null);
+    
     const fetchHistory = async () => {
       if (!selectedModule || !selectedSession) {
-        setMessages([]);
         return;
       }
       try {
@@ -106,6 +110,11 @@ function Chat() {
     };
     fetchHistory();
   }, [selectedSession, selectedModule, apiBaseUrl]);
+
+  // Track active session for race conditions
+  useEffect(() => {
+    activeSessionRef.current = selectedSession?.id;
+  }, [selectedSession]);
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -190,6 +199,8 @@ function Chat() {
       return;
     }
 
+    const currentSessionId = selectedSession.id;
+
     // Add user message
     const userMessage = { role: 'user', content: question };
     setMessages(prev => [...prev, userMessage]);
@@ -235,7 +246,7 @@ function Chat() {
           user_id: userId,
           module_id: selectedModule._id,
           question: question,
-          top_k: 5,
+          top_k: 3,
           document_ids: selectedSession.documentIds || null,
           conversation_history: conversationHistory
         })
@@ -254,10 +265,13 @@ function Chat() {
         sources: data.sources || []
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      // Only update UI if we are still on the same session
+      if (activeSessionRef.current === currentSessionId) {
+        setMessages(prev => [...prev, assistantMessage]);
+      }
 
-      // Save AI message to backend
-      fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${selectedSession.id}/chat`, {
+      // Save AI message to backend (we always save it, even if user navigated away)
+      fetch(`${apiBaseUrl}/api/modules/${selectedModule._id}/sessions/${currentSessionId}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -266,9 +280,13 @@ function Chat() {
         body: JSON.stringify({ role: 'assistant', content: data.answer, sources: data.sources || [] })
       }).catch(err => console.error('Failed to save AI message:', err));
     } catch (err) {
-      setError(err.message);
+      if (activeSessionRef.current === currentSessionId) {
+        setError(err.message);
+      }
     } finally {
-      setIsLoading(false);
+      if (activeSessionRef.current === currentSessionId) {
+        setIsLoading(false);
+      }
     }
   };
 
