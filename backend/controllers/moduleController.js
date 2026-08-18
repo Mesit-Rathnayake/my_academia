@@ -10,7 +10,7 @@ const formatModule = (mod) => ({
 
 exports.createModule = async (req, res) => {
   try {
-    const { moduleName, moduleCode, totalLectures, conductedLectures, attendedLectures, semester, assignments, labs } = req.body;
+    const { moduleName, moduleCode, totalLectures, conductedLectures, attendedLectures, semester, assignments, labs, isGpaCounted, creditsOverride, moduleResults } = req.body;
 
     if (!moduleName || !moduleCode) {
       return res.status(400).json({ 
@@ -27,14 +27,18 @@ exports.createModule = async (req, res) => {
           conductedLectures: conductedLectures || 0,
           attendedLectures: attendedLectures || 0,
           semester: semester ? parseInt(semester) : 1,
+          isGpaCounted: isGpaCounted !== undefined ? isGpaCounted : true,
+          creditsOverride: creditsOverride ? parseFloat(creditsOverride) : null,
           userId: req.user.id,
           assignments: assignments && assignments.length > 0 ? { create: assignments.map(a => ({ name: a.name, marks: a.marks, totalMarks: a.totalMarks, dueDate: a.dueDate ? new Date(a.dueDate) : null, status: a.status })) } : undefined,
-          labs: labs && labs.length > 0 ? { create: labs.map(l => ({ name: l.name, marks: l.marks, totalMarks: l.totalMarks, dueDate: l.dueDate ? new Date(l.dueDate) : null, status: l.status })) } : undefined
+          labs: labs && labs.length > 0 ? { create: labs.map(l => ({ name: l.name, marks: l.marks, totalMarks: l.totalMarks, dueDate: l.dueDate ? new Date(l.dueDate) : null, status: l.status })) } : undefined,
+          moduleResults: moduleResults && moduleResults.length > 0 ? { create: moduleResults.map(r => ({ attemptNumber: r.attemptNumber || 1, marks: r.marks ? parseFloat(r.marks) : null, grade: r.grade || null, isProperAttempt: r.isProperAttempt !== undefined ? r.isProperAttempt : true, academicYear: r.academicYear })) } : undefined
         },
         include: {
           assignments: { orderBy: { createdAt: 'asc' } },
           labs: { orderBy: { createdAt: 'asc' } },
-          documents: { orderBy: { createdAt: 'desc' } }
+          documents: { orderBy: { createdAt: 'desc' } },
+          moduleResults: { orderBy: { attemptNumber: 'asc' } }
         }
       });
       res.status(201).json(formatModule(module));
@@ -63,7 +67,8 @@ exports.getAllModules = async (req, res) => {
       include: {
         assignments: { orderBy: { createdAt: 'asc' } },
         labs: { orderBy: { createdAt: 'asc' } },
-        documents: { orderBy: { createdAt: 'desc' } }
+        documents: { orderBy: { createdAt: 'desc' } },
+        moduleResults: { orderBy: { attemptNumber: 'asc' } }
       }
     });
     res.json(modules.map(formatModule));
@@ -86,7 +91,8 @@ exports.getModule = async (req, res) => {
       include: {
         assignments: { orderBy: { createdAt: 'asc' } },
         labs: { orderBy: { createdAt: 'asc' } },
-        documents: { orderBy: { createdAt: 'desc' } }
+        documents: { orderBy: { createdAt: 'desc' } },
+        moduleResults: { orderBy: { attemptNumber: 'asc' } }
       }
     });
     
@@ -103,7 +109,7 @@ exports.getModule = async (req, res) => {
 
 exports.updateModule = async (req, res) => {
   try {
-    const { moduleName, moduleCode, totalLectures, conductedLectures, attendedLectures, semester, assignments, labs } = req.body;
+    const { moduleName, moduleCode, totalLectures, conductedLectures, attendedLectures, semester, assignments, labs, isGpaCounted, creditsOverride, moduleResults } = req.body;
     
     // First verify it exists and belongs to user
     const existing = await prisma.module.findFirst({
@@ -123,14 +129,18 @@ exports.updateModule = async (req, res) => {
         conductedLectures,
         attendedLectures,
         semester: semester ? parseInt(semester) : undefined,
+        isGpaCounted: isGpaCounted !== undefined ? isGpaCounted : undefined,
+        creditsOverride: creditsOverride !== undefined ? (creditsOverride ? parseFloat(creditsOverride) : null) : undefined,
         // Replace all assignments and labs to sync with frontend arrays
         assignments: assignments ? { deleteMany: {}, create: assignments.map(a => ({ name: a.name, marks: a.marks, totalMarks: a.totalMarks, dueDate: a.dueDate ? new Date(a.dueDate) : null, status: a.status })) } : undefined,
-        labs: labs ? { deleteMany: {}, create: labs.map(l => ({ name: l.name, marks: l.marks, totalMarks: l.totalMarks, dueDate: l.dueDate ? new Date(l.dueDate) : null, status: l.status })) } : undefined
+        labs: labs ? { deleteMany: {}, create: labs.map(l => ({ name: l.name, marks: l.marks, totalMarks: l.totalMarks, dueDate: l.dueDate ? new Date(l.dueDate) : null, status: l.status })) } : undefined,
+        moduleResults: moduleResults ? { deleteMany: {}, create: moduleResults.map(r => ({ attemptNumber: r.attemptNumber || 1, marks: r.marks ? parseFloat(r.marks) : null, grade: r.grade || null, isProperAttempt: r.isProperAttempt !== undefined ? r.isProperAttempt : true, academicYear: r.academicYear })) } : undefined
       },
       include: {
         assignments: { orderBy: { createdAt: 'asc' } },
         labs: { orderBy: { createdAt: 'asc' } },
-        documents: { orderBy: { createdAt: 'desc' } }
+        documents: { orderBy: { createdAt: 'desc' } },
+        moduleResults: { orderBy: { attemptNumber: 'asc' } }
       }
     });
     

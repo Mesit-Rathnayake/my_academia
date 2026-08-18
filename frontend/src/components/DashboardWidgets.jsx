@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendarAlt, FaClock, FaArrowRight, FaExclamationCircle } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaArrowRight, FaExclamationCircle, FaGraduationCap } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
-function DashboardWidgets({ timetable = [], examSeries = [] }) {
+function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
   const [currentDay, setCurrentDay] = useState(new Date().getDay());
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -63,9 +64,12 @@ function DashboardWidgets({ timetable = [], examSeries = [] }) {
   const daysNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
       {/* Today's Classes Widget */}
-      <div className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+        className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group"
+      >
         <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -z-10 group-hover:bg-emerald-500/20 transition-all"></div>
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -108,10 +112,13 @@ function DashboardWidgets({ timetable = [], examSeries = [] }) {
             </p>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Upcoming Exam Widget */}
-      <div className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
+        className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group"
+      >
         <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl -z-10 group-hover:bg-orange-500/20 transition-all"></div>
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -154,7 +161,46 @@ function DashboardWidgets({ timetable = [], examSeries = [] }) {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
+
+      {/* GPA Widget */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
+        className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -z-10 group-hover:bg-blue-500/20 transition-all"></div>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <FaGraduationCap className="text-blue-400" /> Academic Standing
+            </h3>
+            <p className="text-slate-400 text-sm mt-1">Your current performance.</p>
+          </div>
+          <Link to="/academic-performance" className="text-blue-400 hover:text-blue-300 text-sm font-bold flex items-center gap-1 transition-colors">
+            Details <FaArrowRight size={10} />
+          </Link>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center text-center">
+          {gpaData ? (
+            <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-700/50 relative overflow-hidden hover:border-blue-500/30 transition-colors">
+              <p className="text-blue-400 font-bold uppercase tracking-widest text-[10px] mb-2">Overall GPA</p>
+              <h4 className="text-5xl font-black text-white mb-2">{gpaData.ogpa !== null ? gpaData.ogpa.toFixed(2) : 'N/A'}</h4>
+              <p className="text-slate-300 text-sm font-medium mb-1 bg-blue-500/10 py-1.5 px-3 rounded-lg inline-block border border-blue-500/20">
+                {gpaData.classification || 'No Classification'}
+              </p>
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <div className="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-700/50">
+                <span className="text-2xl">🎓</span>
+              </div>
+              <p className="text-slate-300 font-bold">No GPA Data</p>
+              <p className="text-slate-500 text-sm mt-1">Add module results to see it here.</p>
+            </div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 }

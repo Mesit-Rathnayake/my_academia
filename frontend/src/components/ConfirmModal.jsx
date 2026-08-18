@@ -1,11 +1,17 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmText = "Confirm", cancelText = "Cancel", isDanger = false }) {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl"
+      >
         <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
         <p className="text-sm text-slate-300 mb-6 leading-relaxed">
           {message}
@@ -28,7 +34,7 @@ function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmText
             {confirmText}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

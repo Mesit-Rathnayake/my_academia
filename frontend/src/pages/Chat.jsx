@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt, FaPlus, FaComments, FaTrash, FaEdit, FaRedo } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import InteractiveQuiz from '../components/InteractiveQuiz';
+import { motion } from 'framer-motion';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -373,8 +374,17 @@ function Chat() {
     }
   };
 
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    in: { opacity: 1, y: 0 },
+    out: { opacity: 0, y: -20 }
+  };
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+    <motion.div 
+      initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+      className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+    >
       <Navbar />
       <div className="flex-1 pt-20 flex flex-row h-full">
         
@@ -642,7 +652,7 @@ function Chat() {
         onConfirm={confirmDeleteSession}
         onCancel={() => setSessionToDelete(null)}
       />
-    </div>
+    </motion.div>
   );
 }
 

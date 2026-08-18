@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaTrash, FaPlus, FaSave } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 function BulkAddExamsModal({ isOpen, onClose, onSaved }) {
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
@@ -68,7 +69,12 @@ function BulkAddExamsModal({ isOpen, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-slate-800 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-700/50 max-h-[90vh]">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-slate-800 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-700/50 max-h-[90vh]"
+      >
         <div className="p-6 border-b border-slate-700/50 flex justify-between items-center bg-slate-900/40">
           <div>
             <h2 className="text-2xl font-black text-white">Add Exam Timetable</h2>
@@ -159,7 +165,7 @@ function BulkAddExamsModal({ isOpen, onClose, onSaved }) {
             <FaSave /> {isSaving ? 'Saving...' : 'Save All Exams'}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

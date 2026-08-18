@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaSave } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 function AddTimetableEntryModal({ isOpen, onClose, onSaved, initialDay, initialStartTime }) {
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
@@ -62,7 +63,12 @@ function AddTimetableEntryModal({ isOpen, onClose, onSaved, initialDay, initialS
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
-      <div className="bg-slate-800 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-700/50">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="bg-slate-800 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-700/50"
+      >
         <div className="p-6 border-b border-slate-700/50 flex justify-between items-center bg-slate-900/40">
           <div>
             <h2 className="text-2xl font-black text-white">Add Class</h2>
@@ -149,7 +155,7 @@ function AddTimetableEntryModal({ isOpen, onClose, onSaved, initialDay, initialS
             <FaSave /> {isSaving ? 'Saving...' : 'Save Class'}
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

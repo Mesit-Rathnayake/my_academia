@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaTrash, FaEdit, FaCheckCircle, FaTimesCircle, FaClock, FaPlus } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const themes = [
   { name: 'rose', badge: 'bg-rose-500 shadow-rose-500/30', glow: 'from-rose-500/20 via-transparent to-orange-500/10' },
@@ -40,7 +41,10 @@ function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDele
   };
 
   return (
-    <div 
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
       className={`bg-slate-800/80 backdrop-blur-sm p-6 rounded-3xl flex flex-col gap-6 shadow-xl shadow-black/30 border-2 border-slate-700 hover:border-${theme.name}-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden transform hover:-translate-y-1`}
       onClick={onOpenEdit}
     >
@@ -139,7 +143,7 @@ function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDele
           <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">Notes</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

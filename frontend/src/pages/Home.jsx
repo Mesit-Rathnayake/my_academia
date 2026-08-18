@@ -5,11 +5,13 @@ import ModuleFormModal from '../components/ModuleFormModal';
 import DashboardWidgets from '../components/DashboardWidgets';
 import Footer from '../components/Footer';
 import { FaPlus, FaBookReader } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 function Home() {
   const [modules, setModules] = useState([]);
   const [timetable, setTimetable] = useState([]);
   const [examSeries, setExamSeries] = useState([]);
+  const [gpaData, setGpaData] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModule, setEditModule] = useState(null);
@@ -26,10 +28,11 @@ function Home() {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const [modulesRes, timeRes, seriesRes] = await Promise.all([
+      const [modulesRes, timeRes, seriesRes, gpaRes] = await Promise.all([
         fetch(`${apiBaseUrl}/api/modules`, { headers: { 'Authorization': `Bearer ${token}` } }),
         fetch(`${apiBaseUrl}/api/timetable`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiBaseUrl}/api/exam-series`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${apiBaseUrl}/api/exam-series`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${apiBaseUrl}/api/gpa`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       
       if (!modulesRes.ok) throw new Error('Failed to fetch modules');
@@ -38,6 +41,7 @@ function Home() {
       
       if (timeRes.ok) setTimetable(await timeRes.json());
       if (seriesRes.ok) setExamSeries(await seriesRes.json());
+      if (gpaRes.ok) setGpaData(await gpaRes.json());
       
     } catch (err) {
       setError(err.message);
@@ -176,12 +180,15 @@ function Home() {
 
   if (loading) {
     return (
-      <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+      <motion.div 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+      >
         <Navbar />
         <main className="flex-1 pt-20 p-8 overflow-y-auto custom-scrollbar flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </main>
-      </div>
+      </motion.div>
     );
   }
 
@@ -198,8 +205,17 @@ function Home() {
     ? Number(activeTab) 
     : 1;
 
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    in: { opacity: 1, y: 0 },
+    out: { opacity: 0, y: -20 }
+  };
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+    <motion.div 
+      initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+      className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+    >
       <Navbar />
       
       <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar relative z-0">
@@ -232,7 +248,7 @@ function Home() {
 
           {/* Dashboard Summary Widgets */}
           <div className="relative z-10 w-full">
-            <DashboardWidgets timetable={timetable} examSeries={examSeries} />
+            <DashboardWidgets timetable={timetable} examSeries={examSeries} gpaData={gpaData} />
           </div>
 
           <div className="w-full">
@@ -306,7 +322,7 @@ function Home() {
           initialData={editModule}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 

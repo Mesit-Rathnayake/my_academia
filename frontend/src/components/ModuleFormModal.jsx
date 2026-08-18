@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaPlus, FaUpload, FaFilePdf } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import ConfirmModal from './ConfirmModal';
 
 function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
@@ -12,6 +13,9 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
   const [assignments, setAssignments] = useState([]);
   const [labs, setLabs] = useState([]);
   const [documents, setDocuments] = useState([]);
+  const [isGpaCounted, setIsGpaCounted] = useState(true);
+  const [creditsOverride, setCreditsOverride] = useState('');
+  const [moduleResults, setModuleResults] = useState([]);
   const [error, setError] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [docToDelete, setDocToDelete] = useState(null);
@@ -28,6 +32,9 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
       setAssignments(initialData.assignments ? [...initialData.assignments] : []);
       setLabs(initialData.labs ? [...initialData.labs] : []);
       setDocuments(initialData.documents ? [...initialData.documents] : []);
+      setIsGpaCounted(initialData.isGpaCounted !== false);
+      setCreditsOverride(initialData.creditsOverride || '');
+      setModuleResults(initialData.moduleResults ? [...initialData.moduleResults] : []);
     } else {
       setModuleName('');
       setModuleCode('');
@@ -38,8 +45,22 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
       setAssignments([]);
       setLabs([]);
       setDocuments([]);
+      setIsGpaCounted(true);
+      setCreditsOverride('');
+      setModuleResults([]);
     }
   }, [initialData]);
+
+  const addResult = () => {
+    const nextAttempt = moduleResults.length > 0 ? Math.max(...moduleResults.map(r => r.attemptNumber)) + 1 : 1;
+    setModuleResults([...moduleResults, { attemptNumber: nextAttempt, marks: '', grade: '', isProperAttempt: true, academicYear: '' }]);
+  };
+  const removeResult = (i) => setModuleResults(moduleResults.filter((_, idx) => idx !== i));
+  const updateResult = (i, key, val) => {
+    const copy = [...moduleResults];
+    copy[i] = { ...copy[i], [key]: val };
+    setModuleResults(copy);
+  };
 
   const addAssignment = () => setAssignments([...assignments, { name: '', marks: null, totalMarks: null, dueDate: '', status: 'Pending' }]);
   const removeAssignment = (i) => setAssignments(assignments.filter((_, idx) => idx !== i));
@@ -142,6 +163,15 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
         totalMarks: l.totalMarks === null ? null : Number(l.totalMarks),
         dueDate: l.dueDate || null,
         status: l.status || 'Pending'
+      })),
+      isGpaCounted,
+      creditsOverride: creditsOverride === '' ? null : Number(creditsOverride),
+      moduleResults: moduleResults.map(r => ({
+        attemptNumber: Number(r.attemptNumber) || 1,
+        marks: r.marks === '' ? null : Number(r.marks),
+        grade: r.grade || null,
+        isProperAttempt: r.isProperAttempt,
+        academicYear: r.academicYear || null
       }))
     };
 
@@ -150,7 +180,12 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm overflow-y-auto">
-      <div className="glass-panel w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="glass-panel w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+      >
         <div className="p-6 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/40">
           <h2 className="text-2xl font-bold text-white">{initialData ? 'Edit Module' : 'Add Module'}</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
@@ -310,6 +345,65 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
                 </div>
               </div>
             </div>
+
+            {/* GPA Settings */}
+            <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
+              <h3 className="text-lg font-semibold text-white mb-4">Academic Settings</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div className="flex items-center gap-3">
+                  <input type="checkbox" id="isGpaCounted" checked={isGpaCounted} onChange={(e) => setIsGpaCounted(e.target.checked)} className="w-5 h-5 accent-emerald-500 rounded bg-slate-700 border-slate-600 focus:ring-emerald-500" />
+                  <label htmlFor="isGpaCounted" className="text-sm font-medium text-slate-300">Include in GPA Calculation (GPA Counted)</label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Credits Override (Leave blank to auto-detect)</label>
+                  <input type="number" step="0.5" min="0" className="glass-input w-full px-4 py-2 rounded-xl" value={creditsOverride} onChange={(e) => setCreditsOverride(e.target.value)} placeholder="e.g. 3" />
+                </div>
+              </div>
+            </div>
+
+            {/* Academic Results */}
+            <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-white">Academic Results (Attempts)</h3>
+                <button type="button" onClick={addResult} className="text-emerald-400 hover:text-emerald-300 transition-colors text-sm font-bold flex items-center gap-1">
+                  <FaPlus size={12} /> Add Attempt
+                </button>
+              </div>
+              <div className="space-y-4">
+                {moduleResults.map((r, i) => (
+                  <div key={i} className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 relative group">
+                    <button type="button" onClick={() => removeResult(i)} className="absolute top-4 right-4 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <FaTrash size={14} />
+                    </button>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end pr-8">
+                      <div>
+                        <label className="block text-xs text-slate-400 mb-1">Attempt #</label>
+                        <input type="number" min="1" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.attemptNumber} onChange={(e) => updateResult(i, 'attemptNumber', e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-400 mb-1">Grade</label>
+                        <input className="glass-input w-full px-3 py-2 rounded-lg text-sm uppercase" value={r.grade || ''} onChange={(e) => updateResult(i, 'grade', e.target.value.toUpperCase())} placeholder="e.g. A+" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-400 mb-1">Marks (Optional)</label>
+                        <input type="number" min="0" max="100" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.marks || ''} onChange={(e) => updateResult(i, 'marks', e.target.value)} placeholder="0-100" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-slate-400 mb-1">Academic Year</label>
+                        <input className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.academicYear || ''} onChange={(e) => updateResult(i, 'academicYear', e.target.value)} placeholder="e.g. 2024/2025" />
+                      </div>
+                      <div className="flex items-center h-full pb-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={r.isProperAttempt} onChange={(e) => updateResult(i, 'isProperAttempt', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded bg-slate-700" />
+                          <span className="text-xs text-slate-300 font-medium whitespace-nowrap">Proper Attempt</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {moduleResults.length === 0 && <p className="text-slate-500 text-sm text-center py-2">No results recorded for this module yet.</p>}
+              </div>
+            </div>
           </form>
         </div>
 
@@ -321,7 +415,7 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
             {initialData ? 'Save Changes' : 'Create Module'}
           </button>
         </div>
-      </div>
+      </motion.div>
       
       {/* Delete Confirmation Modal */}
       <ConfirmModal 

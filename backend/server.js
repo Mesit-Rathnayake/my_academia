@@ -12,12 +12,14 @@ app.use(cors());
 const timetableRoutes = require('./routes/timetableRoutes');
 const examRoutes = require('./routes/examRoutes');
 const examSeriesRoutes = require('./routes/examSeriesRoutes');
+const gpaRoutes = require('./routes/gpaRoutes');
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/modules', require('./routes/moduleRoutes'));
 app.use('/api/timetable', timetableRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/exam-series', examSeriesRoutes);
+app.use('/api/gpa', gpaRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

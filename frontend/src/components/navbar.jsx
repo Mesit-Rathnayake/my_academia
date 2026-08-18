@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaHome, FaUser, FaComments, FaSignOutAlt, FaGraduationCap, FaCalendarAlt } from 'react-icons/fa';
+import { FaHome, FaUser, FaComments, FaSignOutAlt, FaGraduationCap, FaCalendarAlt, FaChartLine } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar() {
@@ -48,6 +48,7 @@ function Navbar() {
       <nav className="flex items-center gap-2 md:gap-4">
         <NavItem icon={FaHome} label="Home" path="/home" active={isActive('/home')} />
         <NavItem icon={FaCalendarAlt} label="Schedule" path="/schedule" active={isActive('/schedule')} />
+        <NavItem icon={FaChartLine} label="Performance" path="/academic-performance" active={isActive('/academic-performance')} />
         <NavItem icon={FaComments} label="AI Tutor" path="/chat" active={isActive('/chat')} />
         <NavItem icon={FaUser} label="Profile" path="/profile" active={isActive('/profile')} />
       </nav>

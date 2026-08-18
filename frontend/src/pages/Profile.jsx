@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import { FaUserCircle, FaBookOpen, FaClipboardCheck, FaFlask, FaCalendarAlt, FaIdBadge } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 function Profile() {
   const [user, setUser] = useState(null);
@@ -58,19 +59,31 @@ function Profile() {
     navigate('/home');
   };
 
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    in: { opacity: 1, y: 0 },
+    out: { opacity: 0, y: -20 }
+  };
+
   if (loading) {
     return (
-      <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+      <motion.div 
+        initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+        className="flex flex-col h-screen bg-slate-900 text-slate-100"
+      >
         <Navbar />
-        <main className="flex-1 pt-20 p-8 overflow-y-auto custom-scrollbar flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <main className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-rose-500"></div>
         </main>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+    <motion.div 
+      initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+      className="flex flex-col h-screen overflow-hidden bg-slate-900 text-slate-100 font-sans selection:bg-rose-500/30"
+    >
       <Navbar />
       <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar z-0">
         <div className="max-w-6xl mx-auto space-y-12">
@@ -180,7 +193,7 @@ function Profile() {
         </div>
         <Footer />
       </main>
-    </div>
+    </motion.div>
   );
 }
 

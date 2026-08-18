@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/navbar';
-import { FaClock, FaCalendarAlt, FaTrash, FaLayerGroup } from 'react-icons/fa';
-import BulkAddExamsModal from '../components/BulkAddExamsModal';
 import WeeklyCalendar from '../components/WeeklyCalendar';
 import AddTimetableEntryModal from '../components/AddTimetableEntryModal';
+import BulkAddExamsModal from '../components/BulkAddExamsModal';
 import Footer from '../components/Footer';
+import { motion } from 'framer-motion';
+import { FaClock, FaCalendarAlt, FaTrash, FaLayerGroup } from 'react-icons/fa';
 
 function Schedule() {
   const [timetable, setTimetable] = useState([]);
@@ -82,17 +83,31 @@ function Schedule() {
     );
   };
 
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    in: { opacity: 1, y: 0 },
+    out: { opacity: 0, y: -20 }
+  };
+
   if (loading) {
     return (
-      <div className="flex flex-col h-screen bg-slate-900 text-white">
+      <motion.div 
+        initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+        className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+      >
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">Loading...</div>
-      </div>
+        <main className="flex-1 pt-20 p-8 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </main>
+      </motion.div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900">
+    <motion.div 
+      initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
+      className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+    >
       <Navbar />
       <main className="flex-1 pt-28 pb-8 px-8 overflow-y-auto custom-scrollbar">
         <div className="max-w-7xl mx-auto space-y-12">
@@ -209,7 +224,7 @@ function Schedule() {
         initialDay={initialAddClassData.day}
         initialStartTime={initialAddClassData.time}
       />
-    </div>
+    </motion.div>
   );
 }
 

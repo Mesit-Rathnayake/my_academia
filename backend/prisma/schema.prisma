@@ -14,10 +14,26 @@ model User {
   password           String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  universityConfigId String?
+  universityConfig   UniversityConfig? @relation(fields: [universityConfigId], references: [id])
   modules            Module[]
   timetableEntries   TimetableEntry[]
   exams              Exam[]
   examSeries         ExamSeries[]
+}
+
+model UniversityConfig {
+  id                  String   @id @default(cuid())
+  name                String   @unique
+  gpaScale            Float    @default(4.0)
+  rounding            Int      @default(2)
+  creditRule          String   @default("MANUAL")
+  gradingScale        Json
+  classificationRules Json
+  specialGrades       Json
+  users               User[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model Module {
@@ -28,6 +44,8 @@ model Module {
   conductedLectures Int          @default(0)
   attendedLectures  Int          @default(0)
   semester          Int          @default(1)
+  isGpaCounted      Boolean      @default(true)
+  creditsOverride   Float?
   userId            String
   user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt         DateTime     @default(now())
@@ -38,8 +56,22 @@ model Module {
   chatSessions      ChatSession[]
   timetableEntries  TimetableEntry[]
   exams             Exam[]
+  moduleResults     ModuleResult[]
 
   @@unique([moduleCode, userId])
+}
+
+model ModuleResult {
+  id              String   @id @default(cuid())
+  moduleId        String
+  module          Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  attemptNumber   Int      @default(1)
+  marks           Float?
+  grade           String?
+  isProperAttempt Boolean  @default(true)
+  academicYear    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Lab {
