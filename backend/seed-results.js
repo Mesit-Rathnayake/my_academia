@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const prisma = new PrismaClient();
 
 const regNumber = "EG/2022/5440";
@@ -43,16 +44,58 @@ const semesterData = [
 ];
 
 async function main() {
-  const user = await prisma.user.findFirst({
+  // 1. Create or find University Config
+  let universityConfig = await prisma.universityConfig.findFirst({
+    where: { name: 'University of Ruhuna (FoE)' }
+  });
+
+  if (!universityConfig) {
+    universityConfig = await prisma.universityConfig.create({
+      data: {
+        name: 'University of Ruhuna (FoE)',
+        gpaScale: 4.0,
+        rounding: 2,
+        creditRule: 'MANUAL',
+        gradingScale: {
+          "A+": 4.0, "A": 4.0, "A-": 3.7, "B+": 3.3, "B": 3.0, "B-": 2.7,
+          "C+": 2.3, "C": 2.0, "C-": 1.7, "D+": 1.3, "D": 1.0, "E": 0.0
+        },
+        classificationRules: [
+          { name: 'First Class', minGpa: 3.7 },
+          { name: 'Second Class (Upper)', minGpa: 3.3 },
+          { name: 'Second Class (Lower)', minGpa: 3.0 },
+          { name: 'Pass', minGpa: 2.0 }
+        ],
+        specialGrades: {
+          "MC": { isCounted: false, pointValue: null },
+          "AB": { isCounted: true, pointValue: 0.0 },
+          "Not Given": { isCounted: false, pointValue: null }
+        }
+      }
+    });
+    console.log('Created University Config: Ruhuna FoE');
+  }
+
+  let user = await prisma.user.findFirst({
     where: { registrationNumber: regNumber }
   });
 
   if (!user) {
-    console.error(`User with reg number ${regNumber} not found.`);
-    return;
+    console.log(`User with reg number ${regNumber} not found. Creating...`);
+    const hashedPassword = await bcrypt.hash('Mesith1234@#', 10);
+    user = await prisma.user.create({
+      data: {
+        registrationNumber: regNumber,
+        firstName: "Mesith",
+        lastName: "Rathanayake",
+        password: hashedPassword,
+        universityConfigId: universityConfig.id
+      }
+    });
+    console.log(`Created user: ${user.firstName} ${user.lastName}`);
   }
 
-  console.log(`Found user: ${user.name} (${user.id})`);
+  console.log(`Found user: ${user.firstName} ${user.lastName} (${user.id})`);
 
   for (const item of semesterData) {
     // Check if module already exists
