@@ -20,6 +20,7 @@ app.use('/api/timetable', timetableRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/exam-series', examSeriesRoutes);
 app.use('/api/gpa', gpaRoutes);
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => {
