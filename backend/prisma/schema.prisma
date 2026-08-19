@@ -10,7 +10,8 @@ datasource db {
 model User {
   id                 String   @id @default(cuid())
   registrationNumber String   @unique
-  fullName           String
+  firstName          String   @default("Mesith")
+  lastName           String   @default("Rathanayake")
   password           String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt

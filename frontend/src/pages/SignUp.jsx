@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from '../components/Footer';
 import man2 from '../images/man2.png';
+import { FaUser } from 'react-icons/fa';
 
 function SignUp() {
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
-  const [regNumber, setRegNumber] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [registrationNumber, setRegistrationNumber] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -21,8 +23,9 @@ function SignUp() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          registrationNumber: regNumber,
-          fullName: fullName,
+          registrationNumber: registrationNumber,
+          firstName: firstName,
+          lastName: lastName,
           password: password,
         }),
       });
@@ -67,19 +70,42 @@ function SignUp() {
               <input 
                 type="text" 
                 placeholder="Registration Number (EG/20XX/XXXX)"
-                value={regNumber}
-                onChange={(e) => setRegNumber(e.target.value)}
+                value={registrationNumber}
+                onChange={(e) => setRegistrationNumber(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium"
               />
             </div>
             <div>
-              <input 
-                type="text" 
-                placeholder="Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium"
-              />
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">First Name</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <FaUser />
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                  placeholder="John"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Last Name</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <FaUser />
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
+                  placeholder="Doe"
+                />
+              </div>
             </div>
             <div>
               <input 

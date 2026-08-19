@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 
 // Register a new user
 exports.register = async (req, res) => {
-  const { registrationNumber, fullName, password } = req.body;
+  const { registrationNumber, firstName, lastName, password } = req.body;
 
   try {
     const existingUser = await prisma.user.findUnique({ where: { registrationNumber } });
@@ -17,7 +17,8 @@ exports.register = async (req, res) => {
     const user = await prisma.user.create({
       data: {
         registrationNumber,
-        fullName,
+        firstName,
+        lastName,
         password: hashedPassword
       }
     });
@@ -38,7 +39,8 @@ exports.register = async (req, res) => {
       user: {
         _id: user.id,
         registrationNumber: user.registrationNumber,
-        fullName: user.fullName
+        firstName: user.firstName,
+        lastName: user.lastName
       }
     });
   } catch (error) {
@@ -78,7 +80,8 @@ exports.login = async (req, res) => {
       user: {
         _id: user.id,
         registrationNumber: user.registrationNumber,
-        fullName: user.fullName
+        firstName: user.firstName,
+        lastName: user.lastName
       }
     });
   } catch (error) {
@@ -93,7 +96,8 @@ exports.getCurrentUser = async (req, res) => {
     res.json({
       _id: req.user.id,
       registrationNumber: req.user.registrationNumber,
-      fullName: req.user.fullName,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
       createdAt: req.user.createdAt
     });
   } catch (error) {

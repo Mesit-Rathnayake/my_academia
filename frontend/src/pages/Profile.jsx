@@ -129,7 +129,7 @@ function Profile() {
                     <div className="p-3 bg-primary/10 rounded-xl text-primary"><FaUserCircle size={24} /></div>
                     <div>
                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Full Name</p>
-                      <p className="text-lg font-semibold text-slate-900">{user.fullName}</p>
+                      <p className="text-lg font-semibold text-slate-900">{user.firstName} {user.lastName}</p>
                     </div>
                   </div>
                   <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center gap-4 shadow-sm">

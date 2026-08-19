@@ -16,6 +16,7 @@ function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModule, setEditModule] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
 
@@ -28,11 +29,12 @@ function Home() {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const [modulesRes, timeRes, seriesRes, gpaRes] = await Promise.all([
+      const [modulesRes, timeRes, seriesRes, gpaRes, userRes] = await Promise.all([
         fetch(`${apiBaseUrl}/api/modules`, { headers: { 'Authorization': `Bearer ${token}` } }),
         fetch(`${apiBaseUrl}/api/timetable`, { headers: { 'Authorization': `Bearer ${token}` } }),
         fetch(`${apiBaseUrl}/api/exam-series`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiBaseUrl}/api/gpa`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${apiBaseUrl}/api/gpa`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${apiBaseUrl}/api/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
       
       if (!modulesRes.ok) throw new Error('Failed to fetch modules');
@@ -42,6 +44,7 @@ function Home() {
       if (timeRes.ok) setTimetable(await timeRes.json());
       if (seriesRes.ok) setExamSeries(await seriesRes.json());
       if (gpaRes.ok) setGpaData(await gpaRes.json());
+      if (userRes.ok) setUser(await userRes.json());
       
     } catch (err) {
       setError(err.message);
@@ -211,6 +214,13 @@ function Home() {
     out: { opacity: 0, y: -20 }
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
@@ -225,9 +235,9 @@ function Home() {
           <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
             <div>
               <h2 className="text-3xl lg:text-5xl font-black text-slate-900 tracking-tight">
-                Dashboard
+                {getGreeting()}, {user?.firstName || 'Student'}!
               </h2>
-              <p className="text-slate-500 mt-3 font-semibold text-lg">Manage your academic progress and modules.</p>
+              <p className="text-slate-500 mt-3 font-semibold text-lg">Here is your academic overview.</p>
             </div>
             <button onClick={openAddModal} className="bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-md shadow-primary/20 hover:bg-indigo-600 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
               <FaPlus size={18} /> Add Module
