@@ -179,16 +179,16 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="glass-panel w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
       >
-        <div className="p-6 border-b border-slate-700/50 flex justify-between items-center bg-slate-800/40">
-          <h2 className="text-2xl font-bold text-white">{initialData ? 'Edit Module' : 'Add Module'}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
+        <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+          <h2 className="text-2xl font-bold text-slate-900">{initialData ? 'Edit Module' : 'Add Module'}</h2>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-800 text-2xl leading-none">&times;</button>
         </div>
 
         <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
@@ -198,15 +198,15 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
             {/* Core Info */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Module Name</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Module Name</label>
                 <input className="glass-input w-full px-4 py-3 rounded-xl" value={moduleName} onChange={(e) => setModuleName(e.target.value)} required placeholder="e.g. Data Structures" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Module Code</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Module Code</label>
                 <input className="glass-input w-full px-4 py-3 rounded-xl" value={moduleCode} onChange={(e) => setModuleCode(e.target.value)} required placeholder="e.g. CS101" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Semester</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Semester</label>
                 <select className="glass-input w-full px-4 py-3 rounded-xl" value={semester} onChange={(e) => setSemester(e.target.value)}>
                   {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
                     <option key={sem} value={sem}>Semester {sem}</option>
@@ -216,19 +216,19 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
             </div>
 
             {/* Attendance */}
-            <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
-              <h3 className="text-lg font-semibold text-white mb-4">Attendance Tracking</h3>
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Attendance Tracking</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Total Lectures (Expected)</label>
+                  <label className="block text-sm font-medium text-slate-600 mb-2">Total Lectures (Expected)</label>
                   <input type="number" min="0" className="glass-input w-full px-4 py-3 rounded-xl" value={totalLectures} onChange={(e) => setTotalLectures(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Lectures Conducted</label>
+                  <label className="block text-sm font-medium text-slate-600 mb-2">Lectures Conducted</label>
                   <input type="number" min="0" className="glass-input w-full px-4 py-3 rounded-xl" value={conductedLectures} onChange={(e) => setConductedLectures(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Lectures Attended</label>
+                  <label className="block text-sm font-medium text-slate-600 mb-2">Lectures Attended</label>
                   <input type="number" min="0" className="glass-input w-full px-4 py-3 rounded-xl" value={attendedLectures} onChange={(e) => setAttendedLectures(e.target.value)} />
                 </div>
               </div>
@@ -236,9 +236,9 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
 
             {/* Documents Upload (Only in Edit Mode) */}
             {initialData ? (
-              <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-white">Lecture Notes (PDFs)</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">Lecture Notes (PDFs)</h3>
                   <label className="glass-button cursor-pointer px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2">
                     {uploading ? 'Uploading...' : <><FaUpload /> Upload PDF</>}
                     <input type="file" accept=".pdf" className="hidden" onChange={handleFileUpload} disabled={uploading} />
@@ -249,12 +249,12 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {documents.map(doc => (
-                      <div key={doc.id} className="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl border border-slate-700/50">
+                      <div key={doc.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
                         <div className="flex items-center gap-3 truncate">
-                          <FaFilePdf className="text-red-400 text-xl shrink-0" />
-                          <span className="text-slate-200 text-sm truncate" title={doc.name}>{doc.name}</span>
+                          <FaFilePdf className="text-red-500 text-xl shrink-0" />
+                          <span className="text-slate-700 text-sm truncate" title={doc.name}>{doc.name}</span>
                         </div>
-                        <button type="button" onClick={() => handleDeleteDocument(doc.id)} className="text-slate-500 hover:text-red-400 p-2 shrink-0">
+                        <button type="button" onClick={() => handleDeleteDocument(doc.id)} className="text-slate-400 hover:text-red-500 p-2 shrink-0">
                           <FaTrash size={14} />
                         </button>
                       </div>
@@ -263,31 +263,31 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
                 )}
               </div>
             ) : (
-              <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50 border-dashed text-center">
-                <p className="text-slate-400 text-sm">Save this module first to upload and chat with lecture notes.</p>
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 border-dashed text-center">
+                <p className="text-slate-500 text-sm">Save this module first to upload and chat with lecture notes.</p>
               </div>
             )}
 
             {/* Tasks (Assignments & Labs) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Assignments */}
-              <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-white">Assignments</h3>
-                  <button type="button" onClick={addAssignment} className="text-primary hover:text-white transition-colors text-sm font-medium flex items-center gap-1">
+                  <h3 className="text-lg font-semibold text-slate-900">Assignments</h3>
+                  <button type="button" onClick={addAssignment} className="text-primary hover:text-indigo-600 transition-colors text-sm font-medium flex items-center gap-1">
                     <FaPlus size={12} /> Add
                   </button>
                 </div>
                 <div className="space-y-4">
                   {assignments.map((a, i) => (
-                    <div key={i} className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/30 relative group">
-                      <button type="button" onClick={() => removeAssignment(i)} className="absolute top-3 right-3 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 relative group shadow-sm">
+                      <button type="button" onClick={() => removeAssignment(i)} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                         <FaTrash size={14} />
                       </button>
                       <input className="glass-input w-[90%] px-3 py-2 rounded-lg text-sm mb-3 font-semibold" value={a.name} onChange={(e) => updateAssignment(i, 'name', e.target.value)} placeholder={`Assignment ${i+1}`} />
                       <div className="grid grid-cols-2 gap-3 mb-3">
                         <div>
-                          <label className="block text-xs text-slate-400 mb-1">Status</label>
+                          <label className="block text-xs text-slate-500 mb-1">Status</label>
                           <select className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={a.status} onChange={(e) => updateAssignment(i, 'status', e.target.value)}>
                             <option value="Pending">Pending</option>
                             <option value="Submitted">Submitted</option>
@@ -295,7 +295,7 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs text-slate-400 mb-1">Due Date</label>
+                          <label className="block text-xs text-slate-500 mb-1">Due Date</label>
                           <input type="date" className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={a.dueDate ? a.dueDate.split('T')[0] : ''} onChange={(e) => updateAssignment(i, 'dueDate', e.target.value)} />
                         </div>
                       </div>
@@ -311,23 +311,23 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
               </div>
 
               {/* Labs */}
-              <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-white">Labs</h3>
-                  <button type="button" onClick={addLab} className="text-primary hover:text-white transition-colors text-sm font-medium flex items-center gap-1">
+                  <h3 className="text-lg font-semibold text-slate-900">Labs</h3>
+                  <button type="button" onClick={addLab} className="text-primary hover:text-indigo-600 transition-colors text-sm font-medium flex items-center gap-1">
                     <FaPlus size={12} /> Add
                   </button>
                 </div>
                 <div className="space-y-4">
                   {labs.map((l, i) => (
-                    <div key={i} className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/30 relative group">
-                      <button type="button" onClick={() => removeLab(i)} className="absolute top-3 right-3 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 relative group shadow-sm">
+                      <button type="button" onClick={() => removeLab(i)} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                         <FaTrash size={14} />
                       </button>
                       <input className="glass-input w-[90%] px-3 py-2 rounded-lg text-sm mb-3 font-semibold" value={l.name} onChange={(e) => updateLab(i, 'name', e.target.value)} placeholder={`Lab ${i+1}`} />
                       <div className="grid grid-cols-2 gap-3 mb-3">
                         <div>
-                          <label className="block text-xs text-slate-400 mb-1">Status</label>
+                          <label className="block text-xs text-slate-500 mb-1">Status</label>
                           <select className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={l.status} onChange={(e) => updateLab(i, 'status', e.target.value)}>
                             <option value="Pending">Pending</option>
                             <option value="Submitted">Submitted</option>
@@ -335,7 +335,7 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-xs text-slate-400 mb-1">Due Date</label>
+                          <label className="block text-xs text-slate-500 mb-1">Due Date</label>
                           <input type="date" className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={l.dueDate ? l.dueDate.split('T')[0] : ''} onChange={(e) => updateLab(i, 'dueDate', e.target.value)} />
                         </div>
                       </div>
@@ -347,55 +347,55 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
             </div>
 
             {/* GPA Settings */}
-            <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
-              <h3 className="text-lg font-semibold text-white mb-4">Academic Settings</h3>
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Academic Settings</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                 <div className="flex items-center gap-3">
-                  <input type="checkbox" id="isGpaCounted" checked={isGpaCounted} onChange={(e) => setIsGpaCounted(e.target.checked)} className="w-5 h-5 accent-emerald-500 rounded bg-slate-700 border-slate-600 focus:ring-emerald-500" />
-                  <label htmlFor="isGpaCounted" className="text-sm font-medium text-slate-300">Include in GPA Calculation (GPA Counted)</label>
+                  <input type="checkbox" id="isGpaCounted" checked={isGpaCounted} onChange={(e) => setIsGpaCounted(e.target.checked)} className="w-5 h-5 accent-primary rounded bg-white border-slate-300 focus:ring-primary" />
+                  <label htmlFor="isGpaCounted" className="text-sm font-medium text-slate-700">Include in GPA Calculation (GPA Counted)</label>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Credits Override (Leave blank to auto-detect)</label>
+                  <label className="block text-sm font-medium text-slate-600 mb-2">Credits Override (Leave blank to auto-detect)</label>
                   <input type="number" step="0.5" min="0" className="glass-input w-full px-4 py-2 rounded-xl" value={creditsOverride} onChange={(e) => setCreditsOverride(e.target.value)} placeholder="e.g. 3" />
                 </div>
               </div>
             </div>
 
             {/* Academic Results */}
-            <div className="bg-slate-800/30 p-6 rounded-2xl border border-slate-700/50">
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-white">Academic Results (Attempts)</h3>
-                <button type="button" onClick={addResult} className="text-emerald-400 hover:text-emerald-300 transition-colors text-sm font-bold flex items-center gap-1">
+                <h3 className="text-lg font-semibold text-slate-900">Academic Results (Attempts)</h3>
+                <button type="button" onClick={addResult} className="text-primary hover:text-indigo-600 transition-colors text-sm font-bold flex items-center gap-1">
                   <FaPlus size={12} /> Add Attempt
                 </button>
               </div>
               <div className="space-y-4">
                 {moduleResults.map((r, i) => (
-                  <div key={i} className="bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 relative group">
-                    <button type="button" onClick={() => removeResult(i)} className="absolute top-4 right-4 text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 relative group shadow-sm">
+                    <button type="button" onClick={() => removeResult(i)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                       <FaTrash size={14} />
                     </button>
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end pr-8">
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1">Attempt #</label>
+                        <label className="block text-xs text-slate-500 mb-1">Attempt #</label>
                         <input type="number" min="1" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.attemptNumber} onChange={(e) => updateResult(i, 'attemptNumber', e.target.value)} />
                       </div>
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1">Grade</label>
+                        <label className="block text-xs text-slate-500 mb-1">Grade</label>
                         <input className="glass-input w-full px-3 py-2 rounded-lg text-sm uppercase" value={r.grade || ''} onChange={(e) => updateResult(i, 'grade', e.target.value.toUpperCase())} placeholder="e.g. A+" />
                       </div>
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1">Marks (Optional)</label>
+                        <label className="block text-xs text-slate-500 mb-1">Marks (Optional)</label>
                         <input type="number" min="0" max="100" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.marks || ''} onChange={(e) => updateResult(i, 'marks', e.target.value)} placeholder="0-100" />
                       </div>
                       <div>
-                        <label className="block text-xs text-slate-400 mb-1">Academic Year</label>
+                        <label className="block text-xs text-slate-500 mb-1">Academic Year</label>
                         <input className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.academicYear || ''} onChange={(e) => updateResult(i, 'academicYear', e.target.value)} placeholder="e.g. 2024/2025" />
                       </div>
                       <div className="flex items-center h-full pb-2">
                         <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={r.isProperAttempt} onChange={(e) => updateResult(i, 'isProperAttempt', e.target.checked)} className="w-4 h-4 accent-emerald-500 rounded bg-slate-700" />
-                          <span className="text-xs text-slate-300 font-medium whitespace-nowrap">Proper Attempt</span>
+                          <input type="checkbox" checked={r.isProperAttempt} onChange={(e) => updateResult(i, 'isProperAttempt', e.target.checked)} className="w-4 h-4 accent-primary rounded bg-white border-slate-300" />
+                          <span className="text-xs text-slate-700 font-medium whitespace-nowrap">Proper Attempt</span>
                         </label>
                       </div>
                     </div>
@@ -407,11 +407,11 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
           </form>
         </div>
 
-        <div className="p-6 border-t border-slate-700/50 bg-slate-800/80 flex justify-end gap-4">
-          <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-slate-300 font-medium hover:bg-slate-700 transition-colors">
+        <div className="p-6 border-t border-slate-200 bg-slate-50 flex justify-end gap-4">
+          <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-slate-600 font-medium hover:bg-slate-200 transition-colors">
             Cancel
           </button>
-          <button type="submit" form="module-form" className="glass-button px-8 py-3 rounded-xl font-medium shadow-lg">
+          <button type="submit" form="module-form" className="glass-button px-8 py-3 rounded-xl font-medium shadow-sm">
             {initialData ? 'Save Changes' : 'Create Module'}
           </button>
         </div>

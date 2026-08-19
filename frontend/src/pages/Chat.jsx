@@ -383,27 +383,27 @@ function Chat() {
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+      className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
     >
       <Navbar />
       <div className="flex-1 pt-20 flex flex-row h-full">
         
         {/* Secondary Sidebar: Modules & Chats */}
-        <div className="w-72 bg-slate-800/80 border-r border-slate-700/80 flex flex-col z-20 shadow-xl shrink-0 h-full">
-          <div className="p-6 border-b border-slate-700/80">
-            <h2 className="text-xl font-extrabold text-white mb-6 drop-shadow-sm flex items-center gap-3">
+        <div className="w-72 bg-white border-r border-slate-200 flex flex-col z-20 shadow-lg shrink-0 h-full">
+          <div className="p-6 border-b border-slate-200">
+            <h2 className="text-xl font-extrabold text-slate-900 mb-6 drop-shadow-sm flex items-center gap-3">
               <div className="bg-gradient-to-br from-primary to-secondary p-2 rounded-xl shadow-[0_0_15px_rgba(14,165,233,0.3)]">
                 <FaGraduationCap size={20} className="text-white" />
               </div>
               AI Tutor
             </h2>
             <div className="space-y-2">
-              <label htmlFor="module-select" className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <label htmlFor="module-select" className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Module
               </label>
               <select
                 id="module-select"
-                className="w-full glass-input px-4 py-2.5 rounded-xl text-sm font-bold border-slate-600/50 shadow-sm shadow-black/20 focus:border-primary/50 bg-slate-900/50"
+                className="w-full glass-input px-4 py-2.5 rounded-xl text-sm font-bold border-slate-200 shadow-sm focus:border-primary/50 bg-slate-50 text-slate-700"
                 value={selectedModule?._id || ''}
                 onChange={(e) => {
                   const mod = modules.find(m => m._id === e.target.value);
@@ -423,7 +423,7 @@ function Chat() {
 
           <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
             <div className="flex items-center justify-between px-2 mb-4 mt-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Chat Sessions</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Chat Sessions</span>
             </div>
             
             {sessions.map(s => (
@@ -431,8 +431,8 @@ function Chat() {
                 key={s.id}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all cursor-pointer ${
                   selectedSession?.id === s.id 
-                    ? 'bg-primary/20 border border-primary/30 shadow-sm shadow-primary/10 text-white' 
-                    : 'text-slate-300 hover:bg-slate-700/50 hover:text-white border border-transparent'
+                    ? 'bg-primary/10 border border-primary/30 shadow-sm text-primary' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
                 }`}
                 onClick={() => setSelectedSession(s)}
               >
@@ -462,7 +462,7 @@ function Chat() {
             )}
           </div>
 
-          <div className="p-4 border-t border-slate-700/80">
+          <div className="p-4 border-t border-slate-200">
             <button
               onClick={() => setShowNewChatModal(true)}
               disabled={!selectedModule}
@@ -474,20 +474,20 @@ function Chat() {
         </div>
 
         {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col relative bg-slate-900/50">
+        <div className="flex-1 flex flex-col relative bg-slate-50">
           
           {/* Header */}
-          <header className="h-20 glass-panel border-b border-slate-600/50 shadow-md shadow-black/20 flex items-center px-8 z-10 shrink-0 relative">
+          <header className="h-20 bg-white border-b border-slate-200 shadow-sm flex items-center px-8 z-10 shrink-0 relative">
             {selectedSession ? (
               <div>
-                <h2 className="text-lg font-bold text-white">{selectedSession.title}</h2>
-                <p className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
+                <h2 className="text-lg font-bold text-slate-900">{selectedSession.title}</h2>
+                <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
                   <span className="w-2 h-2 rounded-full bg-green-500"></span>
                   {selectedSession.documentIds?.length ? `Filtered to ${selectedSession.documentIds.length} PDFs` : 'Using all module PDFs'}
                 </p>
               </div>
             ) : (
-              <div className="text-slate-400 font-bold">Select or create a chat session to start</div>
+              <div className="text-slate-500 font-bold">Select or create a chat session to start</div>
             )}
           </header>
 
@@ -505,14 +505,14 @@ function Chat() {
 
             <div className="max-w-4xl mx-auto space-y-10 pb-10">
               {messages.length === 0 && !isLoading ? (
-                <div className="flex flex-col items-center justify-center h-[50vh] text-center opacity-70 mt-10">
-                  <div className="bg-slate-800 p-6 rounded-full mb-6 shadow-[0_0_30px_rgba(14,165,233,0.2)] border border-slate-700/50">
+                <div className="flex flex-col items-center justify-center h-[50vh] text-center mt-10">
+                  <div className="bg-white p-6 rounded-full mb-6 shadow-md border border-slate-200">
                     <FaRobot size={64} className="text-primary" />
                   </div>
-                  <h2 className="text-3xl font-extrabold mb-3 drop-shadow-md">
+                  <h2 className="text-3xl font-extrabold mb-3 text-slate-900">
                     {!selectedSession ? 'Create a Chat Session' : 'How can I help you?'}
                   </h2>
-                  <p className="text-slate-400 max-w-md text-lg font-medium">
+                  <p className="text-slate-600 max-w-md text-lg font-medium">
                     {!selectedSession 
                       ? 'Click "+ New Chat" on the left to start a conversation and select your PDFs.' 
                       : 'Ask questions based on your selected PDFs. I will cite my sources!'}
@@ -552,11 +552,10 @@ function Chat() {
               <div ref={messagesEndRef} />
             </div>
             
-            <Footer />
           </div>
 
           {/* Input Area */}
-          <div className="p-6 bg-slate-900/90 backdrop-blur-xl border-t border-slate-700/80 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] shrink-0 relative z-10">
+          <div className="p-6 bg-white/90 backdrop-blur-xl border-t border-slate-200 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] shrink-0 relative z-10">
             <div className="max-w-4xl mx-auto relative group">
               <textarea
                 ref={textareaRef}
@@ -566,7 +565,7 @@ function Chat() {
                 placeholder={selectedSession ? "Ask a question..." : "Select or create a chat session first..."}
                 rows={1}
                 disabled={isLoading || !selectedSession}
-                className="w-full bg-slate-800/80 text-white rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-600/50 shadow-inner shadow-black/20 focus:border-purple-500/60 focus:shadow-[0_0_20px_rgba(168,85,247,0.2)] focus:bg-slate-800 transition-all font-medium disabled:opacity-50 placeholder:text-slate-400"
+                className="w-full bg-slate-50 text-slate-900 rounded-2xl pl-6 pr-16 py-4 resize-none custom-scrollbar leading-relaxed border-2 border-slate-200 shadow-inner shadow-black/5 focus:border-purple-500/60 focus:bg-white transition-all font-medium disabled:opacity-50 placeholder:text-slate-400"
               />
               <button
                 onClick={handleSend}
@@ -576,7 +575,7 @@ function Chat() {
                 <FaPaperPlane size={16} />
               </button>
             </div>
-            <div className="text-center text-xs text-slate-500 font-bold mt-4 tracking-wide uppercase">
+            <div className="text-center text-xs text-slate-400 font-bold mt-4 tracking-wide uppercase">
               AI can make mistakes. Always double-check your lecture notes.
             </div>
           </div>
@@ -586,27 +585,27 @@ function Chat() {
 
       {/* New Chat Modal */}
       {showNewChatModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold text-white mb-4">New Chat Session</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+          <div className="bg-white border border-slate-200 p-6 rounded-2xl w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-bold text-slate-900 mb-4">New Chat Session</h3>
             <div className="mb-4">
-              <label className="block text-sm font-bold text-slate-400 mb-2">Chat Title</label>
+              <label className="block text-sm font-bold text-slate-600 mb-2">Chat Title</label>
               <input 
                 type="text" 
                 value={newChatTitle} 
                 onChange={(e) => setNewChatTitle(e.target.value)}
-                className="w-full glass-input px-4 py-2 rounded-xl text-slate-100 border-slate-600 focus:border-primary/50 bg-slate-900/50"
+                className="w-full glass-input px-4 py-2 rounded-xl text-slate-900 border-slate-300 focus:border-primary/50 bg-slate-50"
                 placeholder="e.g. Exam Prep"
               />
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-bold text-slate-400 mb-2">Select PDFs to Include (Optional)</label>
+              <label className="block text-sm font-bold text-slate-600 mb-2">Select PDFs to Include (Optional)</label>
               <div className="max-h-40 overflow-y-auto space-y-2 custom-scrollbar">
                 {selectedModule?.documents?.length === 0 ? (
                   <p className="text-sm text-slate-500 italic p-2">No documents uploaded to this module yet.</p>
                 ) : (
                   selectedModule?.documents?.map(doc => (
-                    <label key={doc.id} className="flex items-center gap-3 p-2 bg-slate-900/50 rounded-lg cursor-pointer hover:bg-slate-700/50 transition border border-transparent hover:border-slate-600">
+                    <label key={doc.id} className="flex items-center gap-3 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition border border-transparent hover:border-slate-300">
                       <input 
                         type="checkbox" 
                         checked={selectedDocs.includes(doc.id)}
@@ -614,9 +613,9 @@ function Chat() {
                           if (e.target.checked) setSelectedDocs([...selectedDocs, doc.id]);
                           else setSelectedDocs(selectedDocs.filter(id => id !== doc.id));
                         }}
-                        className="w-4 h-4 rounded text-primary focus:ring-primary/50 bg-slate-800 border-slate-600"
+                        className="w-4 h-4 rounded text-primary focus:ring-primary/50 bg-white border-slate-300"
                       />
-                      <span className="text-sm text-slate-200 truncate" title={doc.name}>{doc.name}</span>
+                      <span className="text-sm text-slate-700 truncate" title={doc.name}>{doc.name}</span>
                     </label>
                   ))
                 )}
@@ -681,10 +680,10 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
       
       <div className="flex flex-col max-w-[85%] relative">
         <div 
-          className={`py-4 px-6 shadow-xl text-[15px] leading-relaxed border ${
+          className={`py-4 px-6 shadow-sm text-[15px] leading-relaxed border ${
             isUser 
-              ? 'bg-purple-900/40 border-purple-500/40 rounded-3xl rounded-tr-sm text-purple-50 shadow-purple-900/30' 
-              : 'bg-emerald-900/30 border-emerald-500/40 rounded-3xl rounded-tl-sm text-emerald-50 shadow-emerald-900/30'
+              ? 'bg-purple-50 border-purple-200 rounded-3xl rounded-tr-sm text-purple-900 shadow-purple-900/5' 
+              : 'bg-white border-slate-200 rounded-3xl rounded-tl-sm text-slate-800 shadow-slate-900/5'
           }`}
         >
           {isEditing ? (
@@ -692,16 +691,16 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
               <textarea 
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
-                className="w-full bg-slate-900/50 border border-slate-500 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:border-primary resize-none custom-scrollbar"
+                className="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-primary resize-none custom-scrollbar"
                 rows={4}
               />
               <div className="flex justify-end gap-2">
-                <button onClick={() => setIsEditing(false)} className="text-xs text-slate-300 hover:text-white font-bold px-3 py-1">Cancel</button>
+                <button onClick={() => setIsEditing(false)} className="text-xs text-slate-500 hover:text-slate-800 font-bold px-3 py-1">Cancel</button>
                 <button onClick={handleSaveEdit} className="text-xs bg-primary hover:bg-primary/80 text-white font-bold px-4 py-1.5 rounded-lg shadow-md">Save & Resubmit</button>
               </div>
             </div>
           ) : (
-            <div className="prose prose-invert prose-slate prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-pre:bg-slate-900/80 prose-pre:border prose-pre:border-slate-700/50 prose-pre:rounded-xl break-words whitespace-pre-wrap">
+            <div className="prose prose-slate prose-sm md:prose-base max-w-none prose-p:leading-relaxed prose-pre:bg-slate-50 prose-pre:border prose-pre:border-slate-200 prose-pre:rounded-xl break-words whitespace-pre-wrap">
               <ReactMarkdown 
                   remarkPlugins={[remarkGfm, remarkMath]} 
                   rehypePlugins={[rehypeKatex]}
@@ -714,7 +713,7 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
                           return <InteractiveQuiz questions={quizData} messageId={message.id} />;
                         } catch(e) {
                           return (
-                            <div className="bg-red-500/20 text-red-200 p-4 rounded-xl border border-red-500/50 my-4">
+                            <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 my-4">
                               <p className="font-bold">Error parsing interactive quiz:</p>
                               <pre className="text-xs mt-2 overflow-x-auto">{e.message}</pre>
                             </div>
@@ -739,11 +738,11 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
         {!isEditing && message.id && (
           <div className={`absolute top-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity ${isUser ? '-left-12' : '-right-12'}`}>
             {isUser ? (
-              <button onClick={() => { setIsEditing(true); setEditContent(message.content); }} className="p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded-full shadow-md transition-colors" title="Edit Message">
+              <button onClick={() => { setIsEditing(true); setEditContent(message.content); }} className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 rounded-full shadow-sm transition-colors" title="Edit Message">
                 <FaEdit size={12} />
               </button>
             ) : (
-              <button onClick={() => onRegenerate(message.id)} className="p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded-full shadow-md transition-colors" title="Regenerate Response">
+              <button onClick={() => onRegenerate(message.id)} className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 rounded-full shadow-sm transition-colors" title="Regenerate Response">
                 <FaRedo size={12} />
               </button>
             )}
@@ -754,7 +753,7 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
         {message.sources && message.sources.length > 0 && (
           <div className="mt-3 pl-2">
             <button
-              className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-primary transition-colors py-1 bg-slate-800/50 px-3 rounded-full border border-slate-700/50 hover:border-primary/30 shadow-sm"
+              className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-primary transition-colors py-1 bg-slate-50 px-3 rounded-full border border-slate-200 hover:border-primary/30 shadow-sm"
               onClick={() => setShowSources(!showSources)}
             >
               {showSources ? <FaChevronDown size={10} /> : <FaChevronRight size={10} />}
@@ -764,17 +763,17 @@ function MessageBubble({ message, onEdit, onRegenerate }) {
             {showSources && (
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {message.sources.map((source, i) => (
-                  <div key={i} className={`p-4 rounded-xl border-2 text-sm shadow-lg shadow-black/20 transition-colors ${isUser ? 'bg-purple-900/30 border-purple-700/30 hover:border-purple-500/50' : 'bg-emerald-900/20 border-emerald-700/30 hover:border-emerald-500/50'}`}>
-                    <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-700/50">
-                      <div className="flex items-center gap-2 text-slate-200 font-bold truncate">
-                        <FaFileAlt className={`${isUser ? 'text-purple-400' : 'text-emerald-400'} shrink-0 text-base`} />
+                  <div key={i} className={`p-4 rounded-xl border text-sm shadow-sm transition-colors ${isUser ? 'bg-purple-50 border-purple-200 hover:border-purple-300' : 'bg-slate-50 border-slate-200 hover:border-slate-300'}`}>
+                    <div className="flex justify-between items-center mb-3 pb-3 border-b border-slate-200">
+                      <div className="flex items-center gap-2 text-slate-700 font-bold truncate">
+                        <FaFileAlt className={`${isUser ? 'text-purple-500' : 'text-emerald-500'} shrink-0 text-base`} />
                         <span className="truncate" title={source.document_name}>{source.document_name}</span>
                       </div>
-                      <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap border ${isUser ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'}`}>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-bold whitespace-nowrap border ${isUser ? 'bg-purple-100 text-purple-700 border-purple-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
                         Pg {source.page_number}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300 italic leading-relaxed line-clamp-4">"{source.text_preview}"</p>
+                    <p className="text-xs text-slate-600 italic leading-relaxed line-clamp-4">"{source.text_preview}"</p>
                   </div>
                 ))}
               </div>

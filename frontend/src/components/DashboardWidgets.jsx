@@ -68,17 +68,16 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
       {/* Today's Classes Widget */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group"
+        className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-full relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -z-10 group-hover:bg-emerald-500/20 transition-all"></div>
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <FaCalendarAlt className="text-emerald-400" /> Today's Classes
+            <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <FaCalendarAlt className="text-primary" /> Today's Classes
             </h3>
-            <p className="text-slate-400 text-sm mt-1">{daysNames[currentDay]}, {currentTime.toLocaleDateString()}</p>
+            <p className="text-slate-500 text-sm mt-1">{daysNames[currentDay]}, {currentTime.toLocaleDateString()}</p>
           </div>
-          <Link to="/schedule" className="text-emerald-400 hover:text-emerald-300 text-sm font-bold flex items-center gap-1 transition-colors">
+          <Link to="/schedule" className="text-primary hover:text-indigo-600 text-sm font-bold flex items-center gap-1 transition-colors">
             View All <FaArrowRight size={10} />
           </Link>
         </div>
@@ -86,22 +85,22 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
         <div className="flex-1 space-y-3 flex flex-col justify-center">
           {todaysClasses.length > 0 ? (
             todaysClasses.slice(0, 3).map(cls => (
-              <div key={cls.id} className="bg-slate-900/50 p-4 rounded-2xl border border-slate-700/50 flex justify-between items-center hover:border-emerald-500/30 transition-colors">
+              <div key={cls.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center hover:border-primary/30 transition-colors">
                 <div>
-                  <h4 className="font-bold text-white text-sm">{cls.type}</h4>
+                  <h4 className="font-bold text-slate-800 text-sm">{cls.type}</h4>
                   {cls.location && <p className="text-slate-500 text-xs mt-0.5">📍 {cls.location}</p>}
                 </div>
-                <div className="bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 text-emerald-300 font-bold text-xs tracking-wider">
+                <div className="bg-primary/10 px-3 py-1.5 rounded-lg text-primary font-bold text-xs tracking-wider">
                   {cls.startTime} - {cls.endTime}
                 </div>
               </div>
             ))
           ) : (
             <div className="text-center py-6">
-              <div className="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-700/50">
+              <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
                 <span className="text-2xl">🎉</span>
               </div>
-              <p className="text-slate-300 font-bold">No classes today!</p>
+              <p className="text-slate-700 font-bold">No classes today!</p>
               <p className="text-slate-500 text-sm mt-1">Enjoy your free time or hit the books.</p>
             </div>
           )}
@@ -117,46 +116,45 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
       {/* Upcoming Exam Widget */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-        className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group"
+        className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-full relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl -z-10 group-hover:bg-orange-500/20 transition-all"></div>
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <FaExclamationCircle className="text-orange-400" /> Next Upcoming Exam
+            <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <FaExclamationCircle className="text-orange-500" /> Next Upcoming Exam
             </h3>
-            <p className="text-slate-400 text-sm mt-1">Stay prepared and focused.</p>
+            <p className="text-slate-500 text-sm mt-1">Stay prepared and focused.</p>
           </div>
-          <Link to="/schedule" className="text-orange-400 hover:text-orange-300 text-sm font-bold flex items-center gap-1 transition-colors">
+          <Link to="/schedule" className="text-orange-500 hover:text-orange-600 text-sm font-bold flex items-center gap-1 transition-colors">
             Timetable <FaArrowRight size={10} />
           </Link>
         </div>
 
         <div className="flex-1 flex flex-col justify-center">
           {nextExamSeries ? (
-            <div className="bg-gradient-to-br from-orange-500/10 to-rose-500/10 border border-orange-500/20 p-5 rounded-2xl relative overflow-hidden group-hover:border-orange-500/40 transition-colors">
-              <p className="text-orange-400 font-bold uppercase tracking-widest text-[10px] mb-1">Part of: {nextExamSeries.title}</p>
-              <h4 className="text-xl font-black text-white mb-4 leading-tight">{nextExam.title}</h4>
+            <div className="bg-orange-50 p-5 rounded-2xl relative overflow-hidden border border-orange-100 transition-colors">
+              <p className="text-orange-600 font-bold uppercase tracking-widest text-[10px] mb-1">Part of: {nextExamSeries.title}</p>
+              <h4 className="text-xl font-black text-slate-900 mb-4 leading-tight">{nextExam.title}</h4>
               
               <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mt-auto">
                 <div>
-                  <p className="text-slate-300 text-xs font-medium mb-1">
+                  <p className="text-slate-600 text-xs font-medium mb-1">
                     {new Date(nextExam.date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(nextExam.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                   {nextExam.location && <p className="text-slate-500 text-[10px] uppercase tracking-wider">📍 {nextExam.location}</p>}
                 </div>
                 
-                <div className="bg-slate-900/80 px-4 py-2 rounded-xl shadow-inner border border-slate-700 inline-flex self-start sm:self-auto">
+                <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 inline-flex self-start sm:self-auto">
                   {renderCountdown(nextExam.date)}
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-center py-6">
-              <div className="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-700/50">
+              <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
                 <span className="text-2xl">😎</span>
               </div>
-              <p className="text-slate-300 font-bold">No upcoming exams!</p>
+              <p className="text-slate-700 font-bold">No upcoming exams!</p>
               <p className="text-slate-500 text-sm mt-1">You are all clear for now.</p>
             </div>
           )}
@@ -166,36 +164,35 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
       {/* GPA Widget */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-        className="bg-slate-800/40 backdrop-blur-md rounded-3xl p-6 border border-slate-700/50 shadow-xl flex flex-col h-full relative overflow-hidden group"
+        className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-full relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -z-10 group-hover:bg-blue-500/20 transition-all"></div>
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h3 className="text-xl font-bold text-white flex items-center gap-2">
-              <FaGraduationCap className="text-blue-400" /> Academic Standing
+            <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <FaGraduationCap className="text-green-500" /> Academic Standing
             </h3>
-            <p className="text-slate-400 text-sm mt-1">Your current performance.</p>
+            <p className="text-slate-500 text-sm mt-1">Your current performance.</p>
           </div>
-          <Link to="/academic-performance" className="text-blue-400 hover:text-blue-300 text-sm font-bold flex items-center gap-1 transition-colors">
+          <Link to="/academic-performance" className="text-green-500 hover:text-green-600 text-sm font-bold flex items-center gap-1 transition-colors">
             Details <FaArrowRight size={10} />
           </Link>
         </div>
 
         <div className="flex-1 flex flex-col justify-center text-center">
           {gpaData ? (
-            <div className="bg-slate-900/50 p-5 rounded-2xl border border-slate-700/50 relative overflow-hidden hover:border-blue-500/30 transition-colors">
-              <p className="text-blue-400 font-bold uppercase tracking-widest text-[10px] mb-2">Overall GPA</p>
-              <h4 className="text-5xl font-black text-white mb-2">{gpaData.ogpa !== null ? gpaData.ogpa.toFixed(2) : 'N/A'}</h4>
-              <p className="text-slate-300 text-sm font-medium mb-1 bg-blue-500/10 py-1.5 px-3 rounded-lg inline-block border border-blue-500/20">
+            <div className="bg-green-50 p-5 rounded-2xl border border-green-100 relative overflow-hidden transition-colors">
+              <p className="text-green-700 font-bold uppercase tracking-widest text-[10px] mb-2">Overall GPA</p>
+              <h4 className="text-5xl font-black text-slate-900 mb-2">{gpaData.ogpa !== null ? gpaData.ogpa.toFixed(2) : 'N/A'}</h4>
+              <p className="text-green-800 text-sm font-medium mb-1 bg-white py-1.5 px-3 rounded-lg inline-block border border-green-200">
                 {gpaData.classification || 'No Classification'}
               </p>
             </div>
           ) : (
             <div className="text-center py-6">
-              <div className="bg-slate-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-700/50">
+              <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
                 <span className="text-2xl">🎓</span>
               </div>
-              <p className="text-slate-300 font-bold">No GPA Data</p>
+              <p className="text-slate-700 font-bold">No GPA Data</p>
               <p className="text-slate-500 text-sm mt-1">Add module results to see it here.</p>
             </div>
           )}

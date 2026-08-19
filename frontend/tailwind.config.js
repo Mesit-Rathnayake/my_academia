@@ -6,9 +6,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#6366f1',
-        secondary: '#0ea5e9', // Changed to light blue
-        accent: '#ec4899',
+        primary: '#6366f1', // Indigo 500
+        secondary: '#8b5cf6', // Violet 500
+        accent: '#ec4899', // Pink 500
+        background: '#f8f9fa',
+        card: '#ffffff',
+        text: {
+          main: '#1e293b', // Slate 800
+          muted: '#64748b' // Slate 500
+        },
         dark: {
           900: '#0f172a',
           800: '#1e293b',

@@ -3,11 +3,11 @@ import { FaTrash, FaEdit, FaCheckCircle, FaTimesCircle, FaClock, FaPlus } from '
 import { motion } from 'framer-motion';
 
 const themes = [
-  { name: 'rose', badge: 'bg-rose-500 shadow-rose-500/30', glow: 'from-rose-500/20 via-transparent to-orange-500/10' },
-  { name: 'emerald', badge: 'bg-emerald-500 shadow-emerald-500/30', glow: 'from-emerald-500/20 via-transparent to-teal-500/10' },
-  { name: 'violet', badge: 'bg-violet-500 shadow-violet-500/30', glow: 'from-violet-500/20 via-transparent to-fuchsia-500/10' },
-  { name: 'amber', badge: 'bg-amber-500 shadow-amber-500/30', glow: 'from-amber-500/20 via-transparent to-yellow-500/10' },
-  { name: 'blue', badge: 'bg-blue-500 shadow-blue-500/30', glow: 'from-blue-500/20 via-transparent to-cyan-500/10' },
+  { name: 'rose', badge: 'bg-rose-100 text-rose-700 border-rose-200' },
+  { name: 'emerald', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+  { name: 'violet', badge: 'bg-violet-100 text-violet-700 border-violet-200' },
+  { name: 'amber', badge: 'bg-amber-100 text-amber-700 border-amber-200' },
+  { name: 'blue', badge: 'bg-blue-100 text-blue-700 border-blue-200' },
 ];
 
 function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDelete }) {
@@ -45,26 +45,23 @@ function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDele
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className={`bg-slate-800/80 backdrop-blur-sm p-6 rounded-3xl flex flex-col gap-6 shadow-xl shadow-black/30 border-2 border-slate-700 hover:border-${theme.name}-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden transform hover:-translate-y-1`}
+      className={`bg-white p-6 rounded-3xl flex flex-col gap-6 shadow-sm border border-slate-200 border-t-4 border-t-${theme.name}-500 hover:border-${theme.name}-300 transition-all duration-300 group cursor-pointer relative overflow-hidden transform hover:-translate-y-1 hover:shadow-md`}
       onClick={onOpenEdit}
     >
-      {/* Background glow effect on hover */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${theme.glow} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
-
       {/* Header */}
       <div className="flex justify-between items-start z-10">
         <div>
-          <span className={`text-xs font-black tracking-widest text-white px-3 py-1.5 rounded-lg mb-3 inline-block shadow-lg ${theme.badge}`}>
+          <span className={`text-xs font-bold tracking-widest px-3 py-1.5 rounded-lg mb-3 inline-block border ${theme.badge}`}>
             {moduleCode || 'NO-CODE'}
           </span>
-          <h3 className="text-2xl font-black text-white leading-tight drop-shadow-md">
+          <h3 className="text-xl font-bold text-slate-900 leading-tight">
             {moduleName}
           </h3>
         </div>
-        <div className="flex gap-2 bg-slate-900/50 p-1.5 rounded-xl border border-slate-700/50 hover:bg-slate-900/80 transition-colors">
+        <div className="flex gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100 hover:bg-slate-100 transition-colors">
           <button 
             onClick={(e) => { e.stopPropagation(); onDelete(module._id); }}
-            className="text-slate-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-red-500 shadow-sm"
+            className="text-slate-400 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50"
             title="Delete Module"
           >
             <FaTrash size={14} />
@@ -73,56 +70,56 @@ function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDele
       </div>
 
       {/* Attendance Widget */}
-      <div className="bg-slate-900/70 rounded-2xl p-5 border border-slate-700/80 shadow-inner z-10">
+      <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 z-10">
         <div className="flex justify-between items-center mb-4">
-          <h4 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+          <h4 className="text-sm font-bold text-slate-600 uppercase tracking-widest flex items-center gap-2">
             Attendance
           </h4>
-          <span className={`text-sm font-black px-3 py-1 rounded-lg border shadow-sm ${
-            attendanceStatus === 'danger' ? 'bg-red-500/20 text-red-400 border-red-500/50' :
-            attendanceStatus === 'safe' ? 'bg-green-500/20 text-green-400 border-green-500/50' :
-            'bg-slate-700 text-slate-300 border-slate-600'
+          <span className={`text-sm font-black px-3 py-1 rounded-lg border ${
+            attendanceStatus === 'danger' ? 'bg-red-100 text-red-600 border-red-200' :
+            attendanceStatus === 'safe' ? 'bg-green-100 text-green-600 border-green-200' :
+            'bg-slate-100 text-slate-600 border-slate-200'
           }`}>
             {attendancePercentage}%
           </span>
         </div>
 
-        <div className="w-full bg-slate-800 rounded-full h-3 mb-5 overflow-hidden border border-slate-700 shadow-inner">
+        <div className="w-full bg-slate-200 rounded-full h-2 mb-5 overflow-hidden">
           <div 
             className={`h-full rounded-full transition-all duration-1000 ${
-              attendanceStatus === 'danger' ? 'bg-gradient-to-r from-red-600 to-red-400 shadow-[0_0_10px_rgba(239,68,68,0.8)]' :
-              attendanceStatus === 'safe' ? 'bg-gradient-to-r from-green-600 to-green-400 shadow-[0_0_10px_rgba(34,197,94,0.8)]' :
-              'bg-slate-500 shadow-[0_0_10px_rgba(100,116,139,0.6)]'
+              attendanceStatus === 'danger' ? 'bg-red-500' :
+              attendanceStatus === 'safe' ? 'bg-green-500' :
+              'bg-slate-400'
             }`} 
             style={{ width: `${Math.min(100, attendancePercentage)}%` }}
           ></div>
         </div>
 
-        <div className="flex justify-between text-xs text-slate-400 font-bold uppercase tracking-wide">
-          <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 rounded-l-lg border-r border-slate-700/50 relative group/btn">
-            <span className="text-white text-xl font-black mb-1">{attendedLectures}</span>
+        <div className="flex justify-between text-xs text-slate-500 font-bold uppercase tracking-wide">
+          <div className="flex flex-col items-center bg-white w-full py-2 rounded-l-lg border-y border-l border-slate-200 relative group/btn">
+            <span className="text-slate-800 text-xl font-black mb-1">{attendedLectures}</span>
             <span>Attended</span>
             <button 
               onClick={(e) => { e.stopPropagation(); onInlineUpdate('attendedLectures', attendedLectures + 1); }}
-              className={`absolute top-1 right-2 bg-slate-700 hover:bg-${theme.name}-500 text-white rounded-full p-1 opacity-0 group-hover/btn:opacity-100 transition-all shadow-md`}
+              className={`absolute top-1 right-2 bg-slate-100 hover:bg-${theme.name}-100 hover:text-${theme.name}-700 text-slate-500 rounded-full p-1 opacity-0 group-hover/btn:opacity-100 transition-all`}
               title="Add Attended Lecture"
             >
               <FaPlus size={10} />
             </button>
           </div>
-          <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 border-r border-slate-700/50 relative group/btn">
-            <span className="text-white text-xl font-black mb-1">{conductedLectures}</span>
+          <div className="flex flex-col items-center bg-white w-full py-2 border border-slate-200 relative group/btn">
+            <span className="text-slate-800 text-xl font-black mb-1">{conductedLectures}</span>
             <span>Conducted</span>
             <button 
               onClick={(e) => { e.stopPropagation(); onInlineUpdate('conductedLectures', conductedLectures + 1); }}
-              className={`absolute top-1 right-2 bg-slate-700 hover:bg-${theme.name}-500 text-white rounded-full p-1 opacity-0 group-hover/btn:opacity-100 transition-all shadow-md`}
+              className={`absolute top-1 right-2 bg-slate-100 hover:bg-${theme.name}-100 hover:text-${theme.name}-700 text-slate-500 rounded-full p-1 opacity-0 group-hover/btn:opacity-100 transition-all`}
               title="Add Conducted Lecture"
             >
               <FaPlus size={10} />
             </button>
           </div>
-          <div className="flex flex-col items-center bg-slate-800/50 w-full py-2 rounded-r-lg">
-            <span className="text-white text-xl font-black mb-1">{totalLectures}</span>
+          <div className="flex flex-col items-center bg-white w-full py-2 rounded-r-lg border-y border-r border-slate-200">
+            <span className="text-slate-800 text-xl font-black mb-1">{totalLectures}</span>
             <span>Total</span>
           </div>
         </div>
@@ -130,17 +127,17 @@ function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDele
 
       {/* Stats row for Tasks and Documents */}
       <div className="flex gap-4 z-10">
-        <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 border border-slate-700 shadow-lg flex flex-col items-center justify-center group-hover:border-blue-500/30 transition-colors">
-          <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 drop-shadow-[0_0_10px_rgba(96,165,250,0.5)] mb-1">
+        <div className="flex-1 bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center justify-center transition-colors">
+          <span className="text-3xl font-black text-slate-800 mb-1">
             {assignments.length + labs.length}
           </span>
-          <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">Tasks</span>
+          <span className="text-xs text-slate-500 uppercase tracking-widest font-bold">Tasks</span>
         </div>
-        <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 border border-slate-700 shadow-lg flex flex-col items-center justify-center group-hover:border-purple-500/30 transition-colors">
-          <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300 drop-shadow-[0_0_10px_rgba(192,132,252,0.5)] mb-1">
+        <div className="flex-1 bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center justify-center transition-colors">
+          <span className="text-3xl font-black text-slate-800 mb-1">
             {documents.length}
           </span>
-          <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">Notes</span>
+          <span className="text-xs text-slate-500 uppercase tracking-widest font-bold">Notes</span>
         </div>
       </div>
     </motion.div>

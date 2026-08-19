@@ -182,7 +182,7 @@ function Home() {
     return (
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+        className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
       >
         <Navbar />
         <main className="flex-1 pt-20 p-8 overflow-y-auto custom-scrollbar flex items-center justify-center">
@@ -214,35 +214,30 @@ function Home() {
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden text-slate-100 bg-slate-900"
+      className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
     >
       <Navbar />
       
       <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar relative z-0">
-        {/* Vibrant Multi-Color Background Blobs */}
-        <div className="absolute top-0 right-10 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
-        <div className="absolute top-1/4 left-10 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
-        <div className="absolute bottom-10 right-1/4 w-[700px] h-[700px] bg-violet-500/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-amber-500/10 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
-
+        
         <div className="max-w-7xl mx-auto space-y-10 relative z-10">
           
-          <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-800/40 backdrop-blur-md p-8 rounded-3xl border border-slate-700/50 shadow-2xl">
+          <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
             <div>
-              <h2 className="text-3xl lg:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-rose-300 to-fuchsia-400 drop-shadow-lg tracking-tight">
+              <h2 className="text-3xl lg:text-5xl font-black text-slate-900 tracking-tight">
                 Dashboard
               </h2>
-              <p className="text-slate-300 mt-3 font-semibold text-lg">Manage your academic progress and modules.</p>
+              <p className="text-slate-500 mt-3 font-semibold text-lg">Manage your academic progress and modules.</p>
             </div>
-            <button onClick={openAddModal} className="bg-gradient-to-br from-rose-500 to-orange-500 text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-rose-500/30 hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-rose-400/50">
+            <button onClick={openAddModal} className="bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-md shadow-primary/20 hover:bg-indigo-600 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
               <FaPlus size={18} /> Add Module
             </button>
           </header>
 
           {error && (
-            <div className="bg-red-900/30 backdrop-blur-sm border-2 border-red-500/50 text-red-100 px-6 py-4 rounded-2xl flex justify-between items-center shadow-lg shadow-red-500/20 z-10 relative">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-2xl flex justify-between items-center shadow-sm z-10 relative">
               <p className="font-bold">{error}</p>
-              <button onClick={() => setError(null)} className="text-red-300 hover:text-white font-bold bg-red-500/20 px-4 py-2 rounded-xl transition-colors">Dismiss</button>
+              <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 font-bold bg-red-100 px-4 py-2 rounded-xl transition-colors">Dismiss</button>
             </div>
           )}
 
@@ -253,42 +248,41 @@ function Home() {
 
           <div className="w-full">
             {/* Folder Tabs */}
-            <div className="flex w-full px-2 sm:px-6 relative z-10">
+            <div className="flex w-full px-2 sm:px-6 relative z-10 gap-2">
               {allSemesters.map(sem => {
                 const isActive = currentTab === sem;
                 return (
                   <button
                     key={sem}
                     onClick={() => setActiveTab(sem)}
-                    className={`flex-1 py-3 sm:py-4 font-bold text-xs sm:text-sm md:text-base transition-all duration-300 relative border ${
+                    className={`flex-1 py-3 sm:py-4 font-bold text-xs sm:text-sm md:text-base transition-all duration-300 rounded-t-xl ${
                       isActive 
-                        ? 'bg-slate-800 border-slate-600 border-b-slate-800 text-rose-400 rounded-t-2xl -mb-[1px] shadow-[0_-10px_20px_rgba(0,0,0,0.15)] z-20' 
-                        : 'bg-slate-900/60 border-slate-700/50 text-slate-500 hover:text-slate-300 hover:bg-slate-800/50 rounded-t-xl mt-2 border-b-transparent z-10'
+                        ? 'bg-white text-primary border-b-2 border-primary shadow-sm z-20' 
+                        : 'bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 z-10'
                     }`}
                   >
                     <span className="hidden sm:inline">Semester </span>
                     <span className="sm:hidden">S</span>
                     {sem}
-                    {isActive && <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-rose-500 to-orange-400 rounded-t-2xl"></div>}
                   </button>
                 );
               })}
             </div>
 
             {/* Folder Content Box */}
-            <div className="bg-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-600 relative z-0">
+            <div className="bg-white rounded-b-3xl rounded-tr-3xl p-6 sm:p-10 shadow-sm border border-slate-200 relative z-0">
               {currentTab && (
                 <section className="animate-fadeIn">
                   {!groupedModules[currentTab] || groupedModules[currentTab].length === 0 ? (
-                    <div className="bg-slate-900/40 border-dashed border-2 border-slate-700/50 p-12 sm:p-16 rounded-3xl flex flex-col items-center justify-center text-center shadow-inner">
-                      <div className="bg-gradient-to-br from-rose-500/20 to-orange-500/20 p-8 rounded-full text-rose-400 mb-8 shadow-[0_0_30px_rgba(244,63,94,0.2)] border border-rose-500/20">
-                        <FaBookReader size={56} className="drop-shadow-lg" />
+                    <div className="bg-slate-50 border-dashed border-2 border-slate-200 p-12 sm:p-16 rounded-3xl flex flex-col items-center justify-center text-center">
+                      <div className="bg-primary/10 p-8 rounded-full text-primary mb-8 shadow-sm">
+                        <FaBookReader size={56} />
                       </div>
-                      <h3 className="text-2xl sm:text-3xl font-extrabold mb-4 text-white drop-shadow-md">No Modules Found</h3>
-                      <p className="text-slate-400 max-w-md mx-auto mb-10 font-medium text-base sm:text-lg leading-relaxed">
+                      <h3 className="text-2xl sm:text-3xl font-extrabold mb-4 text-slate-900">No Modules Found</h3>
+                      <p className="text-slate-500 max-w-md mx-auto mb-10 font-medium text-base sm:text-lg leading-relaxed">
                         Get started by adding your first module to Semester {currentTab} to track attendance, assignments, and upload lecture notes.
                       </p>
-                      <button onClick={openAddModal} className="bg-gradient-to-br from-rose-500 to-orange-500 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-2xl font-bold shadow-lg shadow-rose-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 border border-rose-400/50">
+                      <button onClick={openAddModal} className="bg-primary text-white px-8 sm:px-10 py-3 sm:py-4 rounded-2xl font-bold shadow-md shadow-primary/20 hover:bg-indigo-600 transition-all flex items-center gap-3">
                         <FaPlus /> Create Module
                       </button>
                     </div>
