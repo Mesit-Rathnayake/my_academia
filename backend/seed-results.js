@@ -56,21 +56,27 @@ async function main() {
         gpaScale: 4.0,
         rounding: 2,
         creditRule: 'MANUAL',
-        gradingScale: {
-          "A+": 4.0, "A": 4.0, "A-": 3.7, "B+": 3.3, "B": 3.0, "B-": 2.7,
-          "C+": 2.3, "C": 2.0, "C-": 1.7, "D+": 1.3, "D": 1.0, "E": 0.0
-        },
-        classificationRules: [
-          { name: 'First Class', minGpa: 3.7 },
-          { name: 'Second Class (Upper)', minGpa: 3.3 },
-          { name: 'Second Class (Lower)', minGpa: 3.0 },
-          { name: 'Pass', minGpa: 2.0 }
+        gradingScale: [
+          { grade: "A+", gpv: 4.0, minMarks: 85, maxMarks: 100 },
+          { grade: "A", gpv: 4.0, minMarks: 80, maxMarks: 84 },
+          { grade: "A-", gpv: 3.7, minMarks: 75, maxMarks: 79 },
+          { grade: "B+", gpv: 3.3, minMarks: 70, maxMarks: 74 },
+          { grade: "B", gpv: 3.0, minMarks: 65, maxMarks: 69 },
+          { grade: "B-", gpv: 2.7, minMarks: 60, maxMarks: 64 },
+          { grade: "C+", gpv: 2.3, minMarks: 55, maxMarks: 59 },
+          { grade: "C", gpv: 2.0, minMarks: 50, maxMarks: 54 },
+          { grade: "C-", gpv: 1.7, minMarks: 45, maxMarks: 49 },
+          { grade: "D+", gpv: 1.3, minMarks: 40, maxMarks: 44 },
+          { grade: "D", gpv: 1.0, minMarks: 35, maxMarks: 39 },
+          { grade: "E", gpv: 0.0, minMarks: 0, maxMarks: 34 }
         ],
-        specialGrades: {
-          "MC": { isCounted: false, pointValue: null },
-          "AB": { isCounted: true, pointValue: 0.0 },
-          "Not Given": { isCounted: false, pointValue: null }
-        }
+        classificationRules: [
+          { classification: 'First Class', minGpa: 3.7 },
+          { classification: 'Second Class (Upper)', minGpa: 3.3 },
+          { classification: 'Second Class (Lower)', minGpa: 3.0 },
+          { classification: 'Pass', minGpa: 2.0 }
+        ],
+        specialGrades: ["MC", "AB", "Not Given"]
       }
     });
     console.log('Created University Config: Ruhuna FoE');
