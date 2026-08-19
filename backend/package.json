@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "npx prisma generate",
+    "build": "node ./node_modules/prisma/build/index.js generate",
     "test": "jest",
     "test-watch": "jest --watchAll",
     "test-coverage": "jest --coverage",
