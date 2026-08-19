@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaPlus, FaUpload, FaFilePdf } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import CustomSelect from './CustomSelect';
 import ConfirmModal from './ConfirmModal';
 
 function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
@@ -207,11 +208,12 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Semester</label>
-                <select className="glass-input w-full px-4 py-3 rounded-xl" value={semester} onChange={(e) => setSemester(e.target.value)}>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
-                    <option key={sem} value={sem}>Semester {sem}</option>
-                  ))}
-                </select>
+                <CustomSelect 
+                  className="glass-input w-full px-4 py-3 rounded-xl" 
+                  value={semester} 
+                  onChange={setSemester}
+                  options={[1, 2, 3, 4, 5, 6, 7, 8].map(sem => ({ value: sem, label: `Semester ${sem}` }))}
+                />
               </div>
             </div>
 
@@ -288,11 +290,12 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
                       <div className="grid grid-cols-2 gap-3 mb-3">
                         <div>
                           <label className="block text-xs text-slate-500 mb-1">Status</label>
-                          <select className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={a.status} onChange={(e) => updateAssignment(i, 'status', e.target.value)}>
-                            <option value="Pending">Pending</option>
-                            <option value="Submitted">Submitted</option>
-                            <option value="Graded">Graded</option>
-                          </select>
+                          <CustomSelect 
+                            className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" 
+                            value={a.status} 
+                            onChange={(val) => updateAssignment(i, 'status', val)}
+                            options={['Pending', 'Submitted', 'Graded'].map(s => ({ value: s, label: s }))}
+                          />
                         </div>
                         <div>
                           <label className="block text-xs text-slate-500 mb-1">Due Date</label>
@@ -328,11 +331,12 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
                       <div className="grid grid-cols-2 gap-3 mb-3">
                         <div>
                           <label className="block text-xs text-slate-500 mb-1">Status</label>
-                          <select className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={l.status} onChange={(e) => updateLab(i, 'status', e.target.value)}>
-                            <option value="Pending">Pending</option>
-                            <option value="Submitted">Submitted</option>
-                            <option value="Graded">Graded</option>
-                          </select>
+                          <CustomSelect 
+                            className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" 
+                            value={l.status} 
+                            onChange={(val) => updateLab(i, 'status', val)}
+                            options={['Pending', 'Conducted', 'Graded'].map(s => ({ value: s, label: s }))}
+                          />
                         </div>
                         <div>
                           <label className="block text-xs text-slate-500 mb-1">Due Date</label>

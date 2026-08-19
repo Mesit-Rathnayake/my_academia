@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaSave } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import CustomSelect from './CustomSelect';
 
 function AddTimetableEntryModal({ isOpen, onClose, onSaved, initialDay, initialStartTime }) {
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
@@ -83,15 +84,12 @@ function AddTimetableEntryModal({ isOpen, onClose, onSaved, initialDay, initialS
           <form id="add-timetable-form" onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1 block pl-1">Day of Week</label>
-              <select 
+              <CustomSelect 
                 className="bg-white text-slate-900 p-3.5 rounded-xl border border-slate-200 w-full focus:ring-2 focus:ring-primary/50 outline-none transition-all text-sm font-semibold"
                 value={entry.dayOfWeek} 
-                onChange={e => setEntry({...entry, dayOfWeek: parseInt(e.target.value)})}
-              >
-                {days.map((day, i) => (
-                  <option key={i} value={i}>{day}</option>
-                ))}
-              </select>
+                onChange={val => setEntry({...entry, dayOfWeek: val})}
+                options={days.map((day, i) => ({ value: i, label: day }))}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">

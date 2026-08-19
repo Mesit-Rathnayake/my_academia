@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import CustomSelect from '../components/CustomSelect';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import { FaGraduationCap, FaChartLine, FaTasks, FaCalculator } from 'react-icons/fa';
@@ -169,13 +170,18 @@ function Performance() {
                   <form onSubmit={handleProjection} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Target OGPA</label>
-                      <select className="glass-input w-full px-4 py-3 rounded-xl bg-slate-50" value={targetGpa} onChange={e => setTargetGpa(e.target.value)}>
-                        <option value="4.00">4.00 - Perfect</option>
-                        <option value="3.70">3.70 - First Class</option>
-                        <option value="3.30">3.30 - Second Upper</option>
-                        <option value="3.00">3.00 - Second Lower</option>
-                        <option value="2.00">2.00 - Pass</option>
-                      </select>
+                      <CustomSelect 
+                        className="glass-input w-full px-4 py-3 rounded-xl bg-slate-50 border-none shadow-sm" 
+                        value={targetGpa} 
+                        onChange={setTargetGpa}
+                        options={[
+                          { value: "4.00", label: "4.00 - Perfect" },
+                          { value: "3.70", label: "3.70 - First Class" },
+                          { value: "3.30", label: "3.30 - Second Upper" },
+                          { value: "3.00", label: "3.00 - Second Lower" },
+                          { value: "2.00", label: "2.00 - Pass" }
+                        ]}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Total Degree Credits</label>

@@ -3,6 +3,7 @@ import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import { FaGraduationCap, FaPaperPlane, FaRobot, FaUser, FaChevronDown, FaChevronRight, FaFileAlt, FaPlus, FaComments, FaTrash, FaEdit, FaRedo } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
+import CustomSelect from '../components/CustomSelect';
 import InteractiveQuiz from '../components/InteractiveQuiz';
 import { motion } from 'framer-motion';
 import remarkGfm from 'remark-gfm';
@@ -401,23 +402,19 @@ function Chat() {
               <label htmlFor="module-select" className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Module
               </label>
-              <select
-                id="module-select"
-                className="w-full glass-input px-4 py-2.5 rounded-xl text-sm font-bold border-slate-200 shadow-sm focus:border-primary/50 bg-slate-50 text-slate-700"
+              <CustomSelect
+                className="w-full glass-input px-4 py-2.5 rounded-xl text-sm font-bold border border-slate-200 shadow-sm focus:border-primary/50 bg-slate-50 text-slate-700"
                 value={selectedModule?._id || ''}
-                onChange={(e) => {
-                  const mod = modules.find(m => m._id === e.target.value);
+                onChange={(val) => {
+                  const mod = modules.find(m => m._id === val);
                   setSelectedModule(mod || null);
                   setSelectedSession(null);
                 }}
-              >
-                {modules.length === 0 && <option value="">No modules found</option>}
-                {modules.map(mod => (
-                  <option key={mod._id} value={mod._id}>
-                    {mod.moduleCode ? `${mod.moduleCode} - ` : ''}{mod.moduleName}
-                  </option>
-                ))}
-              </select>
+                options={modules.length === 0 ? [{ value: '', label: 'No modules found' }] : modules.map(mod => ({
+                  value: mod._id,
+                  label: (mod.moduleCode ? `${mod.moduleCode} - ` : '') + mod.moduleName
+                }))}
+              />
             </div>
           </div>
 
