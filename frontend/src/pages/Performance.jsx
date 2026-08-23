@@ -4,10 +4,12 @@ import CustomSelect from '../components/CustomSelect';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
 import { FaGraduationCap, FaChartLine, FaTasks, FaCalculator } from 'react-icons/fa';
+import { fetchWithCache, getCache } from '../utils/cache';
+import { HeroGpaSkeleton, Skeleton } from '../components/Skeleton';
 
 function Performance() {
-  const [gpaData, setGpaData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [gpaData, setGpaData] = useState(() => getCache('gpa_performance') || null);
+  const [loading, setLoading] = useState(() => !getCache('gpa_performance'));
   const [error, setError] = useState(null);
 
   // Projection state
@@ -23,18 +25,16 @@ function Performance() {
 
   const fetchGpaData = async () => {
     try {
-      setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch(`${apiBaseUrl}/api/gpa`, {
+      if (!token) return;
+
+      const data = await fetchWithCache(`${apiBaseUrl}/api/gpa`, {
         headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!response.ok) throw new Error('Failed to fetch GPA data');
-      
-      const data = await response.json();
-      setGpaData(data);
+      }, { cacheKey: 'gpa_performance' });
+
+      if (data) setGpaData(data);
     } catch (err) {
-      setError(err.message);
+      if (!gpaData) setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -68,12 +68,24 @@ function Performance() {
     out: { opacity: 0, y: -20 }
   };
 
-  if (loading) {
+  if (loading && !gpaData) {
     return (
       <div className="flex flex-col h-screen bg-slate-50 text-slate-800">
         <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar">
+          <div className="max-w-7xl mx-auto space-y-8">
+            <HeroGpaSkeleton />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 bg-white rounded-2xl border border-slate-100">
+                <Skeleton width="160px" height="22px" className="mb-4" />
+                <Skeleton height="120px" borderRadius="12px" />
+              </div>
+              <div className="p-6 bg-white rounded-2xl border border-slate-100">
+                <Skeleton width="160px" height="22px" className="mb-4" />
+                <Skeleton height="120px" borderRadius="12px" />
+              </div>
+            </div>
+          </div>
         </main>
       </div>
     );

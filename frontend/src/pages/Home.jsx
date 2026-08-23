@@ -6,48 +6,50 @@ import DashboardWidgets from '../components/DashboardWidgets';
 import Footer from '../components/Footer';
 import { FaPlus, FaBookReader } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { fetchWithCache, getCache, setCache } from '../utils/cache';
+import { ModuleCardSkeleton, DashboardWidgetsSkeleton } from '../components/Skeleton';
 
 function Home() {
-  const [modules, setModules] = useState([]);
-  const [timetable, setTimetable] = useState([]);
-  const [examSeries, setExamSeries] = useState([]);
-  const [gpaData, setGpaData] = useState(null);
+  const [modules, setModules] = useState(() => getCache('dashboard_modules') || []);
+  const [timetable, setTimetable] = useState(() => getCache('dashboard_timetable') || []);
+  const [examSeries, setExamSeries] = useState(() => getCache('dashboard_exam_series') || []);
+  const [gpaData, setGpaData] = useState(() => getCache('dashboard_gpa') || null);
+  const [user, setUser] = useState(() => getCache('dashboard_user') || null);
   const [activeTab, setActiveTab] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModule, setEditModule] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(() => !getCache('dashboard_modules'));
   const [error, setError] = useState(null);
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
-    fetchModules();
+    fetchDashboardData();
   }, []);
 
-  const fetchModules = async () => {
+  const fetchDashboardData = async () => {
     try {
-      setLoading(true);
       const token = localStorage.getItem('token');
-      
-      const [modulesRes, timeRes, seriesRes, gpaRes, userRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/api/modules`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiBaseUrl}/api/timetable`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiBaseUrl}/api/exam-series`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiBaseUrl}/api/gpa`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiBaseUrl}/api/auth/me`, { headers: { 'Authorization': `Bearer ${token}` } })
+      if (!token) return;
+
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      // Background revalidate all data with caching
+      const [modulesData, timeData, seriesData, gpaResult, userData] = await Promise.all([
+        fetchWithCache(`${apiBaseUrl}/api/modules`, { headers }, { cacheKey: 'dashboard_modules' }),
+        fetchWithCache(`${apiBaseUrl}/api/timetable`, { headers }, { cacheKey: 'dashboard_timetable' }).catch(() => []),
+        fetchWithCache(`${apiBaseUrl}/api/exam-series`, { headers }, { cacheKey: 'dashboard_exam_series' }).catch(() => []),
+        fetchWithCache(`${apiBaseUrl}/api/gpa`, { headers }, { cacheKey: 'dashboard_gpa' }).catch(() => null),
+        fetchWithCache(`${apiBaseUrl}/api/auth/me`, { headers }, { cacheKey: 'dashboard_user' }).catch(() => null),
       ]);
-      
-      if (!modulesRes.ok) throw new Error('Failed to fetch modules');
-      
-      setModules(await modulesRes.json());
-      
-      if (timeRes.ok) setTimetable(await timeRes.json());
-      if (seriesRes.ok) setExamSeries(await seriesRes.json());
-      if (gpaRes.ok) setGpaData(await gpaRes.json());
-      if (userRes.ok) setUser(await userRes.json());
-      
+
+      if (modulesData) setModules(modulesData);
+      if (timeData) setTimetable(timeData);
+      if (seriesData) setExamSeries(seriesData);
+      if (gpaResult) setGpaData(gpaResult);
+      if (userData) setUser(userData);
+
     } catch (err) {
-      setError(err.message);
+      if (modules.length === 0) setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -181,15 +183,23 @@ function Home() {
     }
   };
 
-  if (loading) {
+  if (loading && modules.length === 0) {
     return (
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
       >
         <Navbar />
-        <main className="flex-1 pt-20 p-8 overflow-y-auto custom-scrollbar flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <main className="flex-1 pt-20 p-8 overflow-y-auto custom-scrollbar">
+          <div className="max-w-7xl mx-auto">
+            <DashboardWidgetsSkeleton />
+            <div className="skeleton-module-grid">
+              <ModuleCardSkeleton />
+              <ModuleCardSkeleton />
+              <ModuleCardSkeleton />
+              <ModuleCardSkeleton />
+            </div>
+          </div>
         </main>
       </motion.div>
     );

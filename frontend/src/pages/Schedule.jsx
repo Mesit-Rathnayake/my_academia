@@ -6,11 +6,13 @@ import BulkAddExamsModal from '../components/BulkAddExamsModal';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
 import { FaClock, FaCalendarAlt, FaTrash, FaLayerGroup } from 'react-icons/fa';
+import { fetchWithCache, getCache } from '../utils/cache';
+import { ScheduleSkeleton, Skeleton } from '../components/Skeleton';
 
 function Schedule() {
-  const [timetable, setTimetable] = useState([]);
-  const [examSeries, setExamSeries] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [timetable, setTimetable] = useState(() => getCache('schedule_timetable') || []);
+  const [examSeries, setExamSeries] = useState(() => getCache('schedule_exam_series') || []);
+  const [loading, setLoading] = useState(() => !getCache('schedule_timetable'));
   const [error, setError] = useState(null);
   
   const [showBulkAddExams, setShowBulkAddExams] = useState(false);
@@ -30,28 +32,24 @@ function Schedule() {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const token = localStorage.getItem('token');
-      
-      const [timeRes, seriesRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/api/timetable`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${apiBaseUrl}/api/exam-series`, { headers: { 'Authorization': `Bearer ${token}` } })
+      if (!token) return;
+
+      const headers = { 'Authorization': `Bearer ${token}` };
+
+      const [timeData, seriesData] = await Promise.all([
+        fetchWithCache(`${apiBaseUrl}/api/timetable`, { headers }, { cacheKey: 'schedule_timetable' }).catch(() => []),
+        fetchWithCache(`${apiBaseUrl}/api/exam-series`, { headers }, { cacheKey: 'schedule_exam_series' }).catch(() => [])
       ]);
       
-      if (!timeRes.ok || !seriesRes.ok) throw new Error('Failed to fetch data');
-      
-      setTimetable(await timeRes.json());
-      setExamSeries(await seriesRes.json());
+      if (timeData) setTimetable(timeData);
+      if (seriesData) setExamSeries(seriesData);
     } catch (err) {
-      setError(err.message);
+      if (timetable.length === 0) setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
-
-
-
 
   const deleteEntry = async (id, type) => {
     try {
@@ -89,15 +87,23 @@ function Schedule() {
     out: { opacity: 0, y: -20 }
   };
 
-  if (loading) {
+  if (loading && timetable.length === 0 && examSeries.length === 0) {
     return (
       <motion.div 
         initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
         className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
       >
         <Navbar />
-        <main className="flex-1 pt-20 p-8 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <main className="flex-1 pt-24 p-8 overflow-y-auto custom-scrollbar">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <Skeleton width="200px" height="32px" />
+              <Skeleton width="120px" height="40px" borderRadius="10px" />
+            </div>
+            <ScheduleSkeleton />
+            <ScheduleSkeleton />
+            <ScheduleSkeleton />
+          </div>
         </main>
       </motion.div>
     );

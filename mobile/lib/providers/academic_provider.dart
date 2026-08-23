@@ -50,9 +50,38 @@ class AcademicProvider with ChangeNotifier {
       ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
   }
 
+  AcademicProvider() {
+    _loadLocalCache();
+  }
+
+  Future<void> _loadLocalCache() async {
+    try {
+      final cachedPerf = await _apiService.getCache('performance');
+      if (cachedPerf != null) {
+        _performance = GpaPerformance.fromJson(jsonDecode(cachedPerf));
+      }
+
+      final cachedMods = await _apiService.getCache('modules');
+      if (cachedMods != null) {
+        final List list = jsonDecode(cachedMods);
+        _modules = list.map((item) => ModuleModel.fromJson(item)).toList();
+      }
+
+      final cachedTime = await _apiService.getCache('timetable');
+      if (cachedTime != null) {
+        final List list = jsonDecode(cachedTime);
+        _timetable = list.map((item) => TimetableEntry.fromJson(item)).toList();
+      }
+
+      notifyListeners();
+    } catch (_) {}
+  }
+
   Future<void> fetchDashboardData() async {
-    _isLoading = true;
-    notifyListeners();
+    if (_modules.isEmpty) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     await Future.wait([
       fetchGpaPerformance(),
@@ -73,6 +102,7 @@ class AcademicProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         _performance = GpaPerformance.fromJson(body);
+        await _apiService.saveCache('performance', response.body);
       }
     } catch (e) {
       debugPrint('Error fetching GPA: $e');

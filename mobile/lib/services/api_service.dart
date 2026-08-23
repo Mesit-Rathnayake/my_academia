@@ -37,6 +37,20 @@ class ApiService {
     return null;
   }
 
+  Future<String?> getCache(String key) async {
+    try {
+      return await _storage.read(key: 'cache_$key');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveCache(String key, String data) async {
+    try {
+      await _storage.write(key: 'cache_$key', value: data);
+    } catch (_) {}
+  }
+
   Map<String, String> _headers(String? token) {
     final headers = <String, String>{
       'Content-Type': 'application/json',
