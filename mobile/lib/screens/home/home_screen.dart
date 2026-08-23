@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/academic_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/notifications_sheet.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -24,6 +25,7 @@ class HomeScreen extends StatelessWidget {
     final gpa = academic.performance;
     final classesToday = academic.todayClasses;
     final exams = academic.upcomingExams;
+    final lowAttendanceModules = academic.modules.where((m) => m.conductedLectures > 0 && m.attendancePercentage < 80).toList();
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -37,7 +39,7 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+                // Header with Notification Bell
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -54,20 +56,55 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryLight,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFC7D2FE)),
-                      ),
-                      child: Center(
-                        child: Text(
-                          user?.firstName.isNotEmpty == true ? user!.firstName[0].toUpperCase() : 'M',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.primary),
+                    Row(
+                      children: [
+                        Stack(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.notifications_outlined, size: 26, color: AppTheme.textPrimary),
+                              onPressed: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => const NotificationsSheet(),
+                                );
+                              },
+                            ),
+                            if (academic.unreadNotificationsCount > 0)
+                              Positioned(
+                                right: 8,
+                                top: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.danger,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    '${academic.unreadNotificationsCount}',
+                                    style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryLight,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: const Color(0xFFC7D2FE)),
+                          ),
+                          child: Center(
+                            child: Text(
+                              user?.firstName.isNotEmpty == true ? user!.firstName[0].toUpperCase() : 'M',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.primary),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -150,10 +187,10 @@ class HomeScreen extends StatelessWidget {
                           Container(width: 1, height: 24, color: Colors.white.withOpacity(0.2)),
                           Column(
                             children: [
-                              const Text('Modules Done', style: TextStyle(fontSize: 11, color: Color(0xFFC7D2FE))),
+                              const Text('Total Modules', style: TextStyle(fontSize: 11, color: Color(0xFFC7D2FE))),
                               const SizedBox(height: 2),
                               Text(
-                                '${gpa?.modules.length ?? '—'}',
+                                '${academic.modules.length}',
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
                               ),
                             ],
@@ -163,7 +200,41 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
+
+                // Attendance Alert Banner (If Any < 80%)
+                if (lowAttendanceModules.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppTheme.dangerLight,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFFECACA)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.warning_amber_rounded, color: AppTheme.danger, size: 24),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Low Attendance Warning',
+                                style: TextStyle(color: AppTheme.danger, fontWeight: FontWeight.w800, fontSize: 13),
+                              ),
+                              Text(
+                                '${lowAttendanceModules.first.moduleName} is currently at ${lowAttendanceModules.first.attendancePercentage.toInt()}% (below 80% requirement).',
+                                style: const TextStyle(color: Color(0xFF7F1D1D), fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
 
                 // Today's Classes Section
                 Row(

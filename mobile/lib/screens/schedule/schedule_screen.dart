@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/academic_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/add_class_dialog.dart';
+import '../../widgets/add_exam_series_dialog.dart';
 import 'package:intl/intl.dart';
 
 class ScheduleScreen extends StatefulWidget {
@@ -24,6 +26,62 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     _selectedDay = weekday == 7 ? 6 : weekday - 1;
   }
 
+  void _showAddDialog() {
+    if (_tabIndex == 0) {
+      showDialog(
+        context: context,
+        builder: (_) => AddClassDialog(initialDay: _selectedDay),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (_) => const AddExamSeriesDialog(),
+      );
+    }
+  }
+
+  void _confirmDeleteClass(String id, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Class', style: TextStyle(fontWeight: FontWeight.w800)),
+        content: Text('Remove $title from your weekly timetable?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.danger),
+            onPressed: () {
+              Navigator.pop(ctx);
+              Provider.of<AcademicProvider>(context, listen: false).deleteTimetableEntry(id);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteExamSeries(String id, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Exam Series', style: TextStyle(fontWeight: FontWeight.w800)),
+        content: Text('Remove $title and all its exam papers?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.danger),
+            onPressed: () {
+              Navigator.pop(ctx);
+              Provider.of<AcademicProvider>(context, listen: false).deleteExamSeries(id);
+            },
+            child: const Text('Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final academic = Provider.of<AcademicProvider>(context);
@@ -34,6 +92,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text('Academic Schedule'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_circle, color: AppTheme.primary, size: 28),
+            onPressed: _showAddDialog,
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(56),
           child: Padding(
@@ -53,9 +117,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         decoration: BoxDecoration(
                           color: _tabIndex == 0 ? AppTheme.card : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: _tabIndex == 0
-                              ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)]
-                              : null,
+                          boxShadow: _tabIndex == 0 ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)] : null,
                         ),
                         child: Center(
                           child: Text(
@@ -77,9 +139,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         decoration: BoxDecoration(
                           color: _tabIndex == 1 ? AppTheme.card : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: _tabIndex == 1
-                              ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)]
-                              : null,
+                          boxShadow: _tabIndex == 1 ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)] : null,
                         ),
                         child: Center(
                           child: Text(
@@ -143,18 +203,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   child: RefreshIndicator(
                     onRefresh: () => academic.fetchDashboardData(),
                     child: dayClasses.isEmpty
-                        ? const Center(
+                        ? Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.coffee_outlined, size: 40, color: AppTheme.textMuted),
-                                SizedBox(height: 12),
-                                Text(
-                                  'No classes on this day',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
-                                ),
-                                SizedBox(height: 4),
-                                Text('Enjoy your free time!', style: TextStyle(color: AppTheme.textSecondary)),
+                                const Icon(Icons.coffee_outlined, size: 40, color: AppTheme.textMuted),
+                                const SizedBox(height: 12),
+                                const Text('No classes on this day', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
+                                const SizedBox(height: 4),
+                                const Text('Tap the + button to add a lecture', style: TextStyle(color: AppTheme.textSecondary)),
                               ],
                             ),
                           )
@@ -206,6 +263,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                         ],
                                       ),
                                     ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: AppTheme.danger, size: 20),
+                                      onPressed: () => _confirmDeleteClass(item.id, item.type),
+                                    ),
                                   ],
                                 ),
                               );
@@ -218,8 +279,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           : RefreshIndicator(
               onRefresh: () => academic.fetchDashboardData(),
               child: academic.examSeries.isEmpty
-                  ? const Center(
-                      child: Text('No exam series scheduled yet.', style: TextStyle(color: AppTheme.textSecondary)),
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.assignment_outlined, size: 40, color: AppTheme.textMuted),
+                          const SizedBox(height: 12),
+                          const Text('No exam series scheduled yet.', style: TextStyle(color: AppTheme.textSecondary, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 4),
+                          const Text('Tap the + button to add exam timetables', style: TextStyle(color: AppTheme.textMuted)),
+                        ],
+                      ),
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.all(16),
@@ -256,6 +326,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                       '${series.exams.length} Papers',
                                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.primary),
                                     ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline, color: AppTheme.danger, size: 20),
+                                    onPressed: () => _confirmDeleteExamSeries(series.id, series.title),
                                   ),
                                 ],
                               ),
@@ -309,6 +384,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       },
                     ),
             ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: AppTheme.primary,
+        onPressed: _showAddDialog,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: Text(_tabIndex == 0 ? 'Add Class' : 'Add Exam Series', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
     );
   }
 }

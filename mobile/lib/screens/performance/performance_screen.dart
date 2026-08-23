@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 import '../../providers/academic_provider.dart';
 import '../../theme/app_theme.dart';
 
@@ -12,6 +13,14 @@ class PerformanceScreen extends StatefulWidget {
 
 class _PerformanceScreenState extends State<PerformanceScreen> {
   final Set<String> _expandedSemesters = {};
+  double _targetGpa = 3.70;
+  final _degreeCreditsController = TextEditingController(text: '140');
+
+  @override
+  void dispose() {
+    _degreeCreditsController.dispose();
+    super.dispose();
+  }
 
   Color _getGradeColor(String grade) {
     if (grade.startsWith('A')) return AppTheme.success;
@@ -20,10 +29,27 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
     return AppTheme.danger;
   }
 
+  void _calculateTargetGpa() {
+    final credits = int.tryParse(_degreeCreditsController.text) ?? 140;
+    Provider.of<AcademicProvider>(context, listen: false).calculateProjection(_targetGpa, credits);
+  }
+
   @override
   Widget build(BuildContext context) {
     final academic = Provider.of<AcademicProvider>(context);
     final gpa = academic.performance;
+    final projection = academic.projectionResult;
+
+    // Prepare chart spots
+    List<FlSpot> spots = [];
+    if (gpa != null && gpa.semesters.isNotEmpty) {
+      final sortedKeys = gpa.semesters.keys.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+      for (var key in sortedKeys) {
+        final semNum = double.tryParse(key) ?? 1.0;
+        final semGpa = gpa.semesters[key]?.sgpa ?? 0.0;
+        spots.add(FlSpot(semNum, semGpa));
+      }
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -106,12 +132,198 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              const Text(
-                'Semester SGPA Breakdown',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
+              // GPA Trend Line Chart
+              if (spots.length >= 2) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.card,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppTheme.cardBorder),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('SGPA Progression Trend', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 160,
+                        child: LineChart(
+                          LineChartData(
+                            minY: 0.0,
+                            maxY: 4.0,
+                            gridData: FlGridData(
+                              show: true,
+                              drawVerticalLine: false,
+                              horizontalInterval: 1.0,
+                              getDrawingHorizontalLine: (val) => const FlLine(color: AppTheme.cardBorder, strokeWidth: 1),
+                            ),
+                            titlesData: FlTitlesData(
+                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  getTitlesWidget: (val, _) => Text('S${val.toInt()}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+                                ),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  interval: 1.0,
+                                  reservedSize: 28,
+                                  getTitlesWidget: (val, _) => Text(val.toStringAsFixed(0), style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+                                ),
+                              ),
+                            ),
+                            borderData: FlBorderData(show: false),
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: spots,
+                                isCurved: true,
+                                color: AppTheme.primary,
+                                barWidth: 3,
+                                isStrokeCapRound: true,
+                                dotData: const FlDotData(show: true),
+                                belowBarData: BarAreaData(
+                                  show: true,
+                                  color: AppTheme.primary.withOpacity(0.12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+
+              // "What Do I Need?" Calculator Section
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppTheme.card,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppTheme.cardBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.calculate_outlined, color: AppTheme.primary, size: 22),
+                        SizedBox(width: 8),
+                        Text('"What Do I Need?" Calculator', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Calculate the average SGPA you need in remaining credits to achieve your target degree class.',
+                      style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Target OGPA Select
+                    const Text('TARGET OGPA', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textSecondary)),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      decoration: BoxDecoration(
+                        color: AppTheme.background,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppTheme.cardBorder),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<double>(
+                          value: _targetGpa,
+                          isExpanded: true,
+                          items: const [
+                            DropdownMenuItem(value: 4.00, child: Text('4.00 - Perfect')),
+                            DropdownMenuItem(value: 3.70, child: Text('3.70 - First Class')),
+                            DropdownMenuItem(value: 3.30, child: Text('3.30 - Second Upper')),
+                            DropdownMenuItem(value: 3.00, child: Text('3.00 - Second Lower')),
+                            DropdownMenuItem(value: 2.00, child: Text('2.00 - General Pass')),
+                          ],
+                          onChanged: (val) => setState(() => _targetGpa = val ?? 3.70),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Degree Credits
+                    const Text('TOTAL DEGREE CREDITS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textSecondary)),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _degreeCreditsController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 140'),
+                    ),
+                    const SizedBox(height: 16),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46,
+                      child: ElevatedButton(
+                        onPressed: academic.isProjecting ? null : _calculateTargetGpa,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: academic.isProjecting
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Text('Calculate Projection', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                      ),
+                    ),
+
+                    // Result Banner
+                    if (projection != null) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: (projection['isPossible'] == true) ? AppTheme.successLight : AppTheme.dangerLight,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: (projection['isPossible'] == true) ? const Color(0xFFA7F3D0) : const Color(0xFFFECACA),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (projection['isPossible'] == true)
+                                  ? '🎉 Target Achievable!'
+                                  : '⚠️ Target Out of Reach',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                color: (projection['isPossible'] == true) ? AppTheme.success : AppTheme.danger,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            if (projection['requiredAverage'] != null)
+                              Text(
+                                'You need an average SGPA of ${(projection['requiredAverage'] as num).toStringAsFixed(2)} over your remaining credits to reach $_targetGpa OGPA.',
+                                style: const TextStyle(fontSize: 13, height: 1.4, color: AppTheme.textPrimary),
+                              )
+                            else
+                              const Text('Remaining credits are insufficient to reach this target.'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ),
+              const SizedBox(height: 20),
+
+              // Semester Breakdown Accordion
+              const Text('Semester SGPA Breakdown', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
               const SizedBox(height: 12),
 
               if (gpa == null || gpa.semesters.isEmpty)
@@ -123,9 +335,7 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppTheme.cardBorder),
                   ),
-                  child: const Center(
-                    child: Text('No semester records found.', style: TextStyle(color: AppTheme.textSecondary)),
-                  ),
+                  child: const Center(child: Text('No semester records found.', style: TextStyle(color: AppTheme.textSecondary))),
                 )
               else
                 ...gpa.semesters.entries.map((entry) {
@@ -156,29 +366,20 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                           leading: Container(
                             width: 40,
                             height: 40,
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryLight,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Center(
-                              child: Text('S$semKey', style: const TextStyle(fontWeight: FontWeight.w900, color: AppTheme.primary)),
-                            ),
+                            decoration: BoxDecoration(color: AppTheme.primaryLight, borderRadius: BorderRadius.circular(10)),
+                            child: Center(child: Text('S$semKey', style: const TextStyle(fontWeight: FontWeight.w900, color: AppTheme.primary))),
                           ),
                           title: Text('Semester $semKey', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
                           subtitle: Text('${semData.credits} Credits Counted', style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                semData.sgpa.toStringAsFixed(2),
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.primary),
-                              ),
+                              Text(semData.sgpa.toStringAsFixed(2), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.primary)),
                               const SizedBox(width: 8),
                               Icon(isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: AppTheme.textSecondary),
                             ],
                           ),
                         ),
-
                         if (isExpanded) ...[
                           const Divider(height: 1, color: AppTheme.cardBorder),
                           Padding(
@@ -208,10 +409,7 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                                                       '${mod.moduleCode.isNotEmpty ? "${mod.moduleCode} - " : ""}${mod.moduleName}',
                                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
                                                     ),
-                                                    Text(
-                                                      '${mod.credits} Credits • ${mod.isGpa ? "GPA" : "Non-GPA"}',
-                                                      style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-                                                    ),
+                                                    Text('${mod.credits} Credits • ${mod.isGpa ? "GPA" : "Non-GPA"}', style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
                                                   ],
                                                 ),
                                               ),
@@ -225,11 +423,7 @@ class _PerformanceScreenState extends State<PerformanceScreen> {
                                                 child: Center(
                                                   child: Text(
                                                     mod.grade.isNotEmpty ? mod.grade : '—',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w900,
-                                                      color: _getGradeColor(mod.grade),
-                                                    ),
+                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: _getGradeColor(mod.grade)),
                                                   ),
                                                 ),
                                               ),

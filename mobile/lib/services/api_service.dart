@@ -59,4 +59,20 @@ class ApiService {
     final url = Uri.parse('$baseUrl$endpoint');
     return await http.post(url, headers: _headers(token), body: jsonEncode(body));
   }
+
+  Future<http.Response> put(String endpoint, [Map<String, dynamic>? body]) async {
+    final token = await getToken();
+    final url = Uri.parse('$baseUrl$endpoint');
+    return await http.put(
+      url,
+      headers: _headers(token),
+      body: body != null ? jsonEncode(body) : null,
+    );
+  }
+
+  Future<http.Response> delete(String endpoint) async {
+    final token = await getToken();
+    final url = Uri.parse('$baseUrl$endpoint');
+    return await http.delete(url, headers: _headers(token));
+  }
 }
