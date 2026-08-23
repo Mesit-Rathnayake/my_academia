@@ -95,7 +95,7 @@ function Home() {
         throw new Error(data.message || 'Failed to save module');
       }
 
-      fetchModules();
+      fetchDashboardData();
       setIsModalOpen(false);
     } catch (err) {
       setError(err.message);
@@ -177,7 +177,7 @@ function Home() {
         throw new Error('Failed to update module');
       }
 
-      fetchModules();
+      fetchDashboardData();
     } catch (err) {
       setError(err.message);
     }
