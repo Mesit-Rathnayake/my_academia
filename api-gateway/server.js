@@ -18,7 +18,8 @@ app.use('/ma-api/v1', createProxyMiddleware({
   target: 'http://127.0.0.1:8294',
   changeOrigin: true,
   pathRewrite: {
-    '^/ma-api/v1': '/api', // Rewrite the path before forwarding
+    '^/ma-api/v1/api': '/api', // Handles /ma-api/v1/api/...
+    '^/ma-api/v1': '/api',     // Handles /ma-api/v1/...
   },
   onProxyReq: (proxyReq, req, res) => {
     console.log(`[PROXY -> Backend] ${req.method} ${req.url} -> http://127.0.0.1:8294${proxyReq.path}`);
