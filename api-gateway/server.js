@@ -31,7 +31,8 @@ app.use('/ma-ai/v1', createProxyMiddleware({
   target: 'http://127.0.0.1:9142',
   changeOrigin: true,
   pathRewrite: {
-    '^/ma-ai/v1': '/api/v1',
+    '^/ma-ai/v1/api/v1': '/api/v1', // Handles /ma-ai/v1/api/v1/...
+    '^/ma-ai/v1': '/api/v1',        // Handles /ma-ai/v1/...
   },
   onProxyReq: (proxyReq, req, res) => {
     console.log(`[PROXY -> AI Service] ${req.method} ${req.url} -> http://127.0.0.1:9142${proxyReq.path}`);

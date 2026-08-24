@@ -15,7 +15,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 GEMINI_MODEL_NAME = os.getenv(
     "GEMINI_MODEL_NAME",
-    "gemini-3.5-flash",
+    "gemini-2.5-flash",
 )
 
 
@@ -182,21 +182,36 @@ def chat(
     )
 
     # --- Generate ---
+    candidate_models = [GEMINI_MODEL_NAME, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    # Deduplicate while preserving order
+    models_to_try = list(dict.fromkeys(candidate_models))
+
+    last_error = None
+    answer = None
+
     try:
         client = genai.Client(api_key=GEMINI_API_KEY)
 
-        response = _call_gemini_with_retry(
-            client=client,
-            model=GEMINI_MODEL_NAME,
-            messages=messages,
-            config={
-                "system_instruction": SYSTEM_PROMPT,
-                "temperature": 0.3,
-                "max_output_tokens": 8192,
-            },
-        )
+        for model_candidate in models_to_try:
+            try:
+                response = _call_gemini_with_retry(
+                    client=client,
+                    model=model_candidate,
+                    messages=messages,
+                    config={
+                        "system_instruction": SYSTEM_PROMPT,
+                        "temperature": 0.3,
+                        "max_output_tokens": 8192,
+                    },
+                )
+                answer = response.text or "I could not generate a response."
+                break
+            except Exception as e:
+                last_error = e
+                continue
 
-        answer = response.text or "I could not generate a response."
+        if answer is None:
+            raise ChatServiceError(f"Gemini API call failed across all candidate models: {last_error}")
 
     except Exception as exc:
         raise ChatServiceError(
