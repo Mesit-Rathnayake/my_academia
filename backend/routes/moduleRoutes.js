@@ -26,6 +26,7 @@ router.delete('/:id', moduleController.deleteModule);
 
 // Document routes
 router.post('/:moduleId/documents', upload.single('file'), documentController.uploadDocument);
+router.get('/:moduleId/documents/:documentId', documentController.getDocument);
 router.delete('/:moduleId/documents/:documentId', documentController.deleteDocument);
 
 // Chat routes

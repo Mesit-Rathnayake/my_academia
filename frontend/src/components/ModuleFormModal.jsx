@@ -240,8 +240,11 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
             {initialData ? (
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Lecture Notes (PDFs)</h3>
-                  <label className="glass-button cursor-pointer px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900">Lecture Notes & Syllabus (PDFs)</h3>
+                    <p className="text-xs text-slate-500">Upload notes to chat with them in the AI Tutor</p>
+                  </div>
+                  <label className="bg-primary hover:bg-indigo-700 text-white font-bold cursor-pointer px-4 py-2.5 rounded-xl text-sm shadow-md shadow-primary/20 flex items-center gap-2 transition-all active:scale-95">
                     {uploading ? 'Uploading...' : <><FaUpload /> Upload PDF</>}
                     <input type="file" accept=".pdf" className="hidden" onChange={handleFileUpload} disabled={uploading} />
                   </label>
@@ -412,10 +415,18 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
         </div>
 
         <div className="p-6 border-t border-slate-200 bg-slate-50 flex justify-end gap-4">
-          <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-slate-600 font-medium hover:bg-slate-200 transition-colors">
+          <button 
+            type="button" 
+            onClick={onClose} 
+            className="px-6 py-3 rounded-xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition-colors border border-slate-200 text-sm"
+          >
             Cancel
           </button>
-          <button type="submit" form="module-form" className="glass-button px-8 py-3 rounded-xl font-medium shadow-sm">
+          <button 
+            type="submit" 
+            form="module-form" 
+            className="bg-primary hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/25 transition-all active:scale-95 text-sm"
+          >
             {initialData ? 'Save Changes' : 'Create Module'}
           </button>
         </div>

@@ -5,30 +5,30 @@ function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmText
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-sm shadow-2xl"
+        className="bg-white border border-slate-200 p-6 rounded-3xl w-full max-w-md shadow-2xl"
       >
-        <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-        <p className="text-sm text-slate-300 mb-6 leading-relaxed">
+        <h3 className="text-xl font-bold text-slate-900 mb-2">{title}</h3>
+        <p className="text-sm text-slate-600 mb-6 leading-relaxed">
           {message}
         </p>
         <div className="flex justify-end gap-3">
           <button 
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-bold text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-colors"
+            className="px-5 py-2.5 text-sm font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200"
           >
             {cancelText}
           </button>
           <button 
             onClick={onConfirm}
-            className={`px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-lg ${
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md ${
               isDanger 
-                ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20' 
-                : 'bg-primary hover:bg-primary/80 text-white shadow-primary/20'
+                ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-500/20' 
+                : 'bg-primary hover:bg-indigo-700 text-white shadow-primary/20'
             }`}
           >
             {confirmText}

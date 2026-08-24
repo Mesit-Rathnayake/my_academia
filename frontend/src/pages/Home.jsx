@@ -133,9 +133,14 @@ function Home() {
   };
 
   const handleInlineUpdate = async (moduleId, field, value) => {
+    if (field === 'refresh') {
+      fetchDashboardData();
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
-      const moduleToUpdate = modules.find(m => m._id === moduleId);
+      const moduleToUpdate = modules.find(m => (m._id || m.id) === moduleId);
       
       if (!moduleToUpdate) {
         throw new Error('Module not found');

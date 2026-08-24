@@ -117,3 +117,23 @@ exports.deleteDocument = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+exports.getDocument = async (req, res) => {
+  try {
+    const { moduleId, documentId } = req.params;
+    const document = await prisma.document.findFirst({
+      where: { id: documentId, moduleId: moduleId }
+    });
+
+    if (!document || !fs.existsSync(document.filepath)) {
+      return res.status(404).json({ message: 'Document file not found' });
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${document.name}"`);
+    fs.createReadStream(document.filepath).pipe(res);
+  } catch (error) {
+    console.error('Get document error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
