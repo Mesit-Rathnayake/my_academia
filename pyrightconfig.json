@@ -1,0 +1,11 @@
+{
+  "include": [
+    "ai-service"
+  ],
+  "extraPaths": [
+    "ai-service"
+  ],
+  "venvPath": "ai-service",
+  "venv": ".venv",
+  "reportMissingImports": false
+}
