@@ -622,13 +622,13 @@ function Chat() {
             <div className="flex justify-end gap-3">
               <button 
                 onClick={() => { setShowNewChatModal(false); setNewChatTitle(''); setSelectedDocs([]); }}
-                className="px-4 py-2 text-sm font-bold text-slate-400 hover:text-white transition"
+                className="px-5 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 hover:text-red-700 border border-red-200 rounded-xl transition-all active:scale-95"
               >
                 Cancel
               </button>
               <button 
                 onClick={handleCreateSession}
-                className="bg-primary hover:bg-primary/80 text-white px-5 py-2 rounded-xl text-sm font-bold transition shadow-lg shadow-primary/20"
+                className="bg-primary hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-bold transition shadow-md shadow-primary/20 active:scale-95"
               >
                 Create Chat
               </button>
