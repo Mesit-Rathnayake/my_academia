@@ -21,7 +21,7 @@ def get_gemini_api_key() -> str:
 
 
 def get_gemini_model_name() -> str:
-    return os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
+    return os.getenv("GEMINI_MODEL_NAME", "gemini-flash-latest")
 
 
 class ChatServiceError(Exception):
@@ -122,23 +122,7 @@ def _build_messages(
 )
 def _call_gemini_with_retry(client, model, messages, config):
     """
-    Calls Gemini API with exponential backoff retries to handle 503 UNAVAILABLE errors.
-    """
-    return client.models.generate_content(
-        model=model,
-        contents=messages,
-        config=config,
-    )
-
-
-@retry(
-    stop=stop_after_attempt(5),
-    wait=wait_exponential(multiplier=1, min=2, max=10),
-    reraise=True
-)
-def _call_gemini_with_retry(client, model, messages, config):
-    """
-    Calls Gemini API with exponential backoff retries to handle 503 UNAVAILABLE errors.
+    Calls Gemini API with exponential backoff retries to handle transient errors.
     """
     return client.models.generate_content(
         model=model,
@@ -188,7 +172,14 @@ def chat(
     )
 
     # --- Generate ---
-    candidate_models = [get_gemini_model_name(), "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    candidate_models = [
+        get_gemini_model_name(),
+        "gemini-flash-latest",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-pro",
+        "gemini-pro-latest"
+    ]
     # Deduplicate while preserving order
     models_to_try = list(dict.fromkeys(candidate_models))
 
