@@ -1,12 +1,12 @@
 {
-  "python.defaultInterpreterPath": "${workspaceFolder}/ai-service/.venv/Scripts/python.exe",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
   "python.analysis.extraPaths": [
-    "${workspaceFolder}/ai-service",
-    "${workspaceFolder}/ai-service/app"
+    "${workspaceFolder}",
+    "${workspaceFolder}/app"
   ],
   "python.autoComplete.extraPaths": [
-    "${workspaceFolder}/ai-service",
-    "${workspaceFolder}/ai-service/app"
+    "${workspaceFolder}",
+    "${workspaceFolder}/app"
   ],
   "python.analysis.typeCheckingMode": "off",
   "python.analysis.diagnosticSeverityOverrides": {

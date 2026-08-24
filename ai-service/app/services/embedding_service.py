@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
+from typing import Any, cast
 
 from sentence_transformers import SentenceTransformer
 
@@ -48,7 +49,7 @@ def embed_documents(texts: list[str]) -> list[list[float]]:
     model = get_embedding_model()
 
     try:
-        embeddings = model.encode(
+        embeddings: Any = model.encode(
             cleaned_texts,
             normalize_embeddings=True,
             convert_to_numpy=True,
@@ -59,7 +60,7 @@ def embed_documents(texts: list[str]) -> list[list[float]]:
             "Could not generate document embeddings."
         ) from exc
 
-    return embeddings.tolist()
+    return cast(list[list[float]], embeddings.tolist())
 
 
 def embed_query(question: str) -> list[float]:
@@ -77,7 +78,7 @@ def embed_query(question: str) -> list[float]:
     model = get_embedding_model()
 
     try:
-        embedding = model.encode(
+        embedding: Any = model.encode(
             cleaned_question,
             normalize_embeddings=True,
             convert_to_numpy=True,
@@ -88,4 +89,4 @@ def embed_query(question: str) -> list[float]:
             "Could not generate the question embedding."
         ) from exc
 
-    return embedding.tolist()
+    return cast(list[float], embedding.tolist())
