@@ -7,6 +7,7 @@ router.use(auth);
 
 router.get('/', examSeriesController.getExamSeries);
 router.post('/', examSeriesController.createExamSeries);
+router.put('/:id', examSeriesController.updateExamSeries);
 router.delete('/:id', examSeriesController.deleteExamSeries);
 
 module.exports = router;

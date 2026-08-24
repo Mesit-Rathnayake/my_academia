@@ -1,26 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/exam_model.dart';
 import '../providers/academic_provider.dart';
 import '../theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class AddExamSeriesDialog extends StatefulWidget {
-  const AddExamSeriesDialog({super.key});
+  final ExamSeries? initialSeries;
+  const AddExamSeriesDialog({super.key, this.initialSeries});
 
   @override
   State<AddExamSeriesDialog> createState() => _AddExamSeriesDialogState();
 }
 
 class _ExamRowItem {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController locationController = TextEditingController();
-  DateTime dateTime = DateTime.now().add(const Duration(days: 7));
+  final TextEditingController titleController;
+  final TextEditingController locationController;
+  DateTime dateTime;
+
+  _ExamRowItem({String title = '', String location = '', DateTime? dt})
+      : titleController = TextEditingController(text: title),
+        locationController = TextEditingController(text: location),
+        dateTime = dt ?? DateTime.now().add(const Duration(days: 7));
 }
 
 class _AddExamSeriesDialogState extends State<AddExamSeriesDialog> {
-  final _seriesTitleController = TextEditingController();
-  final List<_ExamRowItem> _rows = [_ExamRowItem()];
+  late final TextEditingController _seriesTitleController;
+  late final List<_ExamRowItem> _rows;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final s = widget.initialSeries;
+    _seriesTitleController = TextEditingController(text: s?.title ?? '');
+
+    if (s != null && s.exams.isNotEmpty) {
+      _rows = s.exams
+          .map((e) => _ExamRowItem(
+                title: e.title,
+                location: e.location ?? '',
+                dt: e.dateTime,
+              ))
+          .toList();
+    } else {
+      _rows = [_ExamRowItem()];
+    }
+  }
 
   @override
   void dispose() {
@@ -52,8 +78,8 @@ class _AddExamSeriesDialogState extends State<AddExamSeriesDialog> {
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _rows[index].dateTime,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
     );
 
     if (pickedDate != null && mounted) {
@@ -94,6 +120,7 @@ class _AddExamSeriesDialogState extends State<AddExamSeriesDialog> {
                   ? r.titleController.text.trim()
                   : 'Subject Exam',
               'dateTime': r.dateTime.toIso8601String(),
+              'date': r.dateTime.toIso8601String(),
               'location': r.locationController.text.trim(),
             })
         .toList();
@@ -101,7 +128,12 @@ class _AddExamSeriesDialogState extends State<AddExamSeriesDialog> {
     setState(() => _isLoading = true);
 
     final academic = Provider.of<AcademicProvider>(context, listen: false);
-    final success = await academic.createExamSeries(seriesTitle, exams);
+    final bool success;
+    if (widget.initialSeries != null) {
+      success = await academic.updateExamSeries(widget.initialSeries!.id, seriesTitle, exams);
+    } else {
+      success = await academic.createExamSeries(seriesTitle, exams);
+    }
 
     if (mounted) {
       setState(() => _isLoading = false);
@@ -113,101 +145,152 @@ class _AddExamSeriesDialogState extends State<AddExamSeriesDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.initialSeries != null;
+
     return Dialog(
       backgroundColor: AppTheme.card,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxHeight: 600, maxWidth: 500),
+        constraints: const BoxConstraints(maxHeight: 620, maxWidth: 500),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Add Exam Timetable', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                  Text(
+                    isEditing ? 'Edit Exam Series' : 'Add Exam Series',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close, color: AppTheme.textSecondary),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-
-              // Series Title
-              const Text('EXAMINATION SERIES NAME', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.primary)),
-              const SizedBox(height: 6),
+              const SizedBox(height: 16),
               TextField(
                 controller: _seriesTitleController,
-                decoration: const InputDecoration(hintText: 'e.g. End Semester Examination'),
+                decoration: InputDecoration(
+                  labelText: 'Series Name (e.g. End Semester Fall 2026)',
+                  prefixIcon: const Icon(Icons.school_outlined, color: AppTheme.primary),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  filled: true,
+                  fillColor: AppTheme.background,
+                ),
               ),
               const SizedBox(height: 16),
-
-              const Text('EXAM PAPERS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.textSecondary)),
+              const Text(
+                'Exam Papers / Subjects',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
               const SizedBox(height: 8),
-
-              // Papers List
               Expanded(
-                child: ListView.builder(
+                child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: _rows.length,
-                  itemBuilder: (context, idx) {
-                    final row = _rows[idx];
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final row = _rows[index];
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: AppTheme.background,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: AppTheme.cardBorder),
+                        border: Border.all(color: AppTheme.border),
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Paper #${idx + 1}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.primary)),
+                              CircleAvatar(
+                                radius: 12,
+                                backgroundColor: AppTheme.primary.withOpacity(0.1),
+                                child: Text(
+                                  '${index + 1}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppTheme.primary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: TextField(
+                                  controller: row.titleController,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Subject / Module Name',
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                  ),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                              ),
                               if (_rows.length > 1)
-                                GestureDetector(
-                                  onTap: () => _removeRow(idx),
-                                  child: const Icon(Icons.delete_outline, color: AppTheme.danger, size: 18),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                  onPressed: () => _removeRow(index),
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          TextField(
-                            controller: row.titleController,
-                            decoration: const InputDecoration(hintText: 'Subject / Module Name', isDense: true),
-                          ),
-                          const SizedBox(height: 8),
+                          const Divider(height: 12),
                           Row(
                             children: [
                               Expanded(
-                                flex: 3,
                                 child: InkWell(
-                                  onTap: () => _pickDateTime(idx),
+                                  onTap: () => _pickDateTime(index),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                     decoration: BoxDecoration(
                                       color: AppTheme.card,
                                       borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: AppTheme.cardBorder),
+                                      border: Border.all(color: AppTheme.border),
                                     ),
-                                    child: Text(
-                                      DateFormat('MMM d, h:mm a').format(row.dateTime),
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.calendar_today, size: 14, color: AppTheme.primary),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            DateFormat('MMM dd, HH:mm').format(row.dateTime),
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 8),
                               Expanded(
-                                flex: 2,
-                                child: TextField(
-                                  controller: row.locationController,
-                                  decoration: const InputDecoration(hintText: 'Hall', isDense: true),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.card,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: AppTheme.border),
+                                  ),
+                                  child: TextField(
+                                    controller: row.locationController,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Location (Hall A)',
+                                      isDense: true,
+                                      border: InputBorder.none,
+                                    ),
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
                                 ),
                               ),
                             ],
@@ -218,33 +301,35 @@ class _AddExamSeriesDialogState extends State<AddExamSeriesDialog> {
                   },
                 ),
               ),
-
-              // Add Row Button
+              const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: _addRow,
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('Add Another Subject'),
                 style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 44),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  minimumSize: const Size.fromHeight(44),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Save Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSave,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Save All Exams', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _handleSave,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size.fromHeight(48),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      )
+                    : Text(
+                        isEditing ? 'Update Exam Series' : 'Save Exam Series',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
               ),
             ],
           ),

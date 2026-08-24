@@ -5,7 +5,7 @@ import AddTimetableEntryModal from '../components/AddTimetableEntryModal';
 import BulkAddExamsModal from '../components/BulkAddExamsModal';
 import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
-import { FaClock, FaCalendarAlt, FaTrash, FaLayerGroup } from 'react-icons/fa';
+import { FaClock, FaCalendarAlt, FaTrash, FaEdit, FaLayerGroup } from 'react-icons/fa';
 import { fetchWithCache, getCache } from '../utils/cache';
 import { ScheduleSkeleton, Skeleton } from '../components/Skeleton';
 
@@ -16,6 +16,7 @@ function Schedule() {
   const [error, setError] = useState(null);
   
   const [showBulkAddExams, setShowBulkAddExams] = useState(false);
+  const [selectedSeriesForEdit, setSelectedSeriesForEdit] = useState(null);
   const [showAddClass, setShowAddClass] = useState(false);
   const [initialAddClassData, setInitialAddClassData] = useState({ day: 1, time: '08:00' });
   
@@ -142,7 +143,7 @@ function Schedule() {
               <div className="mb-6 border-b border-slate-200 pb-4 flex justify-between items-center">
                 <h3 className="text-2xl font-bold text-slate-900">Upcoming Exams</h3>
                 <button 
-                  onClick={() => setShowBulkAddExams(true)}
+                  onClick={() => { setSelectedSeriesForEdit(null); setShowBulkAddExams(true); }}
                   className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 hover:text-indigo-700 text-primary px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-transparent"
                 >
                   <FaLayerGroup /> Add Exam Time Table
@@ -158,9 +159,22 @@ function Schedule() {
                     <div key={series.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
                       <div className="bg-slate-50 p-5 border-b border-slate-200 flex justify-between items-center">
                         <h4 className="text-xl font-bold text-slate-900">{series.title}</h4>
-                        <button onClick={() => deleteEntry(series.id, 'exam-series')} className="text-slate-400 hover:text-red-500 hover:bg-red-50 px-3 py-2 rounded-xl transition-colors text-sm font-medium flex items-center gap-2">
-                          <FaTrash size={12} /> Delete Series
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => { setSelectedSeriesForEdit(series); setShowBulkAddExams(true); }} 
+                            className="text-primary hover:text-indigo-700 bg-primary/10 hover:bg-primary/20 px-3.5 py-2 rounded-xl transition-colors text-xs font-bold flex items-center gap-1.5"
+                            title="Edit Exam Series"
+                          >
+                            <FaEdit size={12} /> Edit Series
+                          </button>
+                          <button 
+                            onClick={() => deleteEntry(series.id, 'exam-series')} 
+                            className="text-slate-400 hover:text-red-600 hover:bg-red-50 px-3.5 py-2 rounded-xl transition-colors text-xs font-bold flex items-center gap-1.5"
+                            title="Delete Series"
+                          >
+                            <FaTrash size={12} /> Delete
+                          </button>
+                        </div>
                       </div>
                       
                       <div className="p-5">
@@ -213,9 +227,14 @@ function Schedule() {
 
       <BulkAddExamsModal 
         isOpen={showBulkAddExams} 
-        onClose={() => setShowBulkAddExams(false)}
+        initialData={selectedSeriesForEdit}
+        onClose={() => {
+          setShowBulkAddExams(false);
+          setSelectedSeriesForEdit(null);
+        }}
         onSaved={() => {
           setShowBulkAddExams(false);
+          setSelectedSeriesForEdit(null);
           fetchData();
         }}
       />

@@ -268,6 +268,22 @@ class AcademicProvider with ChangeNotifier {
     return false;
   }
 
+  Future<bool> updateExamSeries(String id, String title, List<Map<String, dynamic>> exams) async {
+    try {
+      final response = await _apiService.put('/exam-series/$id', {
+        'title': title,
+        'exams': exams,
+      });
+      if (response.statusCode == 200) {
+        await fetchExamSeries();
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Error updating exam series: $e');
+    }
+    return false;
+  }
+
   Future<bool> deleteExamSeries(String id) async {
     try {
       final response = await _apiService.delete('/exam-series/$id');

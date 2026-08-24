@@ -327,10 +327,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.primary),
                                     ),
                                   ),
-                                  const SizedBox(width: 6),
+                                  const SizedBox(width: 4),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit_outlined, color: AppTheme.primary, size: 20),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => AddExamSeriesDialog(initialSeries: series),
+                                      );
+                                    },
+                                    tooltip: 'Edit Series',
+                                  ),
                                   IconButton(
                                     icon: const Icon(Icons.delete_outline, color: AppTheme.danger, size: 20),
                                     onPressed: () => _confirmDeleteExamSeries(series.id, series.title),
+                                    tooltip: 'Delete Series',
                                   ),
                                 ],
                               ),
