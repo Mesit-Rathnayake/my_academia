@@ -1,7 +1,12 @@
-from __future__ import annotations
-
 import os
+from pathlib import Path
 from typing import Any
+from dotenv import load_dotenv
+
+# Ensure .env is loaded
+env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
+load_dotenv()
 
 from google import genai
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -11,12 +16,12 @@ from app.services.vector_store_service import (
 )
 
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+def get_gemini_api_key() -> str:
+    return os.getenv("GEMINI_API_KEY", "")
 
-GEMINI_MODEL_NAME = os.getenv(
-    "GEMINI_MODEL_NAME",
-    "gemini-2.5-flash",
-)
+
+def get_gemini_model_name() -> str:
+    return os.getenv("GEMINI_MODEL_NAME", "gemini-2.5-flash")
 
 
 class ChatServiceError(Exception):
@@ -158,7 +163,8 @@ def chat(
     so the frontend can display citations.
     """
 
-    if not GEMINI_API_KEY:
+    api_key = get_gemini_api_key()
+    if not api_key:
         raise ChatServiceError(
             "GEMINI_API_KEY is not configured. "
             "Set it in the .env file."
@@ -182,7 +188,7 @@ def chat(
     )
 
     # --- Generate ---
-    candidate_models = [GEMINI_MODEL_NAME, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    candidate_models = [get_gemini_model_name(), "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
     # Deduplicate while preserving order
     models_to_try = list(dict.fromkeys(candidate_models))
 
@@ -190,7 +196,7 @@ def chat(
     answer = None
 
     try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        client = genai.Client(api_key=api_key)
 
         for model_candidate in models_to_try:
             try:
