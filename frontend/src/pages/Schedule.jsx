@@ -113,7 +113,7 @@ function Schedule() {
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
+      className="flex flex-col h-screen overflow-hidden text-slate-800 bg-transparent"
     >
       <Navbar />
       <main className="flex-1 pt-28 pb-8 px-8 overflow-y-auto custom-scrollbar">
@@ -139,7 +139,7 @@ function Schedule() {
             </div>
 
             {/* Exams Section */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative">
+            <div className="bg-white/80 backdrop-blur-xl p-8 rounded-3xl border border-white/70 shadow-[0_10px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 relative">
               <div className="mb-6 border-b border-slate-200 pb-4 flex justify-between items-center">
                 <h3 className="text-2xl font-bold text-slate-900">Upcoming Exams</h3>
                 <button 

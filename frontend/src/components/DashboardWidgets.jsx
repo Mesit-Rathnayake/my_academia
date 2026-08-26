@@ -68,7 +68,7 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
       {/* Today's Classes Widget */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-        className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-full relative overflow-hidden"
+        className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 flex flex-col h-full relative overflow-hidden"
       >
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -85,7 +85,7 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
         <div className="flex-1 space-y-3 flex flex-col justify-center">
           {todaysClasses.length > 0 ? (
             todaysClasses.slice(0, 3).map(cls => (
-              <div key={cls.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center hover:border-primary/30 transition-colors">
+              <div key={cls.id} className="bg-slate-50/80 p-4 rounded-2xl border border-slate-100/80 flex justify-between items-center hover:border-primary/30 transition-colors">
                 <div>
                   <h4 className="font-bold text-slate-800 text-sm">{cls.type}</h4>
                   {cls.location && <p className="text-slate-500 text-xs mt-0.5">📍 {cls.location}</p>}
@@ -97,7 +97,7 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
             ))
           ) : (
             <div className="text-center py-6">
-              <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
+              <div className="bg-slate-50/80 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
                 <span className="text-2xl">🎉</span>
               </div>
               <p className="text-slate-700 font-bold">No classes today!</p>
@@ -116,7 +116,7 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
       {/* Upcoming Exam Widget */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-        className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-full relative overflow-hidden"
+        className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 flex flex-col h-full relative overflow-hidden"
       >
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -132,26 +132,27 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
 
         <div className="flex-1 flex flex-col justify-center">
           {nextExamSeries ? (
-            <div className="bg-orange-50 p-5 rounded-2xl relative overflow-hidden border border-orange-100 transition-colors">
+            <div className="bg-orange-50/80 p-5 rounded-2xl relative overflow-hidden border border-orange-100 transition-colors">
               <p className="text-orange-600 font-bold uppercase tracking-widest text-[10px] mb-1">Part of: {nextExamSeries.title}</p>
               <h4 className="text-xl font-black text-slate-900 mb-4 leading-tight">{nextExam.title}</h4>
               
               <div className="flex flex-col sm:flex-row justify-between sm:items-end gap-4 mt-auto">
                 <div>
-                  <p className="text-slate-600 text-xs font-medium mb-1">
-                    {new Date(nextExam.date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(nextExam.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                  {nextExam.location && <p className="text-slate-500 text-[10px] uppercase tracking-wider">📍 {nextExam.location}</p>}
+                  <p className="text-slate-500 text-xs font-semibold">{new Date(nextExam.date).toLocaleDateString()}</p>
+                  <p className="text-slate-700 text-sm font-bold mt-0.5">⏱️ {new Date(nextExam.date).toLocaleTimeString()}</p>
                 </div>
                 
-                <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 inline-flex self-start sm:self-auto">
-                  {renderCountdown(nextExam.date)}
+                <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl border border-orange-200 shadow-sm flex items-center gap-2 self-start sm:self-auto">
+                  <FaClock className="text-orange-500 text-xs animate-pulse" />
+                  <span className="text-xs font-black text-orange-600 uppercase tracking-wider">
+                    {Math.ceil((new Date(nextExam.date) - new Date()) / (1000 * 60 * 60 * 24))}d left
+                  </span>
                 </div>
               </div>
             </div>
           ) : (
             <div className="text-center py-6">
-              <div className="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
+              <div className="bg-slate-50/80 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border border-slate-100">
                 <span className="text-2xl">😎</span>
               </div>
               <p className="text-slate-700 font-bold">No upcoming exams!</p>
@@ -164,7 +165,7 @@ function DashboardWidgets({ timetable = [], examSeries = [], gpaData = null }) {
       {/* GPA Widget */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }}
-        className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col h-full relative overflow-hidden"
+        className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 flex flex-col h-full relative overflow-hidden"
       >
         <div className="flex justify-between items-start mb-6">
           <div>

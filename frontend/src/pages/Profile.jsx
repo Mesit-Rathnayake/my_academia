@@ -99,7 +99,7 @@ function Profile() {
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden bg-slate-50 text-slate-800 font-sans selection:bg-primary/30"
+      className="flex flex-col h-screen overflow-hidden bg-transparent text-slate-800 font-sans selection:bg-primary/30"
     >
       <Navbar />
       <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar z-0">
@@ -112,7 +112,7 @@ function Profile() {
             <p className="text-slate-500 mt-2 font-medium">Manage your personal information and overview.</p>
           </header>
 
-          <div className="bg-white p-8 md:p-12 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+          <div className="bg-white/80 backdrop-blur-xl p-8 md:p-12 rounded-3xl border border-white/70 shadow-[0_10px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 relative overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>

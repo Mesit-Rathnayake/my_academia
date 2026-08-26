@@ -94,7 +94,7 @@ function Performance() {
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden bg-slate-50 text-slate-800 font-sans selection:bg-primary/30"
+      className="flex flex-col h-screen overflow-hidden bg-transparent text-slate-800 font-sans selection:bg-primary/30"
     >
       <Navbar />
       <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar">
@@ -117,21 +117,21 @@ function Performance() {
             <>
               {/* Overview Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white border border-slate-200 shadow-sm p-6 rounded-3xl relative overflow-hidden transition-all hover:shadow-md">
+                <div className="bg-white/80 backdrop-blur-xl border border-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 p-6 rounded-3xl relative overflow-hidden transition-all hover:shadow-md">
                   <FaGraduationCap className="absolute -right-4 -bottom-4 text-8xl text-green-50" />
                   <p className="text-green-600 font-bold uppercase tracking-wider text-xs mb-2">Current OGPA</p>
                   <h3 className="text-4xl font-black text-slate-900">{gpaData.ogpa !== null ? gpaData.ogpa.toFixed(2) : 'N/A'}</h3>
                   <p className="text-slate-500 text-sm mt-2">Cumulative Grade Point Average</p>
                 </div>
                 
-                <div className="bg-white border border-slate-200 shadow-sm p-6 rounded-3xl relative overflow-hidden transition-all hover:shadow-md">
+                <div className="bg-white/80 backdrop-blur-xl border border-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 p-6 rounded-3xl relative overflow-hidden transition-all hover:shadow-md">
                   <FaChartLine className="absolute -right-4 -bottom-4 text-8xl text-blue-50" />
                   <p className="text-blue-600 font-bold uppercase tracking-wider text-xs mb-2">Classification</p>
                   <h3 className="text-2xl font-bold text-slate-900 mt-2 leading-tight">{gpaData.classification}</h3>
                   <p className="text-slate-500 text-sm mt-2">Based on current OGPA</p>
                 </div>
 
-                <div className="bg-white border border-slate-200 shadow-sm p-6 rounded-3xl relative overflow-hidden transition-all hover:shadow-md">
+                <div className="bg-white/80 backdrop-blur-xl border border-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 p-6 rounded-3xl relative overflow-hidden transition-all hover:shadow-md">
                   <FaTasks className="absolute -right-4 -bottom-4 text-8xl text-purple-50" />
                   <p className="text-purple-600 font-bold uppercase tracking-wider text-xs mb-2">Total Credits</p>
                   <h3 className="text-4xl font-black text-slate-900">{gpaData.totalCountedCredits}</h3>
@@ -146,13 +146,13 @@ function Performance() {
                 <div className="xl:col-span-2 space-y-6">
                   <h3 className="text-xl font-bold text-slate-900">Semester Breakdown</h3>
                   {Object.keys(gpaData.sgpas).length === 0 ? (
-                    <div className="bg-white border border-slate-200 p-8 rounded-3xl text-center text-slate-500 shadow-sm">
+                    <div className="bg-white/80 backdrop-blur-xl border border-white/70 p-8 rounded-3xl text-center text-slate-500 shadow-sm ring-1 ring-slate-900/5">
                       No semesters recorded yet. Add modules with results to see your breakdown.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {Object.entries(gpaData.sgpas).sort(([a], [b]) => Number(a) - Number(b)).map(([sem, data]) => (
-                        <div key={sem} className="bg-white border border-slate-200 p-6 rounded-2xl hover:border-primary/50 transition-colors shadow-sm">
+                        <div key={sem} className="bg-white/80 backdrop-blur-xl border border-white/70 p-6 rounded-2xl hover:border-primary/50 transition-colors shadow-sm ring-1 ring-slate-900/5">
                           <div className="flex justify-between items-center mb-4">
                             <h4 className="font-bold text-slate-800">Semester {sem}</h4>
                             <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-bold">
@@ -170,7 +170,7 @@ function Performance() {
                 </div>
 
                 {/* What Do I Need Calculator */}
-                <div className="bg-white border border-slate-200 p-6 rounded-3xl h-fit shadow-sm">
+                <div className="bg-white/80 backdrop-blur-xl border border-white/70 p-6 rounded-3xl h-fit shadow-[0_8px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5">
                   <div className="flex items-center gap-3 mb-6">
                     <FaCalculator className="text-2xl text-primary" />
                     <h3 className="text-xl font-bold text-slate-900">"What do I need?"</h3>

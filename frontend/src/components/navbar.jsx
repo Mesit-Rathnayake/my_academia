@@ -31,7 +31,7 @@ function Navbar() {
   );
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-xl border-b border-slate-200 flex items-center justify-between px-6 z-50 shadow-sm">
+    <header className="fixed top-0 left-0 right-0 h-20 bg-white/75 backdrop-blur-xl border-b border-white/60 flex items-center justify-between px-6 z-50 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
       {/* Brand - Left */}
       <div className="flex items-center gap-3 w-1/4">
         <div className="bg-gradient-to-br from-primary to-secondary p-2.5 rounded-xl shadow-md shadow-primary/20 cursor-pointer transition-transform hover:scale-105" onClick={() => navigate('/home')}>

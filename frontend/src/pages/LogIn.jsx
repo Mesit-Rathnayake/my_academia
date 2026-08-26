@@ -39,16 +39,16 @@ function LogIn() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 flex flex-col font-sans relative z-50 overflow-hidden">
+    <div className="min-h-screen bg-transparent text-slate-900 flex flex-col font-sans relative overflow-hidden">
       <Header />
-      <div className="flex-1 max-w-7xl mx-auto px-6 w-full flex flex-col md:flex-row items-center justify-center gap-12 py-12">
-        <div className="flex-1 w-full max-w-md bg-white p-8 sm:p-12 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 relative z-10">
+      <div className="flex-1 max-w-7xl mx-auto px-6 w-full flex flex-col md:flex-row items-center justify-center gap-12 py-12 relative z-10">
+        <div className="flex-1 w-full max-w-md bg-white/80 backdrop-blur-xl p-8 sm:p-12 rounded-3xl shadow-[0_16px_40px_rgba(0,0,0,0.06)] border border-white/70 ring-1 ring-slate-900/5 relative z-10">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-8 tracking-tight">Welcome Back!</h2>
           
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-bold flex items-center justify-between shadow-sm">
               <span>⚠️ {error}</span>
-              <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 px-2 py-1">✕</button>
+              <button type="button" onClick={() => setError('')} className="text-red-400 hover:text-red-600 px-2 py-1">✕</button>
             </div>
           )}
 
@@ -83,11 +83,6 @@ function LogIn() {
           </p>
         </div>
         <div className="flex-1 hidden md:flex justify-center items-center relative">
-          {/* Decorative Rings */}
-          <div className="absolute w-[550px] h-[550px] rounded-full border-[40px] border-secondary/10 -z-10 animate-[spin_25s_linear_infinite] top-1/2 left-1/2 -translate-x-[48%] -translate-y-[45%]"></div>
-          <div className="absolute w-[400px] h-[400px] rounded-full border-[28px] border-primary/10 -z-10 animate-[spin_18s_linear_infinite_reverse] top-1/2 left-1/2 -translate-x-[52%] -translate-y-[55%]"></div>
-          <div className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-br from-primary/5 to-secondary/5 -z-20 blur-3xl top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-          
           <img src={man3} alt="Student illustration" className="max-w-full h-auto w-[80%] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 relative z-10" />
         </div>
       </div>

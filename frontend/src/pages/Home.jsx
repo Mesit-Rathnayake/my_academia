@@ -239,7 +239,7 @@ function Home() {
   return (
     <motion.div 
       initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
+      className="flex flex-col h-screen overflow-hidden text-slate-800 bg-transparent"
     >
       <Navbar />
       
@@ -247,7 +247,7 @@ function Home() {
         
         <div className="max-w-7xl mx-auto space-y-10 relative z-10">
           
-          <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+          <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/80 backdrop-blur-xl p-8 rounded-3xl border border-white/70 shadow-[0_10px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5">
             <div>
               <h2 className="text-3xl lg:text-5xl font-black text-slate-900 tracking-tight">
                 {getGreeting()}, {user?.firstName || 'Student'}!
@@ -282,8 +282,8 @@ function Home() {
                     onClick={() => setActiveTab(sem)}
                     className={`flex-1 py-3 sm:py-4 font-bold text-xs sm:text-sm md:text-base transition-all duration-300 rounded-t-xl ${
                       isActive 
-                        ? 'bg-white text-primary border-b-2 border-primary shadow-sm z-20' 
-                        : 'bg-slate-100 text-slate-500 hover:text-slate-700 hover:bg-slate-200 z-10'
+                        ? 'bg-white/90 backdrop-blur-md text-primary border-b-2 border-primary shadow-sm z-20' 
+                        : 'bg-white/50 backdrop-blur-sm text-slate-500 hover:text-slate-700 hover:bg-white/70 z-10'
                     }`}
                   >
                     <span className="hidden sm:inline">Semester </span>
@@ -295,7 +295,7 @@ function Home() {
             </div>
 
             {/* Folder Content Box */}
-            <div className="bg-white rounded-b-3xl rounded-tr-3xl p-6 sm:p-10 shadow-sm border border-slate-200 relative z-0">
+            <div className="bg-white/80 backdrop-blur-xl rounded-b-3xl rounded-tr-3xl p-6 sm:p-10 shadow-[0_10px_30px_rgba(0,0,0,0.03)] border border-white/70 ring-1 ring-slate-900/5 relative z-0">
               {currentTab && (
                 <section className="animate-fadeIn">
                   {!groupedModules[currentTab] || groupedModules[currentTab].length === 0 ? (

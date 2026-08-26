@@ -21,19 +21,23 @@ function CustomSelect({ value, onChange, options, className = '' }) {
     (typeof opt === 'object' ? opt.value : opt) === value
   ) || (options.length > 0 ? options[0] : null);
 
-  const displayLabel = selectedOption 
-    ? (typeof selectedOption === 'object' ? selectedOption.label : selectedOption)
-    : '';
+  let displayLabel = '';
+  if (selectedOption) {
+    displayLabel = typeof selectedOption === 'object' ? selectedOption.label : selectedOption;
+  }
 
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
-      <div 
-        className="flex items-center justify-between w-full cursor-pointer h-full"
+    <div className="relative w-full" ref={containerRef}>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        className={`flex min-h-11 w-full items-center justify-between text-left ${className}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="truncate">{displayLabel}</span>
         <FaChevronDown className={`transition-transform duration-200 text-slate-400 ml-2 ${isOpen ? 'rotate-180' : ''}`} size={12} />
-      </div>
+      </button>
 
       <AnimatePresence>
         {isOpen && (
@@ -42,7 +46,7 @@ function CustomSelect({ value, onChange, options, className = '' }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto custom-scrollbar overflow-hidden"
+            className="absolute left-0 top-full z-50 mt-2 max-h-60 w-full overflow-hidden overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl custom-scrollbar"
           >
             {options.map((opt, idx) => {
               const optValue = typeof opt === 'object' ? opt.value : opt;
@@ -50,7 +54,9 @@ function CustomSelect({ value, onChange, options, className = '' }) {
               const isSelected = optValue === value;
               
               return (
-                <div
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
                   key={idx}
                   className={`px-4 py-3 cursor-pointer transition-colors text-sm font-medium ${
                     isSelected 
@@ -63,7 +69,7 @@ function CustomSelect({ value, onChange, options, className = '' }) {
                   }}
                 >
                   {optLabel}
-                </div>
+                </button>
               );
             })}
           </motion.div>

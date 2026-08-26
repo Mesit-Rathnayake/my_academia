@@ -80,7 +80,7 @@ function ModuleCard({ module = {}, index = 0, onOpenEdit, onInlineUpdate, onDele
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className={`bg-white p-6 rounded-3xl flex flex-col gap-5 shadow-sm border border-slate-200 border-t-4 ${theme.borderTop} hover:border-slate-300 transition-all duration-300 group cursor-pointer relative overflow-hidden transform hover:-translate-y-1 hover:shadow-md`}
+      className={`bg-white/80 backdrop-blur-xl p-6 rounded-3xl flex flex-col gap-5 shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-white/70 border-t-4 ${theme.borderTop} hover:border-slate-300 ring-1 ring-slate-900/5 transition-all duration-300 group cursor-pointer relative overflow-hidden transform hover:-translate-y-1 hover:shadow-lg`}
       onClick={onOpenEdit}
     >
       {/* Header */}
