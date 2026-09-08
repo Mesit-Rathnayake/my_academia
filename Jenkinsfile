@@ -138,9 +138,44 @@ pipeline {
                     echo "Waiting 20 seconds for services and PostgreSQL healthcheck..."
                     sleep 20
                     
-                    # Test gateway endpoints
-                    curl --fail --retry 5 --retry-delay 3 http://localhost:8080/ma-api/v1/health || exit 1
-                    curl --fail --retry 5 --retry-delay 3 http://localhost:8080/ma-ai/v1/health || exit 1
+                    # Test backend directly inside the Docker stack
+                    echo "🧪 Testing Backend health directly..."
+                    docker compose exec -T backend wget -qO- http://127.0.0.1:5001/api/health || exit 1
+                    
+                    # Test AI service directly inside the Docker stack
+                    echo "🧪 Testing AI service health directly..."
+                    docker compose exec -T ai-service python3 -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8000/health').read().decode())" || exit 1
+                    
+                    # Test API Gateway reverse proxying to Backend & AI service
+                    echo "🧪 Testing API Gateway routing to Backend and AI Service..."
+                    docker compose exec -T api-gateway node -e "
+                      const http = require('http');
+                      function check(url) {
+                        return new Promise((resolve, reject) => {
+                          http.get(url, (res) => {
+                            let data = '';
+                            res.on('data', chunk => data += chunk);
+                            res.on('end', () => {
+                              if (res.statusCode >= 200 && res.statusCode < 300) {
+                                console.log('  [PASS] ' + url + ' -> ' + data);
+                                resolve();
+                              } else {
+                                reject(new Error(url + ' returned ' + res.statusCode + ': ' + data));
+                              }
+                            });
+                          }).on('error', reject);
+                        });
+                      }
+                      Promise.all([
+                        check('http://127.0.0.1:8080/ma-api/v1/health'),
+                        check('http://127.0.0.1:8080/ma-ai/v1/health')
+                      ]).then(() => {
+                        console.log('✅ All Gateway smoke tests passed!');
+                      }).catch(err => {
+                        console.error('❌ Gateway smoke test failed:', err.message);
+                        process.exit(1);
+                      });
+                    " || exit 1
                     
                     echo "✅ Smoke tests passed successfully!"
                     docker compose down -v

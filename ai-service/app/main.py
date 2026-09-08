@@ -43,7 +43,7 @@ app.add_middleware(
 @app.middleware("http")
 async def verify_internal_token(request: Request, call_next):
     # Public endpoints that do not require internal token
-    public_paths = {"/", "/health", "/docs", "/openapi.json", "/redoc"}
+    public_paths = {"/", "/health", "/api/v1/health", "/docs", "/openapi.json", "/redoc"}
     
     if request.url.path in public_paths or request.method == "OPTIONS":
         return await call_next(request)
@@ -89,6 +89,7 @@ def root() -> dict[str, str]:
 
 
 @app.get("/health")
+@app.get("/api/v1/health")
 def health_check() -> dict[str, str]:
     return {
         "status": "healthy",
