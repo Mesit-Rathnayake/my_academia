@@ -28,8 +28,9 @@ ai-service/chroma_data/
 *.chroma
 
 # Build outputs
-/build
-/dist
+build/
+dist/
+frontend/build/
 /.next/
 /out/
 

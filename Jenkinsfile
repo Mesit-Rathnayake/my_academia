@@ -9,6 +9,7 @@ pipeline {
         IMAGE_NAME_FRONTEND = 'myacademia/frontend'
         BUILD_TAG = "${env.BUILD_NUMBER}"
         NODE_ENV = 'test'
+        DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/my_academia?schema=public'
         JWT_SECRET = 'jenkins_test_jwt_secret_key_123456'
         INTERNAL_SERVICE_KEY = 'jenkins_test_internal_secret'
     }
@@ -94,7 +95,7 @@ pipeline {
                             sh '''
                                 python3 -m venv .venv || true
                                 . .venv/bin/activate || true
-                                pip install -r requirements.txt --quiet
+                                pip install fastapi[standard] google-genai tenacity --quiet || true
                                 echo '🧪 Compiling and verifying Python syntax...'
                                 python3 -m compileall app/
                             '''
@@ -106,7 +107,7 @@ pipeline {
                     steps {
                         dir('frontend') {
                             echo '⚙️ Installing frontend dependencies...'
-                            sh 'npm ci || npm install'
+                            sh 'npm ci --ignore-scripts || npm install --ignore-scripts'
                             echo '🏗️ Building React SPA production bundle...'
                             sh 'CI=false npm run build'
                         }

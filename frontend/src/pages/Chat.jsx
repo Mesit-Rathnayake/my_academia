@@ -247,7 +247,6 @@ function Chat() {
       }
 
       const conversationHistory = buildConversationHistory();
-      const token = localStorage.getItem('token');
       const response = await fetch(`${AI_SERVICE_URL}/api/v1/chat`, {
         method: 'POST',
         headers: {

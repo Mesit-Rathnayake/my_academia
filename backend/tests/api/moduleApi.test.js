@@ -5,9 +5,11 @@ const jwt = require('jsonwebtoken');
 
 let authToken;
 let testUser;
+let isDbAvailable = false;
 
 beforeAll(async () => {
   try {
+    await prisma.$connect();
     // Clean up if exists
     await prisma.user.deleteMany({ where: { registrationNumber: 'EG/2020/9999' } });
     
@@ -23,7 +25,7 @@ beforeAll(async () => {
     
     // Generate token
     authToken = jwt.sign(
-      { id: testUser.id }, 
+      { _id: testUser.id }, 
       process.env.JWT_SECRET || 'test_jwt_secret', 
       { 
         algorithm: 'HS256',
@@ -31,14 +33,16 @@ beforeAll(async () => {
         audience: 'my-academia-users'
       }
     );
+    isDbAvailable = true;
   } catch (e) {
-    console.log("Setup notice:", e.message);
+    console.log("Database connection not active in setup, skipping DB-dependent integration tests:", e.message);
+    isDbAvailable = false;
   }
 }, 30000);
 
 afterAll(async () => {
   try {
-    if (testUser) {
+    if (testUser && isDbAvailable) {
       await prisma.module.deleteMany({ where: { userId: testUser.id } });
       await prisma.user.deleteMany({ where: { id: testUser.id } });
     }
@@ -48,7 +52,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
   try {
-    if (testUser) {
+    if (testUser && isDbAvailable) {
       await prisma.module.deleteMany({ where: { userId: testUser.id } });
     }
   } catch(e) {}
@@ -56,15 +60,15 @@ beforeEach(async () => {
 
 describe('Module API Tests', () => {
   it('should create a new module via API', async () => {
-    if (!authToken) return;
+    if (!isDbAvailable || !authToken) return;
     const response = await request(app)
       .post('/api/modules')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
         moduleName: 'Database Systems',
         moduleCode: 'CS2040',
-        lectureHours: 30,
-        attendedHours: 0
+        totalLectures: 30,
+        attendedLectures: 0
       });
     
     expect(response.status).toBe(201);
@@ -73,14 +77,14 @@ describe('Module API Tests', () => {
   });
 
   it('should retrieve all modules via API', async () => {
-    if (!authToken || !testUser) return;
+    if (!isDbAvailable || !authToken || !testUser) return;
     // First create a module
     await prisma.module.create({
       data: {
         moduleName: 'Web Development',
         moduleCode: 'CS2050',
-        lectureHours: 30,
-        attendedHours: 0,
+        totalLectures: 30,
+        attendedLectures: 0,
         userId: testUser.id
       }
     });

@@ -17,15 +17,23 @@ const auth = async (req, res, next) => {
       issuer: 'my-academia',     // 🔒 Validate token issuer
       audience: 'my-academia-users' // 🔒 Validate token audience
     });
+
+    const userId = decoded._id || decoded.id || decoded.userId;
+    if (!userId) {
+      return res.status(401).json({ message: 'Token is not valid' });
+    }
     
     // 🔒 Verify user still exists in database
-    const user = await prisma.user.findUnique({ where: { id: decoded._id } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       return res.status(401).json({ message: 'Token is not valid' });
     }
 
-    // Add user to request object
-    req.user = user;
+    // Add user to request object (supporting both .id and ._id)
+    req.user = {
+      ...user,
+      _id: user.id
+    };
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
