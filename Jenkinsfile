@@ -60,8 +60,12 @@ pipeline {
                 stage('Audit AI Service') {
                     steps {
                         dir('ai-service') {
-                            sh 'python3 -m pip install safety || true'
-                            sh 'safety check || true'
+                            sh '''
+                                python3 -m venv .venv || true
+                                . .venv/bin/activate || true
+                                pip install safety || true
+                                safety check || true
+                            '''
                         }
                     }
                 }
@@ -86,11 +90,14 @@ pipeline {
                 stage('Verify AI Service (Python & FastAPI)') {
                     steps {
                         dir('ai-service') {
-                            echo '⚙️ Installing Python dependencies...'
-                            sh 'python3 -m pip install --upgrade pip'
-                            sh 'pip install -r requirements.txt'
-                            echo '🧪 Compiling and verifying Python syntax...'
-                            sh 'python3 -m compileall app/'
+                            echo '⚙️ Setting up Python venv & dependencies...'
+                            sh '''
+                                python3 -m venv .venv || true
+                                . .venv/bin/activate || true
+                                pip install -r requirements.txt --quiet
+                                echo '🧪 Compiling and verifying Python syntax...'
+                                python3 -m compileall app/
+                            '''
                         }
                     }
                 }
