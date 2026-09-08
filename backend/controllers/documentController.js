@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prismaClient');
 const fs = require('fs');
 const FormData = require('form-data');
 const axios = require('axios');
@@ -49,9 +48,11 @@ exports.uploadDocument = async (req, res) => {
 
       console.log(`Forwarding document ${document.id} to AI Service at ${AI_SERVICE_URL}/api/v1/documents/index`);
 
+      const internalKey = process.env.INTERNAL_SERVICE_KEY || 'my-academia-internal-secret';
       const aiResponse = await axios.post(`${AI_SERVICE_URL}/api/v1/documents/index`, formData, {
         headers: {
-          ...formData.getHeaders()
+          ...formData.getHeaders(),
+          'x-internal-token': internalKey
         }
       });
 
@@ -121,6 +122,16 @@ exports.deleteDocument = async (req, res) => {
 exports.getDocument = async (req, res) => {
   try {
     const { moduleId, documentId } = req.params;
+
+    // 🔒 SECURITY: Verify module belongs to the requesting user
+    const module = await prisma.module.findFirst({
+      where: { id: moduleId, userId: req.user.id }
+    });
+
+    if (!module) {
+      return res.status(404).json({ message: 'Module not found' });
+    }
+
     const document = await prisma.document.findFirst({
       where: { id: documentId, moduleId: moduleId }
     });

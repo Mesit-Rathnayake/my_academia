@@ -1,56 +1,32 @@
 const request = require('supertest');
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('../../server');  // Changed from '../../src/server'
+const app = require('../../server');
 
-let mongoServer;
-
-beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-  await mongoose.connect(uri);
-});
-
-afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
-});
-
-describe('User Registration - TDD', () => {
-  it('should register a new user successfully', async () => {
-    const response = await request(app)
-      .post('/api/auth/register')
-      .send({
-        registrationNumber: 'EG/2020/1234',
-        fullName: 'John Doe',
-        password: 'Password123'
-      });
-    
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty('token');
-    expect(response.body).toHaveProperty('user');
+describe('Server & Health Unit Tests', () => {
+  it('should return health check status OK', async () => {
+    const response = await request(app).get('/api/health');
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('status', 'OK');
   });
 
-  it('should reject duplicate registration numbers', async () => {
-    // First registration
-    await request(app)
-      .post('/api/auth/register')
-      .send({
-        registrationNumber: 'EG/2020/1235',
-        fullName: 'John Doe',
-        password: 'Password123'
-      });
-
-    // Second registration with same number
+  it('should reject registration with invalid payload', async () => {
     const response = await request(app)
       .post('/api/auth/register')
       .send({
-        registrationNumber: 'EG/2020/1235',
-        fullName: 'Jane Smith',
-        password: 'Password456'
+        registrationNumber: 'invalid-num', // Format mismatch
+        password: '123' // Too short
       });
-
+    
     expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty('message', 'Registration number already exists');
+    expect(response.body).toHaveProperty('errors');
+  });
+
+  it('should reject login without password', async () => {
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({
+        registrationNumber: 'EG/2020/1234'
+      });
+    
+    expect(response.status).toBe(400);
   });
 });

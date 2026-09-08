@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prismaClient');
 const GpaEngine = require('../services/gpaEngine');
 
 exports.getGpaData = async (req, res) => {

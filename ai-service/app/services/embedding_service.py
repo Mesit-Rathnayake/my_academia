@@ -4,6 +4,7 @@ import os
 from functools import lru_cache
 from typing import Any, cast
 
+# pyrefly: ignore [missing-import]
 from sentence_transformers import SentenceTransformer
 
 

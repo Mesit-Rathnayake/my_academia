@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prismaClient');
 
 // 🔒 SECURITY MEASURE: JWT Authentication middleware (OWASP A02:2021 - Cryptographic Failures Fix)
 const auth = async (req, res, next) => {

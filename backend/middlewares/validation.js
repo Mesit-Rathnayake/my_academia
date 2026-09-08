@@ -19,11 +19,16 @@ const validateRegistration = [
     .isLength({ min: 5, max: 20 })
     .matches(/^[A-Z]{2}\/[0-9]{4}\/[0-9]{4}$/)
     .withMessage('Registration number must be in format: EG/2020/1234'),
-  // 🔒 Full name sanitization
-  body('fullName')
-    .isLength({ min: 2, max: 100 })
+  // 🔒 First name sanitization
+  body('firstName')
+    .isLength({ min: 1, max: 50 })
     .matches(/^[a-zA-Z\s]+$/)
-    .withMessage('Full name must contain only letters and spaces'),
+    .withMessage('First name must contain only letters and spaces'),
+  // 🔒 Last name sanitization
+  body('lastName')
+    .isLength({ min: 1, max: 50 })
+    .matches(/^[a-zA-Z\s]+$/)
+    .withMessage('Last name must contain only letters and spaces'),
   // 🔒 Strong password requirements
   body('password')
     .isLength({ min: 8 })

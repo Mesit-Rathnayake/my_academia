@@ -11,7 +11,7 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import ConfirmModal from '../components/ConfirmModal';
 
-const AI_SERVICE_URL = process.env.REACT_APP_AI_SERVICE_URL || 'http://localhost:8000';
+const AI_SERVICE_URL = process.env.REACT_APP_AI_SERVICE_URL || '/ma-ai/v1';
 
 function Chat() {
   const [modules, setModules] = useState([]);
@@ -247,9 +247,13 @@ function Chat() {
       }
 
       const conversationHistory = buildConversationHistory();
+      const token = localStorage.getItem('token');
       const response = await fetch(`${AI_SERVICE_URL}/api/v1/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({
           user_id: userId,
           module_id: selectedModule._id,

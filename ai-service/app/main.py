@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
@@ -37,6 +38,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 🔒 Internal service token verification middleware
+@app.middleware("http")
+async def verify_internal_token(request: Request, call_next):
+    # Public endpoints that do not require internal token
+    public_paths = {"/", "/health", "/docs", "/openapi.json", "/redoc"}
+    
+    if request.url.path in public_paths or request.method == "OPTIONS":
+        return await call_next(request)
+    
+    expected_token = os.getenv("INTERNAL_SERVICE_KEY", "my-academia-internal-secret")
+    provided_token = request.headers.get("x-internal-token")
+    
+    # In development/test if no token is enforced or matching token is provided
+    if expected_token and provided_token != expected_token:
+        # Also allow bypass in local dev if DEV_MODE is true
+        if os.getenv("DEV_MODE", "false").lower() != "true":
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Forbidden: Invalid or missing X-Internal-Token header"},
+            )
+            
+    return await call_next(request)
+
 
 app.include_router(
     documents_router,

@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: my_academia_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-my_academia}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-my_academia}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # AI Service (FastAPI + ChromaDB)
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: my_academia_ai_service
+    restart: always
+    environment:
+      - PORT=8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-my-academia-internal-secret}
+      - CHROMA_PERSIST_DIRECTORY=/app/chroma_data
+    volumes:
+      - chroma_data:/app/chroma_data
+    expose:
+      - "8000"
+
+  # Backend (Node.js / Express + Prisma)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: my_academia_backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-my_academia}?schema=public
+      - JWT_SECRET=${JWT_SECRET:-super_secret_jwt_key_change_in_prod}
+      - AI_SERVICE_URL=http://ai-service:8000
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-my-academia-internal-secret}
+      - ALLOWED_ORIGINS=http://localhost:8080,http://localhost:3000,http://127.0.0.1:8080
+    expose:
+      - "5001"
+
+  # Frontend (React SPA on Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: my_academia_frontend
+    restart: always
+    expose:
+      - "80"
+
+  # API Gateway (Reverse proxy & security boundary)
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: my_academia_gateway
+    restart: always
+    depends_on:
+      - backend
+      - ai-service
+      - frontend
+    environment:
+      - PORT=8080
+      - BACKEND_URL=http://backend:5001
+      - AI_SERVICE_URL=http://ai-service:8000
+      - FRONTEND_URL=http://frontend:80
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-my-academia-internal-secret}
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
+  chroma_data:

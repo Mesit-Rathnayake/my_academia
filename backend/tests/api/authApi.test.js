@@ -1,13 +1,20 @@
 const request = require('supertest');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const app = require('../../server');
+const prisma = require('../../prismaClient');
+
+afterAll(async () => {
+  try {
+    await prisma.$disconnect();
+  } catch (e) {}
+});
 
 beforeEach(async () => {
-  // Clear the database before each test
   try {
-    await prisma.user.deleteMany({});
-  } catch(e) {
-    console.log("Ensure PostgreSQL is running for tests to pass");
+    await prisma.user.deleteMany({
+      where: { registrationNumber: { in: ['EG/2020/1234', 'EG/2020/1235'] } }
+    });
+  } catch (e) {
+    console.log("Database cleanup notice:", e.message);
   }
 });
 
@@ -17,7 +24,8 @@ describe('Auth API Tests', () => {
       .post('/api/auth/register')
       .send({
         registrationNumber: 'EG/2020/1234',
-        fullName: 'John Doe',
+        firstName: 'John',
+        lastName: 'Doe',
         password: 'Password123'
       });
     
@@ -32,7 +40,8 @@ describe('Auth API Tests', () => {
       .post('/api/auth/register')
       .send({
         registrationNumber: 'EG/2020/1234',
-        fullName: 'John Doe',
+        firstName: 'John',
+        lastName: 'Doe',
         password: 'Password123'
       });
 
@@ -65,8 +74,9 @@ describe('Auth API Tests', () => {
       .post('/api/auth/register')
       .send({
         registrationNumber: 'EG/2020/1234',
-        fullName: 'John Doe',
-        password: 'password123'
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'Password123'
       });
 
     // Second registration with same number
@@ -74,8 +84,9 @@ describe('Auth API Tests', () => {
       .post('/api/auth/register')
       .send({
         registrationNumber: 'EG/2020/1234',
-        fullName: 'Jane Smith',
-        password: 'password456'
+        firstName: 'Jane',
+        lastName: 'Smith',
+        password: 'Password456'
       });
     
     expect(response.status).toBe(400);

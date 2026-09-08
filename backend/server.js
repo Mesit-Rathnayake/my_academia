@@ -3,11 +3,31 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
 
+const helmet = require('helmet');
+
 const app = express();
+
+// Security headers
+app.use(helmet());
+
+// CORS configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
+  : ['http://localhost:3000', 'http://localhost:8080', 'http://localhost:4721', 'http://127.0.0.1:8080', 'http://127.0.0.1:4721', 'http://127.0.0.1:3000'];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
 
 const timetableRoutes = require('./routes/timetableRoutes');
 const examRoutes = require('./routes/examRoutes');

@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from typing import Any
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 
 # Ensure .env is loaded

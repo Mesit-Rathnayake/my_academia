@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../prismaClient');
 
 // Helper to format module object for backwards compatibility with frontend expecting _id
 const formatModule = (mod) => ({

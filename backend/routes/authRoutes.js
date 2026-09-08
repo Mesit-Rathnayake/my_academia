@@ -9,8 +9,8 @@ const { validateRegistration, validateLogin } = require('../middlewares/validati
 // 🔒 SECURITY MEASURE: User registration with input validation
 router.post('/register', validateRegistration, authController.register);
 
-// 🔒 SECURITY MEASURE: Login with input validation (rate limiting temporarily disabled for testing)
-router.post('/login', validateLogin, authController.login);
+// 🔒 SECURITY MEASURE: Login with input validation and rate limiting
+router.post('/login', loginLimiter, validateLogin, authController.login);
 
 // 🔒 SECURITY MEASURE: Protected route with JWT authentication
 router.get('/me', auth, authController.getCurrentUser);
