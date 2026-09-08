@@ -39,9 +39,9 @@ app.use((req, res, next) => {
 app.use('/ma-api/v1', createProxyMiddleware({
   target: BACKEND_URL,
   changeOrigin: true,
-  pathRewrite: {
-    '^/ma-api/v1/api': '/api', // Handles /ma-api/v1/api/...
-    '^/ma-api/v1': '/api',     // Handles /ma-api/v1/...
+  pathRewrite: (path) => {
+    if (path === '/health' || path === '/api/health') return '/api/health';
+    return path.startsWith('/api') ? path : '/api' + path;
   },
   onProxyReq: (proxyReq, req, res) => {
     proxyReq.setHeader('x-internal-token', INTERNAL_SERVICE_KEY);
@@ -53,9 +53,9 @@ app.use('/ma-api/v1', createProxyMiddleware({
 app.use('/ma-ai/v1', createProxyMiddleware({
   target: AI_SERVICE_URL,
   changeOrigin: true,
-  pathRewrite: {
-    '^/ma-ai/v1/api/v1': '/api/v1', // Handles /ma-ai/v1/api/v1/...
-    '^/ma-ai/v1': '/api/v1',        // Handles /ma-ai/v1/...
+  pathRewrite: (path) => {
+    if (path === '/health' || path === '/api/v1/health') return '/api/v1/health';
+    return path.startsWith('/api/v1') ? path : '/api/v1' + path;
   },
   onProxyReq: (proxyReq, req, res) => {
     proxyReq.setHeader('x-internal-token', INTERNAL_SERVICE_KEY);

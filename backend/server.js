@@ -43,7 +43,7 @@ app.use('/api/gpa', gpaRoutes);
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get(['/health', '/api/health'], (req, res) => {
   res.json({ status: 'OK', message: 'Server is running with PostgreSQL' });
 });
 
