@@ -2,7 +2,11 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors');
 const helmet = require('helmet');
-require('dotenv').config();
+try {
+  require('dotenv').config();
+} catch (e) {
+  // Ignore in production containers
+}
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -19,6 +23,11 @@ app.use(helmet({
 }));
 
 app.use(cors());
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', service: 'API Gateway' });
+});
 
 // Log all requests for debugging
 app.use((req, res, next) => {
