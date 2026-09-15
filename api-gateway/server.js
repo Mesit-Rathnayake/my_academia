@@ -36,30 +36,46 @@ app.use((req, res, next) => {
 });
 
 // Proxy /ma-api/v1 -> Backend
-app.use('/ma-api/v1', createProxyMiddleware({
+app.use('/ma-api/v1', (req, res, next) => {
+  req.headers['x-internal-token'] = INTERNAL_SERVICE_KEY;
+  next();
+}, createProxyMiddleware({
   target: BACKEND_URL,
   changeOrigin: true,
+  headers: {
+    'x-internal-token': INTERNAL_SERVICE_KEY,
+  },
   pathRewrite: (path) => {
     if (path === '/health' || path === '/api/health') return '/api/health';
     return path.startsWith('/api') ? path : '/api' + path;
   },
-  onProxyReq: (proxyReq, req, res) => {
-    proxyReq.setHeader('x-internal-token', INTERNAL_SERVICE_KEY);
-    console.log(`[PROXY -> Backend] ${req.method} ${req.url} -> ${BACKEND_URL}${proxyReq.path}`);
+  on: {
+    proxyReq: (proxyReq, req, res) => {
+      proxyReq.setHeader('x-internal-token', INTERNAL_SERVICE_KEY);
+      console.log(`[PROXY -> Backend] ${req.method} ${req.url} -> ${BACKEND_URL}${proxyReq.path}`);
+    }
   }
 }));
 
 // Proxy /ma-ai/v1 -> AI Service
-app.use('/ma-ai/v1', createProxyMiddleware({
+app.use('/ma-ai/v1', (req, res, next) => {
+  req.headers['x-internal-token'] = INTERNAL_SERVICE_KEY;
+  next();
+}, createProxyMiddleware({
   target: AI_SERVICE_URL,
   changeOrigin: true,
+  headers: {
+    'x-internal-token': INTERNAL_SERVICE_KEY,
+  },
   pathRewrite: (path) => {
     if (path === '/health' || path === '/api/v1/health') return '/api/v1/health';
     return path.startsWith('/api/v1') ? path : '/api/v1' + path;
   },
-  onProxyReq: (proxyReq, req, res) => {
-    proxyReq.setHeader('x-internal-token', INTERNAL_SERVICE_KEY);
-    console.log(`[PROXY -> AI Service] ${req.method} ${req.url} -> ${AI_SERVICE_URL}${proxyReq.path}`);
+  on: {
+    proxyReq: (proxyReq, req, res) => {
+      proxyReq.setHeader('x-internal-token', INTERNAL_SERVICE_KEY);
+      console.log(`[PROXY -> AI Service] ${req.method} ${req.url} -> ${AI_SERVICE_URL}${proxyReq.path}`);
+    }
   }
 }));
 

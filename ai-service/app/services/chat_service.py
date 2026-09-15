@@ -22,7 +22,7 @@ def get_gemini_api_key() -> str:
 
 
 def get_gemini_model_name() -> str:
-    return os.getenv("GEMINI_MODEL_NAME", "gemini-flash-latest")
+    return os.getenv("GEMINI_MODEL_NAME", "gemini-3.6-flash")
 
 
 class ChatServiceError(Exception):
@@ -175,6 +175,8 @@ def chat(
     # --- Generate ---
     candidate_models = [
         get_gemini_model_name(),
+        "gemini-3.6-flash",
+        "gemini-3.7-flash",
         "gemini-flash-latest",
         "gemini-2.5-flash",
         "gemini-2.5-flash-lite",
