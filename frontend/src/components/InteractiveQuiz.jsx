@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCheckCircle, FaTimesCircle, FaTrophy } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import ConfirmModal from './ConfirmModal';
 
 function InteractiveQuiz({ questions, messageId }) {
@@ -23,8 +23,8 @@ function InteractiveQuiz({ questions, messageId }) {
 
   if (!Array.isArray(questions) || questions.length === 0) {
     return (
-      <div className="bg-red-500/20 text-red-200 p-4 rounded-xl border border-red-500/50">
-        <p className="font-bold">Error: Invalid quiz format generated.</p>
+      <div className="bg-red-50 text-red-700 p-3 rounded-lg border border-red-200 text-xs">
+        <p className="font-semibold">Error: Invalid quiz format generated.</p>
       </div>
     );
   }
@@ -44,6 +44,9 @@ function InteractiveQuiz({ questions, messageId }) {
       return;
     }
     setSubmitted(true);
+    if (messageId) {
+      localStorage.setItem(`quiz_submitted_${messageId}`, "true");
+    }
   };
 
   const confirmSubmit = () => {
@@ -62,45 +65,48 @@ function InteractiveQuiz({ questions, messageId }) {
   }, 0);
 
   return (
-    <div className="my-6 max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-white font-sans shadow-xl shadow-slate-200/70">
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 shadow-md text-white flex justify-between items-center">
-        <h3 className="text-2xl font-black tracking-tight drop-shadow-sm">Interactive Quiz</h3>
-        <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-bold backdrop-blur-md">
-          {questions.length} Questions
+    <div className="my-4 max-w-2xl overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121215] font-sans shadow-sm">
+      <div className="bg-blue-600 px-5 py-3.5 text-white flex justify-between items-center">
+        <div>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-blue-200 block">Practice Assessment</span>
+          <h3 className="text-sm font-bold tracking-tight">Module Knowledge Check</h3>
+        </div>
+        <span className="bg-blue-700 border border-blue-500 px-2.5 py-1 rounded font-mono text-[11px] font-semibold">
+          {questions.length} Items
         </span>
       </div>
 
-      <div className="space-y-8 bg-slate-50/70 p-6">
+      <div className="space-y-4 bg-zinc-50/60 dark:bg-zinc-900/50 p-5">
         {questions.map((q, qIndex) => {
           const isCorrect = userAnswers[qIndex] === q.answer;
           
           return (
-            <div key={q.id ?? q.question} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h4 className="mb-4 break-words whitespace-normal text-lg font-bold leading-relaxed text-slate-800">
-                <span className="mr-2 shrink-0 text-indigo-600">{qIndex + 1}.</span>
+            <div key={q.id ?? q.question} className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121215] p-4">
+              <h4 className="mb-3 break-words whitespace-normal text-xs sm:text-sm font-semibold leading-relaxed text-zinc-900 dark:text-zinc-100">
+                <span className="mr-2 font-mono text-zinc-400">{qIndex + 1}.</span>
                 {q.question}
               </h4>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {q.options.map((opt, oIndex) => {
                   const isSelected = userAnswers[qIndex] === oIndex;
                   const isActuallyCorrect = q.answer === oIndex;
                   
-                  let optClass = "border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50";
+                  let optClass = "border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-blue-400 hover:bg-zinc-50 dark:hover:bg-zinc-900";
                   let icon = null;
                   
                   if (isSelected) {
-                    optClass = "border-indigo-500 bg-indigo-50 text-indigo-900 shadow-sm shadow-indigo-100";
+                    optClass = "border-blue-600 bg-blue-600 text-white";
                   }
                   
                   if (submitted) {
                     if (isActuallyCorrect) {
-                      optClass = "border-emerald-500 bg-emerald-50 text-emerald-900 shadow-sm shadow-emerald-100";
-                      icon = <FaCheckCircle className="text-emerald-600" />;
+                      optClass = "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-900 dark:text-emerald-200";
+                      icon = <FaCheckCircle className="text-emerald-600 dark:text-emerald-400" size={13} />;
                     } else if (isSelected && !isActuallyCorrect) {
-                      optClass = "border-red-500 bg-red-50 text-red-900 shadow-sm shadow-red-100";
-                      icon = <FaTimesCircle className="text-red-600" />;
+                      optClass = "border-red-400 bg-red-50 dark:bg-red-950/50 text-red-900 dark:text-red-200";
+                      icon = <FaTimesCircle className="text-red-600 dark:text-red-400" size={13} />;
                     } else {
-                      optClass = "border-slate-200 bg-slate-50 text-slate-400 opacity-70";
+                      optClass = "border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-400 opacity-65";
                     }
                   }
 
@@ -110,9 +116,9 @@ function InteractiveQuiz({ questions, messageId }) {
                       key={`${q.id ?? q.question}-${opt}`}
                       onClick={() => handleSelect(qIndex, oIndex)}
                       disabled={submitted}
-                      className={`w-full text-left p-4 rounded-xl border-2 transition-all flex justify-between items-center gap-4 ${optClass}`}
+                      className={`w-full text-left px-3.5 py-2.5 rounded-lg border transition-colors flex justify-between items-center gap-3 text-xs ${optClass}`}
                     >
-                      <span className="font-medium text-[15px] break-words whitespace-normal flex-1">{opt}</span>
+                      <span className="font-medium break-words whitespace-normal flex-1">{opt}</span>
                       {icon && <span className="shrink-0">{icon}</span>}
                     </button>
                   );
@@ -120,9 +126,9 @@ function InteractiveQuiz({ questions, messageId }) {
               </div>
 
               {submitted && q.explanation && (
-                <div className={`mt-3 overflow-hidden rounded-xl border-l-4 p-4 text-sm ${isCorrect ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-red-500 bg-red-50 text-red-800'}`}>
-                  <p className="font-bold mb-1.5">{isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
-                  <div className="opacity-90 leading-relaxed break-words whitespace-pre-wrap">{q.explanation}</div>
+                <div className={`mt-3 rounded-lg border-l-2 p-3 text-xs ${isCorrect ? 'border-emerald-600 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200' : 'border-red-600 bg-red-50/70 dark:bg-red-950/40 text-red-900 dark:text-red-200'}`}>
+                  <p className="font-bold mb-1">{isCorrect ? 'Correct' : 'Incorrect'}</p>
+                  <div className="leading-relaxed break-words whitespace-pre-wrap">{q.explanation}</div>
                 </div>
               )}
             </div>
@@ -130,27 +136,22 @@ function InteractiveQuiz({ questions, messageId }) {
         })}
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 bg-white p-6 sm:flex-row">
+      <div className="flex items-center justify-between gap-4 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121215] px-5 py-3.5">
         {submitted ? (
-          <div className="flex w-full items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-3 shadow-inner sm:w-auto sm:justify-start">
-            <div className="bg-gradient-to-br from-amber-400 to-orange-500 w-12 h-12 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.4)]">
-              <FaTrophy className="text-white text-xl" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Final Score</p>
-              <p className="text-2xl font-black text-slate-900">
-                {score} <span className="text-lg text-slate-400">/ {questions.length}</span>
-              </p>
-            </div>
+          <div className="flex items-center justify-between w-full">
+            <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">Assessment Score</span>
+            <span className="text-base font-mono font-bold text-zinc-900 dark:text-zinc-100 tabular-nums">
+              {score} / {questions.length} ({Math.round((score / questions.length) * 100)}%)
+            </span>
           </div>
         ) : (
-          <div className="w-full sm:w-auto ml-auto">
+          <div className="ml-auto">
             <button
               type="button"
               onClick={handleSubmit}
-              className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-8 py-3 font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:brightness-110 active:scale-95 sm:w-auto"
+              className="rounded-lg bg-blue-600 hover:bg-blue-700 px-5 py-2 text-xs font-semibold text-white transition-colors"
             >
-              Submit Quiz
+              Submit Answers
             </button>
           </div>
         )}
@@ -159,9 +160,9 @@ function InteractiveQuiz({ questions, messageId }) {
       <ConfirmModal 
         isOpen={showSubmitWarning}
         title="Unanswered Questions"
-        message="You haven't answered all the questions. Are you sure you want to submit anyway?"
+        message="You haven't answered all questions. Submit anyway?"
         confirmText="Submit"
-        cancelText="Keep Trying"
+        cancelText="Continue"
         isDanger={false}
         onConfirm={confirmSubmit}
         onCancel={() => setShowSubmitWarning(false)}

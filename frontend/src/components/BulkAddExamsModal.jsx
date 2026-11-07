@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaTimes } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 function BulkAddExamsModal({ isOpen, onClose, onSaved, initialData = null }) {
@@ -64,13 +64,13 @@ function BulkAddExamsModal({ isOpen, onClose, onSaved, initialData = null }) {
 
   const handleSave = async () => {
     if (!seriesTitle.trim()) {
-      setError("Please provide a name for the Examination Series (e.g., 'Seventh Semester End Examination').");
+      setError("Please provide a title for the examination series.");
       return;
     }
 
     const validExams = exams.filter(e => e.title.trim() && e.date);
     if (validExams.length === 0) {
-      setError("Please fill out at least one subject completely (Title and Date).");
+      setError("Please fill out at least one examination paper (Title and Date).");
       return;
     }
 
@@ -101,7 +101,7 @@ function BulkAddExamsModal({ isOpen, onClose, onSaved, initialData = null }) {
       
       onSaved();
     } catch (err) {
-      setError("Failed to save the exam series. Please check your connection and try again.");
+      setError("Failed to save the exam series. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -110,88 +110,85 @@ function BulkAddExamsModal({ isOpen, onClose, onSaved, initialData = null }) {
   const isEditing = !!(initialData && (initialData.id || initialData._id));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/50 backdrop-blur-xs overflow-y-auto">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="bg-white border border-slate-200 w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.12 }}
+        className="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-zinc-800 w-full max-w-3xl rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[88vh]"
       >
-        <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+        <div className="px-5 py-4 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-900">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">
-              {isEditing ? 'Edit Exam Timetable Series' : 'Bulk Add Exam Timetable'}
+            <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+              {isEditing ? 'Edit Examination Series' : 'New Examination Series'}
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Group all exam papers under one examination series with scheduled dates & venues.
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Group exam papers under a single examination session
             </p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-200 transition-colors">
-            <FaTimes size={18} />
+          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 p-1.5 rounded-md">
+            <FaTimes size={14} />
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+        <div className="p-5 overflow-y-auto flex-1">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-sm font-semibold flex items-center gap-2">
-              <span>⚠️</span> {error}
+            <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 px-3.5 py-2.5 rounded-lg mb-4 text-xs font-medium">
+              {error}
             </div>
           )}
 
-          <div className="mb-6">
-            <label className="text-xs text-primary font-bold uppercase tracking-wider mb-2 block">
-              Examination Series Name
+          <div className="mb-5">
+            <label className="text-xs text-zinc-700 dark:text-zinc-300 font-semibold mb-1.5 block">
+              Series Title
             </label>
             <input 
               type="text" 
-              placeholder="e.g. End Semester Examination - Fall 2026" 
-              className="bg-white text-slate-900 font-bold p-4 rounded-xl border border-slate-200 w-full focus:ring-2 focus:ring-primary/50 outline-none text-base transition-all" 
+              placeholder="e.g. Semester 06 End Examination" 
+              className="glass-input px-3.5 py-2.5 rounded-lg w-full text-xs font-semibold" 
               value={seriesTitle} 
               onChange={e => setSeriesTitle(e.target.value)} 
               required 
             />
           </div>
 
-          <label className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-3 block">
-            Exam Papers / Subjects
+          <label className="text-xs text-zinc-700 dark:text-zinc-300 font-semibold mb-2 block">
+            Scheduled Papers
           </label>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {exams.map((exam, i) => (
-              <div key={i} className="flex flex-col sm:flex-row gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200 items-center hover:border-slate-300 transition-all">
-                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary font-bold flex items-center justify-center text-xs shrink-0">
-                  #{i + 1}
+              <div key={i} className="flex flex-col sm:flex-row gap-2.5 bg-zinc-50 dark:bg-zinc-900/50 p-3 rounded-lg border border-zinc-200/80 dark:border-zinc-800 items-center">
+                <div className="w-6 h-6 rounded bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-mono font-bold flex items-center justify-center text-[11px] shrink-0">
+                  {i + 1}
                 </div>
                 
-                <div className="flex-1 w-full sm:w-auto min-w-[180px]">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block pl-1">Subject / Module</label>
+                <div className="flex-1 w-full sm:w-auto">
                   <input 
                     type="text" 
-                    placeholder="e.g. Distributed Systems" 
-                    className="bg-white text-slate-900 font-semibold p-3 rounded-xl border border-slate-200 w-full focus:ring-2 focus:ring-primary/50 outline-none text-sm" 
+                    placeholder="Module Code & Name" 
+                    className="glass-input px-3 py-2 rounded-lg w-full text-xs" 
                     value={exam.title} 
                     onChange={e => handleChange(i, 'title', e.target.value)} 
                     required 
                   />
                 </div>
 
-                <div className="flex-1 w-full sm:w-auto min-w-[200px]">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block pl-1">Date & Time</label>
+                <div className="w-full sm:w-48">
                   <input 
                     type="datetime-local" 
-                    className="bg-white text-slate-900 p-3 rounded-xl border border-slate-200 w-full focus:ring-2 focus:ring-primary/50 outline-none text-sm font-medium" 
+                    className="glass-input px-3 py-2 rounded-lg w-full text-xs font-mono" 
                     value={exam.date} 
                     onChange={e => handleChange(i, 'date', e.target.value)} 
                     required 
                   />
                 </div>
                 
-                <div className="flex-1 w-full sm:w-auto min-w-[140px]">
-                  <label className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block pl-1">Location (Optional)</label>
+                <div className="w-full sm:w-36">
                   <input 
                     type="text" 
-                    placeholder="Hall A" 
-                    className="bg-white text-slate-900 p-3 rounded-xl border border-slate-200 w-full focus:ring-2 focus:ring-primary/50 outline-none text-sm" 
+                    placeholder="Venue (e.g. Hall A)" 
+                    className="glass-input px-3 py-2 rounded-lg w-full text-xs" 
                     value={exam.location} 
                     onChange={e => handleChange(i, 'location', e.target.value)} 
                   />
@@ -201,10 +198,10 @@ function BulkAddExamsModal({ isOpen, onClose, onSaved, initialData = null }) {
                   <button 
                     type="button"
                     onClick={() => handleRemoveRow(i)}
-                    className="text-slate-400 hover:text-red-600 p-3 rounded-xl hover:bg-red-50 transition-colors mt-4 sm:mt-0"
-                    title="Remove Subject"
+                    className="text-zinc-400 hover:text-red-600 p-1.5 rounded transition-colors"
+                    title="Remove Paper"
                   >
-                    <FaTrash size={14} />
+                    <FaTrash size={12} />
                   </button>
                 )}
               </div>
@@ -214,23 +211,23 @@ function BulkAddExamsModal({ isOpen, onClose, onSaved, initialData = null }) {
           <button 
             type="button"
             onClick={handleAddRow}
-            className="mt-5 flex items-center justify-center gap-2 w-full py-3.5 rounded-xl border-2 border-dashed border-slate-200 text-slate-600 hover:text-primary hover:border-primary hover:bg-primary/5 transition-all font-bold text-sm"
+            className="mt-3 flex items-center justify-center gap-1.5 w-full py-2.5 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:text-blue-600 hover:border-blue-500 transition-colors font-semibold text-xs"
           >
-            <FaPlus size={12} /> Add Another Subject
+            <FaPlus size={10} /> Add Paper
           </button>
         </div>
 
-        <div className="p-6 border-t border-slate-200 bg-slate-50 flex justify-end gap-4">
-          <button onClick={onClose} type="button" className="px-6 py-3 rounded-xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition-colors border border-slate-200 text-sm">
+        <div className="px-5 py-3.5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex justify-end gap-2">
+          <button onClick={onClose} type="button" className="px-3.5 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 font-semibold bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors border border-zinc-200 dark:border-zinc-700 text-xs">
             Cancel
           </button>
           <button 
             onClick={handleSave} 
             disabled={isSaving}
             type="button"
-            className="flex items-center gap-2 bg-primary hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/25 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale text-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 text-xs shadow-xs"
           >
-            <FaSave /> {isSaving ? 'Saving...' : (isEditing ? 'Update Exam Series' : 'Save All Exams')}
+            {isSaving ? 'Saving...' : (isEditing ? 'Update Series' : 'Save Series')}
           </button>
         </div>
       </motion.div>

@@ -5,30 +5,31 @@ function ConfirmModal({ isOpen, title, message, onConfirm, onCancel, confirmText
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/50 backdrop-blur-xs p-4">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white border border-slate-200 p-6 rounded-3xl w-full max-w-md shadow-2xl"
+        exit={{ opacity: 0, scale: 0.97 }}
+        transition={{ duration: 0.12 }}
+        className="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-zinc-800 p-5 rounded-xl w-full max-w-sm shadow-xl"
       >
-        <h3 className="text-xl font-bold text-slate-900 mb-2">{title}</h3>
-        <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+        <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">{title}</h3>
+        <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed">
           {message}
         </p>
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-2">
           <button 
             onClick={onCancel}
-            className="px-5 py-2.5 text-sm font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors border border-slate-200"
+            className="px-3.5 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors border border-zinc-200 dark:border-zinc-700"
           >
             {cancelText}
           </button>
           <button 
             onClick={onConfirm}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md ${
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
               isDanger 
-                ? 'bg-red-600 hover:bg-red-700 text-white shadow-red-500/20' 
-                : 'bg-primary hover:bg-indigo-700 text-white shadow-primary/20'
+                ? 'bg-red-600 hover:bg-red-700 text-white' 
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
             {confirmText}

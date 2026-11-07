@@ -1,28 +1,35 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ThemeToggleButton } from '../utils/theme';
 
 const Header = () => {
   const navigate = useNavigate();
   return (
-    <header className="w-full bg-white/70 backdrop-blur-xl border-b border-white/60 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-40 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-      <h1 
-        className="text-2xl font-black tracking-tight text-slate-900 cursor-pointer"
+    <header className="w-full bg-[#fafaf9]/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-zinc-200/90 dark:border-zinc-800/90 h-14 px-6 md:px-12 flex justify-between items-center sticky top-0 z-40 transition-colors">
+      <div 
+        className="flex items-center gap-2.5 cursor-pointer"
         onClick={() => navigate('/')}
       >
-        My <span className="text-primary">Academia</span>
-      </h1>
-      <div className="flex items-center gap-4">
+        <div className="w-7 h-7 rounded-md bg-blue-600 text-white flex items-center justify-center font-mono text-xs font-bold tracking-tighter">
+          MA
+        </div>
+        <span className="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+          My Academia
+        </span>
+      </div>
+      <div className="flex items-center gap-2.5">
+        <ThemeToggleButton />
         <button 
-          className="px-5 py-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+          className="px-3.5 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
           onClick={() => navigate('/signup')}
         >
-          Sign Up
+          Register
         </button>
         <button 
-          className="px-6 py-2 text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white rounded-full shadow-md transition-transform hover:-translate-y-0.5"
+          className="px-4 py-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
           onClick={() => navigate('/login')}
         >
-          Log In
+          Sign In
         </button>
       </div>
     </header>

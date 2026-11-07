@@ -180,263 +180,260 @@ function ModuleFormModal({ onClose, onSubmit, initialData = null }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/50 backdrop-blur-xs overflow-y-auto">
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.12 }}
+        className="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-zinc-800 w-full max-w-3xl rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
       >
-        <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-          <h2 className="text-2xl font-bold text-slate-900">{initialData ? 'Edit Module' : 'Add Module'}</h2>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-800 text-2xl leading-none">&times;</button>
+        <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-900">
+          <div>
+            <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{initialData ? 'Edit Course Module' : 'Register New Module'}</h2>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Configure attendance, grading attempts, coursework, and PDFs</p>
+          </div>
+          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 text-xl leading-none">&times;</button>
         </div>
 
-        <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
-          {error && <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl mb-6">{error}</div>}
+        <div className="p-6 overflow-y-auto flex-1">
+          {error && <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 px-3.5 py-2.5 rounded-lg mb-5 text-xs font-medium">{error}</div>}
           
-          <form id="module-form" onSubmit={handleSubmit} className="space-y-8">
+          <form id="module-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Core Info */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Module Name</label>
-                <input className="glass-input w-full px-4 py-3 rounded-xl" value={moduleName} onChange={(e) => setModuleName(e.target.value)} required placeholder="e.g. Data Structures" />
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Module Title</label>
+                <input className="glass-input w-full px-3 py-2 rounded-lg text-xs" value={moduleName} onChange={(e) => setModuleName(e.target.value)} required placeholder="e.g. Data Structures" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Module Code</label>
-                <input className="glass-input w-full px-4 py-3 rounded-xl" value={moduleCode} onChange={(e) => setModuleCode(e.target.value)} required placeholder="e.g. CS101" />
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Module Code</label>
+                <input className="glass-input w-full px-3 py-2 rounded-lg text-xs font-mono uppercase" value={moduleCode} onChange={(e) => setModuleCode(e.target.value)} required placeholder="e.g. EC3202" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Semester</label>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Semester</label>
                 <CustomSelect 
-                  className="glass-input w-full px-4 py-3 rounded-xl" 
+                  className="glass-input w-full px-3 py-2 rounded-lg text-xs font-medium" 
                   value={semester} 
                   onChange={setSemester}
-                  options={[1, 2, 3, 4, 5, 6, 7, 8].map(sem => ({ value: sem, label: `Semester ${sem}` }))}
+                  options={[1, 2, 3, 4, 5, 6, 7, 8].map(sem => ({ value: sem, label: `Semester 0${sem}` }))}
                 />
               </div>
             </div>
 
+            {/* Academic Results */}
+            <div className="bg-zinc-50/80 dark:bg-zinc-900/50 p-4 rounded-lg border border-zinc-200/80 dark:border-zinc-800">
+              <div className="flex justify-between items-center mb-3">
+                <div>
+                  <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase font-mono tracking-wider">Examination Results & Attempts</h3>
+                </div>
+                <button type="button" onClick={addResult} className="text-zinc-800 dark:text-zinc-200 hover:text-zinc-900 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                  <FaPlus size={9} /> Add Attempt
+                </button>
+              </div>
+              <div className="space-y-2.5">
+                {moduleResults.map((r, i) => (
+                  <div key={i} className="bg-white dark:bg-[#121215] p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 relative group">
+                    <button type="button" onClick={() => removeResult(i)} className="absolute top-3 right-3 text-zinc-400 hover:text-red-600">
+                      <FaTrash size={11} />
+                    </button>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end pr-6">
+                      <div>
+                        <label className="block text-[11px] text-zinc-500 mb-1">Attempt #</label>
+                        <input type="number" min="1" className="glass-input w-full px-2.5 py-1.5 rounded text-xs font-mono" value={r.attemptNumber} onChange={(e) => updateResult(i, 'attemptNumber', e.target.value)} />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-zinc-500 mb-1">Grade</label>
+                        <input className="glass-input w-full px-2.5 py-1.5 rounded text-xs font-mono uppercase font-bold" value={r.grade || ''} onChange={(e) => updateResult(i, 'grade', e.target.value.toUpperCase())} placeholder="A+, B-, C+" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-zinc-500 mb-1">Marks (Opt)</label>
+                        <input type="number" min="0" max="100" className="glass-input w-full px-2.5 py-1.5 rounded text-xs font-mono" value={r.marks || ''} onChange={(e) => updateResult(i, 'marks', e.target.value)} placeholder="0–100" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-zinc-500 mb-1">Academic Year</label>
+                        <input className="glass-input w-full px-2.5 py-1.5 rounded text-xs font-mono" value={r.academicYear || ''} onChange={(e) => updateResult(i, 'academicYear', e.target.value)} placeholder="2025/26" />
+                      </div>
+                      <div className="flex items-center pb-1.5">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={r.isProperAttempt} onChange={(e) => updateResult(i, 'isProperAttempt', e.target.checked)} className="w-3.5 h-3.5 accent-blue-600 rounded border-zinc-300" />
+                          <span className="text-xs text-zinc-700 dark:text-zinc-300 font-medium whitespace-nowrap">Proper Attempt</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {moduleResults.length === 0 && <p className="text-zinc-400 text-xs text-center py-2">No grade recorded yet.</p>}
+              </div>
+            </div>
+
             {/* Attendance */}
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Attendance Tracking</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-zinc-50/80 dark:bg-zinc-900/50 p-4 rounded-lg border border-zinc-200/80 dark:border-zinc-800">
+              <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase font-mono tracking-wider mb-3">Lecture Attendance</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">Total Lectures (Expected)</label>
-                  <input type="number" min="0" className="glass-input w-full px-4 py-3 rounded-xl" value={totalLectures} onChange={(e) => setTotalLectures(e.target.value)} />
+                  <label className="block text-xs text-zinc-600 dark:text-zinc-400 mb-1">Expected Total Lectures</label>
+                  <input type="number" min="0" className="glass-input w-full px-3 py-2 rounded-lg text-xs font-mono" value={totalLectures} onChange={(e) => setTotalLectures(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">Lectures Conducted</label>
-                  <input type="number" min="0" className="glass-input w-full px-4 py-3 rounded-xl" value={conductedLectures} onChange={(e) => setConductedLectures(e.target.value)} />
+                  <label className="block text-xs text-zinc-600 dark:text-zinc-400 mb-1">Lectures Conducted</label>
+                  <input type="number" min="0" className="glass-input w-full px-3 py-2 rounded-lg text-xs font-mono" value={conductedLectures} onChange={(e) => setConductedLectures(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">Lectures Attended</label>
-                  <input type="number" min="0" className="glass-input w-full px-4 py-3 rounded-xl" value={attendedLectures} onChange={(e) => setAttendedLectures(e.target.value)} />
+                  <label className="block text-xs text-zinc-600 dark:text-zinc-400 mb-1">Lectures Attended</label>
+                  <input type="number" min="0" className="glass-input w-full px-3 py-2 rounded-lg text-xs font-mono" value={attendedLectures} onChange={(e) => setAttendedLectures(e.target.value)} />
                 </div>
               </div>
             </div>
 
-            {/* Documents Upload (Only in Edit Mode) */}
+            {/* Documents Upload */}
             {initialData ? (
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <div className="flex justify-between items-center mb-4">
+              <div className="bg-zinc-50/80 dark:bg-zinc-900/50 p-4 rounded-lg border border-zinc-200/80 dark:border-zinc-800">
+                <div className="flex justify-between items-center mb-3">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Lecture Notes & Syllabus (PDFs)</h3>
-                    <p className="text-xs text-slate-500">Upload notes to chat with them in the AI Tutor</p>
+                    <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase font-mono tracking-wider">Lecture PDFs ({documents.length})</h3>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400">Indexed automatically for Course AI citations</p>
                   </div>
-                  <label className="bg-primary hover:bg-indigo-700 text-white font-bold cursor-pointer px-4 py-2.5 rounded-xl text-sm shadow-md shadow-primary/20 flex items-center gap-2 transition-all active:scale-95">
-                    {uploading ? 'Uploading...' : <><FaUpload /> Upload PDF</>}
+                  <label className="bg-blue-600 hover:bg-blue-700 text-white font-semibold cursor-pointer px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition-colors">
+                    {uploading ? 'Indexing...' : <><FaUpload size={10} /> Upload PDF</>}
                     <input type="file" accept=".pdf" className="hidden" onChange={handleFileUpload} disabled={uploading} />
                   </label>
                 </div>
                 {documents.length === 0 ? (
-                  <p className="text-slate-500 text-sm">No notes uploaded yet. Upload a PDF to chat with it.</p>
+                  <p className="text-zinc-400 text-xs">No PDFs attached to this module yet.</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {documents.map(doc => (
-                      <div key={doc.id} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                        <div className="flex items-center gap-3 truncate">
-                          <FaFilePdf className="text-red-500 text-xl shrink-0" />
-                          <span className="text-slate-700 text-sm truncate" title={doc.name}>{doc.name}</span>
+                      <div key={doc.id} className="flex items-center justify-between px-3 py-2 bg-white dark:bg-[#121215] rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs">
+                        <div className="flex items-center gap-2 truncate">
+                          <FaFilePdf className="text-red-600 shrink-0" />
+                          <span className="text-zinc-800 dark:text-zinc-200 truncate" title={doc.name}>{doc.name}</span>
                         </div>
-                        <button type="button" onClick={() => handleDeleteDocument(doc.id)} className="text-slate-400 hover:text-red-500 p-2 shrink-0">
-                          <FaTrash size={14} />
+                        <button type="button" onClick={() => handleDeleteDocument(doc.id)} className="text-zinc-400 hover:text-red-600 p-1 shrink-0">
+                          <FaTrash size={11} />
                         </button>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 border-dashed text-center">
-                <p className="text-slate-500 text-sm">Save this module first to upload and chat with lecture notes.</p>
-              </div>
-            )}
+            ) : null}
 
             {/* Tasks (Assignments & Labs) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Assignments */}
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Assignments</h3>
-                  <button type="button" onClick={addAssignment} className="text-primary hover:text-indigo-600 transition-colors text-sm font-medium flex items-center gap-1">
-                    <FaPlus size={12} /> Add
+              <div className="bg-zinc-50/80 dark:bg-zinc-900/50 p-4 rounded-lg border border-zinc-200/80 dark:border-zinc-800">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase font-mono tracking-wider">Assignments</h3>
+                  <button type="button" onClick={addAssignment} className="text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                    <FaPlus size={9} /> Add
                   </button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2.5">
                   {assignments.map((a, i) => (
-                    <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 relative group shadow-sm">
-                      <button type="button" onClick={() => removeAssignment(i)} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <FaTrash size={14} />
+                    <div key={i} className="bg-white dark:bg-[#121215] p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 relative">
+                      <button type="button" onClick={() => removeAssignment(i)} className="absolute top-2.5 right-2.5 text-zinc-400 hover:text-red-600">
+                        <FaTrash size={11} />
                       </button>
-                      <input className="glass-input w-[90%] px-3 py-2 rounded-lg text-sm mb-3 font-semibold" value={a.name} onChange={(e) => updateAssignment(i, 'name', e.target.value)} placeholder={`Assignment ${i+1}`} />
-                      <div className="grid grid-cols-2 gap-3 mb-3">
+                      <input className="glass-input w-[88%] px-2.5 py-1.5 rounded text-xs mb-2 font-medium" value={a.name} onChange={(e) => updateAssignment(i, 'name', e.target.value)} placeholder={`Assignment ${i+1}`} />
+                      <div className="grid grid-cols-2 gap-2 mb-2">
                         <div>
-                          <label className="block text-xs text-slate-500 mb-1">Status</label>
+                          <label className="block text-[10px] text-zinc-500 mb-0.5">Status</label>
                           <CustomSelect 
-                            className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" 
+                            className="glass-input w-full px-2 py-1 rounded text-xs" 
                             value={a.status} 
                             onChange={(val) => updateAssignment(i, 'status', val)}
                             options={['Pending', 'Submitted', 'Graded'].map(s => ({ value: s, label: s }))}
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-slate-500 mb-1">Due Date</label>
-                          <input type="date" className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={a.dueDate ? a.dueDate.split('T')[0] : ''} onChange={(e) => updateAssignment(i, 'dueDate', e.target.value)} />
+                          <label className="block text-[10px] text-zinc-500 mb-0.5">Due Date</label>
+                          <input type="date" className="glass-input w-full px-2 py-1 rounded text-xs font-mono" value={a.dueDate ? a.dueDate.split('T')[0] : ''} onChange={(e) => updateAssignment(i, 'dueDate', e.target.value)} />
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <input type="number" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={a.marks ?? ''} onChange={(e) => updateAssignment(i, 'marks', e.target.value)} placeholder="Marks" />
-                        <span className="text-slate-500">/</span>
-                        <input type="number" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={a.totalMarks ?? ''} onChange={(e) => updateAssignment(i, 'totalMarks', e.target.value)} placeholder="Total" />
+                      <div className="flex items-center gap-1.5">
+                        <input type="number" className="glass-input w-full px-2.5 py-1 rounded text-xs font-mono" value={a.marks ?? ''} onChange={(e) => updateAssignment(i, 'marks', e.target.value)} placeholder="Score" />
+                        <span className="text-zinc-400 text-xs">/</span>
+                        <input type="number" className="glass-input w-full px-2.5 py-1 rounded text-xs font-mono" value={a.totalMarks ?? ''} onChange={(e) => updateAssignment(i, 'totalMarks', e.target.value)} placeholder="Max" />
                       </div>
                     </div>
                   ))}
-                  {assignments.length === 0 && <p className="text-slate-500 text-sm text-center py-4">No assignments added.</p>}
+                  {assignments.length === 0 && <p className="text-zinc-400 text-xs text-center py-2">No assignments added.</p>}
                 </div>
               </div>
 
               {/* Labs */}
-              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Labs</h3>
-                  <button type="button" onClick={addLab} className="text-primary hover:text-indigo-600 transition-colors text-sm font-medium flex items-center gap-1">
-                    <FaPlus size={12} /> Add
+              <div className="bg-zinc-50/80 dark:bg-zinc-900/50 p-4 rounded-lg border border-zinc-200/80 dark:border-zinc-800">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 uppercase font-mono tracking-wider">Laboratories</h3>
+                  <button type="button" onClick={addLab} className="text-zinc-700 dark:text-zinc-200 hover:text-zinc-900 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+                    <FaPlus size={9} /> Add
                   </button>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2.5">
                   {labs.map((l, i) => (
-                    <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 relative group shadow-sm">
-                      <button type="button" onClick={() => removeLab(i)} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <FaTrash size={14} />
+                    <div key={i} className="bg-white dark:bg-[#121215] p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 relative">
+                      <button type="button" onClick={() => removeLab(i)} className="absolute top-2.5 right-2.5 text-zinc-400 hover:text-red-600">
+                        <FaTrash size={11} />
                       </button>
-                      <input className="glass-input w-[90%] px-3 py-2 rounded-lg text-sm mb-3 font-semibold" value={l.name} onChange={(e) => updateLab(i, 'name', e.target.value)} placeholder={`Lab ${i+1}`} />
-                      <div className="grid grid-cols-2 gap-3 mb-3">
+                      <input className="glass-input w-[88%] px-2.5 py-1.5 rounded text-xs mb-2 font-medium" value={l.name} onChange={(e) => updateLab(i, 'name', e.target.value)} placeholder={`Lab ${i+1}`} />
+                      <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <label className="block text-xs text-slate-500 mb-1">Status</label>
+                          <label className="block text-[10px] text-zinc-500 mb-0.5">Status</label>
                           <CustomSelect 
-                            className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" 
+                            className="glass-input w-full px-2 py-1 rounded text-xs" 
                             value={l.status} 
                             onChange={(val) => updateLab(i, 'status', val)}
                             options={['Pending', 'Conducted', 'Graded'].map(s => ({ value: s, label: s }))}
                           />
                         </div>
                         <div>
-                          <label className="block text-xs text-slate-500 mb-1">Due Date</label>
-                          <input type="date" className="glass-input w-full px-2 py-1.5 rounded-lg text-xs" value={l.dueDate ? l.dueDate.split('T')[0] : ''} onChange={(e) => updateLab(i, 'dueDate', e.target.value)} />
+                          <label className="block text-[10px] text-zinc-500 mb-0.5">Date</label>
+                          <input type="date" className="glass-input w-full px-2 py-1 rounded text-xs font-mono" value={l.dueDate ? l.dueDate.split('T')[0] : ''} onChange={(e) => updateLab(i, 'dueDate', e.target.value)} />
                         </div>
                       </div>
                     </div>
                   ))}
-                  {labs.length === 0 && <p className="text-slate-500 text-sm text-center py-4">No labs added.</p>}
+                  {labs.length === 0 && <p className="text-zinc-400 text-xs text-center py-2">No labs added.</p>}
                 </div>
               </div>
             </div>
 
-            {/* GPA Settings */}
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Academic Settings</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="flex items-center gap-3">
-                  <input type="checkbox" id="isGpaCounted" checked={isGpaCounted} onChange={(e) => setIsGpaCounted(e.target.checked)} className="w-5 h-5 accent-primary rounded bg-white border-slate-300 focus:ring-primary" />
-                  <label htmlFor="isGpaCounted" className="text-sm font-medium text-slate-700">Include in GPA Calculation (GPA Counted)</label>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-2">Credits Override (Leave blank to auto-detect)</label>
-                  <input type="number" step="0.5" min="0" className="glass-input w-full px-4 py-2 rounded-xl" value={creditsOverride} onChange={(e) => setCreditsOverride(e.target.value)} placeholder="e.g. 3" />
-                </div>
-              </div>
-            </div>
-
-            {/* Academic Results */}
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-slate-900">Academic Results (Attempts)</h3>
-                <button type="button" onClick={addResult} className="text-primary hover:text-indigo-600 transition-colors text-sm font-bold flex items-center gap-1">
-                  <FaPlus size={12} /> Add Attempt
-                </button>
-              </div>
-              <div className="space-y-4">
-                {moduleResults.map((r, i) => (
-                  <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 relative group shadow-sm">
-                    <button type="button" onClick={() => removeResult(i)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <FaTrash size={14} />
-                    </button>
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end pr-8">
-                      <div>
-                        <label className="block text-xs text-slate-500 mb-1">Attempt #</label>
-                        <input type="number" min="1" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.attemptNumber} onChange={(e) => updateResult(i, 'attemptNumber', e.target.value)} />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-slate-500 mb-1">Grade</label>
-                        <input className="glass-input w-full px-3 py-2 rounded-lg text-sm uppercase" value={r.grade || ''} onChange={(e) => updateResult(i, 'grade', e.target.value.toUpperCase())} placeholder="e.g. A+" />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-slate-500 mb-1">Marks (Optional)</label>
-                        <input type="number" min="0" max="100" className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.marks || ''} onChange={(e) => updateResult(i, 'marks', e.target.value)} placeholder="0-100" />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-slate-500 mb-1">Academic Year</label>
-                        <input className="glass-input w-full px-3 py-2 rounded-lg text-sm" value={r.academicYear || ''} onChange={(e) => updateResult(i, 'academicYear', e.target.value)} placeholder="e.g. 2024/2025" />
-                      </div>
-                      <div className="flex items-center h-full pb-2">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={r.isProperAttempt} onChange={(e) => updateResult(i, 'isProperAttempt', e.target.checked)} className="w-4 h-4 accent-primary rounded bg-white border-slate-300" />
-                          <span className="text-xs text-slate-700 font-medium whitespace-nowrap">Proper Attempt</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {moduleResults.length === 0 && <p className="text-slate-500 text-sm text-center py-2">No results recorded for this module yet.</p>}
+            {/* Credit Rules */}
+            <div className="bg-zinc-50/80 dark:bg-zinc-900/50 p-4 rounded-lg border border-zinc-200/80 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input type="checkbox" id="isGpaCounted" checked={isGpaCounted} onChange={(e) => setIsGpaCounted(e.target.checked)} className="w-4 h-4 accent-blue-600 rounded border-zinc-300" />
+                <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Count module toward Cumulative GPA</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-zinc-600 dark:text-zinc-400 whitespace-nowrap">Credits Override:</label>
+                <input type="number" step="0.5" min="0" className="glass-input w-24 px-2.5 py-1.5 rounded text-xs font-mono" value={creditsOverride} onChange={(e) => setCreditsOverride(e.target.value)} placeholder="Auto" />
               </div>
             </div>
           </form>
         </div>
 
-        <div className="p-6 border-t border-slate-200 bg-slate-50 flex justify-end gap-4">
+        <div className="px-6 py-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex justify-end gap-2">
           <button 
             type="button" 
             onClick={onClose} 
-            className="px-6 py-3 rounded-xl text-slate-700 font-bold bg-slate-100 hover:bg-slate-200 hover:text-slate-900 transition-colors border border-slate-200 text-sm"
+            className="px-4 py-2 rounded-lg text-zinc-700 dark:text-zinc-300 font-semibold bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors border border-zinc-200 dark:border-zinc-700 text-xs"
           >
             Cancel
           </button>
           <button 
             type="submit" 
             form="module-form" 
-            className="bg-primary hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/25 transition-all active:scale-95 text-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold transition-colors text-xs shadow-xs"
           >
             {initialData ? 'Save Changes' : 'Create Module'}
           </button>
         </div>
       </motion.div>
       
-      {/* Delete Confirmation Modal */}
       <ConfirmModal 
         isOpen={!!docToDelete}
-        title="Delete Document"
-        message="Are you sure you want to delete this document? This will remove it from the module."
+        title="Remove PDF Document"
+        message="Are you sure you want to remove this PDF from the module?"
         confirmText="Delete"
         cancelText="Cancel"
         isDanger={true}

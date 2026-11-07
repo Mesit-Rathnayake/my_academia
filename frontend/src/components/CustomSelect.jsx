@@ -6,7 +6,6 @@ function CustomSelect({ value, onChange, options, className = '' }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
-  // Handle clicking outside to close
   useEffect(() => {
     function handleClickOutside(event) {
       if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -32,21 +31,21 @@ function CustomSelect({ value, onChange, options, className = '' }) {
         type="button"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className={`flex min-h-11 w-full items-center justify-between text-left ${className}`}
+        className={`flex min-h-9 w-full items-center justify-between text-left ${className}`}
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="truncate">{displayLabel}</span>
-        <FaChevronDown className={`transition-transform duration-200 text-slate-400 ml-2 ${isOpen ? 'rotate-180' : ''}`} size={12} />
+        <FaChevronDown className={`transition-transform duration-150 text-zinc-400 ml-2 shrink-0 ${isOpen ? 'rotate-180' : ''}`} size={10} />
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.15 }}
-            className="absolute left-0 top-full z-50 mt-2 max-h-60 w-full overflow-hidden overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl custom-scrollbar"
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.1 }}
+            className="absolute left-0 top-full z-50 mt-1 max-h-56 w-full overflow-hidden overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-[#16161a] shadow-lg py-1"
           >
             {options.map((opt, idx) => {
               const optValue = typeof opt === 'object' ? opt.value : opt;
@@ -58,10 +57,10 @@ function CustomSelect({ value, onChange, options, className = '' }) {
                   type="button"
                   aria-pressed={isSelected}
                   key={idx}
-                  className={`px-4 py-3 cursor-pointer transition-colors text-sm font-medium ${
+                  className={`w-full text-left px-3 py-2 cursor-pointer transition-colors text-xs block ${
                     isSelected 
-                      ? 'bg-primary/10 text-primary font-bold' 
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                      ? 'bg-blue-600 text-white font-semibold' 
+                      : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white font-medium'
                   }`}
                   onClick={() => {
                     onChange(optValue);
