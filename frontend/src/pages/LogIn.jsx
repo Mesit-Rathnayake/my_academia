@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from '../components/Footer';
-import man3 from '../images/man3.png';
+import man2 from '../images/man2.png';
 
 function LogIn() {
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
@@ -28,64 +28,76 @@ function LogIn() {
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem('token', data.token);
-        navigate('/Home');
+        navigate('/home');
       } else {
-        setError(data.message || 'Login failed');
+        setError(data.message || 'Invalid credentials');
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('An error occurred. Please try again later.');
+      setError('Unable to reach server. Please try again.');
     }
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-900 flex flex-col font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-transparent text-zinc-900 dark:text-zinc-100 flex flex-col font-sans">
       <Header />
-      <div className="flex-1 max-w-7xl mx-auto px-6 w-full flex flex-col md:flex-row items-center justify-center gap-12 py-12 relative z-10">
-        <div className="flex-1 w-full max-w-md bg-white/80 backdrop-blur-xl p-8 sm:p-12 rounded-3xl shadow-[0_16px_40px_rgba(0,0,0,0.06)] border border-white/70 ring-1 ring-slate-900/5 relative z-10">
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-8 tracking-tight">Welcome Back!</h2>
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-sm bg-white dark:bg-[#121215] p-7 rounded-xl border border-zinc-200/90 dark:border-zinc-800/90 border-t-[3px] border-t-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <span className="text-[11px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold block mb-1">Authentication</span>
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Sign in to My Academia</h1>
+            </div>
+            <img
+              src={man2}
+              alt="Student Sign In"
+              className="w-12 h-12 rounded-lg object-contain bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 p-1 shrink-0"
+            />
+          </div>
           
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-bold flex items-center justify-between shadow-sm">
-              <span>⚠️ {error}</span>
-              <button type="button" onClick={() => setError('')} className="text-red-400 hover:text-red-600 px-2 py-1">✕</button>
+            <div className="mb-5 p-3 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-xs font-medium flex items-center justify-between">
+              <span>{error}</span>
+              <button type="button" onClick={() => setError('')} className="text-red-500 hover:text-red-800 ml-2">✕</button>
             </div>
           )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Registration Number</label>
               <input
                 type="text"
-                placeholder="Registration Number (EG/20XX/XXXX)"
+                placeholder="EG/2022/5440"
                 value={regNumber}
                 onChange={(e) => setRegNumber(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium"
+                required
+                className="glass-input w-full px-3.5 py-2.5 rounded-lg text-xs font-mono"
               />
             </div>
             <div>
+              <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5">Password</label>
               <input
                 type="password"
-                placeholder="Password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 text-slate-900 px-5 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all font-medium"
+                required
+                className="glass-input w-full px-3.5 py-2.5 rounded-lg text-xs"
               />
             </div>
             <button 
               type="submit"
-              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-0.5"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2.5 rounded-lg transition-colors mt-2 shadow-xs"
             >
-              Log In
+              Sign In
             </button>
           </form>
-          <p className="mt-8 text-center text-slate-600 font-medium">
-            Don't Have an Account? <Link to="/signup" className="text-primary hover:text-secondary transition-colors font-bold">Sign Up</Link>
+
+          <p className="mt-6 pt-5 border-t border-zinc-100 dark:border-zinc-800 text-center text-xs text-zinc-500 dark:text-zinc-400">
+            New student? <Link to="/signup" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Create an account</Link>
           </p>
         </div>
-        <div className="flex-1 hidden md:flex justify-center items-center relative">
-          <img src={man3} alt="Student illustration" className="max-w-full h-auto w-[80%] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 relative z-10" />
-        </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

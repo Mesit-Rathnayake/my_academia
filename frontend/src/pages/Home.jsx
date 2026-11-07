@@ -6,8 +6,9 @@ import DashboardWidgets from '../components/DashboardWidgets';
 import Footer from '../components/Footer';
 import { FaPlus, FaBookReader } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { fetchWithCache, getCache, setCache } from '../utils/cache';
+import { fetchWithCache, getCache } from '../utils/cache';
 import { ModuleCardSkeleton, DashboardWidgetsSkeleton } from '../components/Skeleton';
+import { getUserAvatar } from '../utils/theme';
 
 function Home() {
   const [modules, setModules] = useState(() => getCache('dashboard_modules') || []);
@@ -24,6 +25,7 @@ function Home() {
 
   useEffect(() => {
     fetchDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchDashboardData = async () => {
@@ -33,7 +35,6 @@ function Home() {
 
       const headers = { 'Authorization': `Bearer ${token}` };
 
-      // Background revalidate all data with caching
       const [modulesData, timeData, seriesData, gpaResult, userData] = await Promise.all([
         fetchWithCache(`${apiBaseUrl}/api/modules`, { headers }, { cacheKey: 'dashboard_modules' }),
         fetchWithCache(`${apiBaseUrl}/api/timetable`, { headers }, { cacheKey: 'dashboard_timetable' }).catch(() => []),
@@ -105,10 +106,7 @@ function Home() {
   const handleDeleteModule = async (moduleId) => {
     try {
       setError(null);
-      
-      if (!moduleId) {
-        throw new Error('Module ID is undefined');
-      }
+      if (!moduleId) throw new Error('Module ID is undefined');
 
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiBaseUrl}/api/modules/${moduleId}`, {
@@ -120,13 +118,12 @@ function Home() {
       });
 
       const data = await response.json();
-      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete module');
       }
 
       setModules(prev => prev.filter(module => module._id !== moduleId));
-      
+      fetchDashboardData();
     } catch (err) {
       setError(err.message);
     }
@@ -149,21 +146,17 @@ function Home() {
       const updatedModule = { ...moduleToUpdate };
 
       if (field.startsWith('assignment:')) {
-        const [_, index, prop] = field.split(':');
-        const assignmentIndex = parseInt(index);
-        
+        const [, index, prop] = field.split(':');
+        const assignmentIndex = parseInt(index, 10);
         if (!updatedModule.assignments) updatedModule.assignments = [];
         if (!updatedModule.assignments[assignmentIndex]) updatedModule.assignments[assignmentIndex] = {};
-        
         updatedModule.assignments[assignmentIndex][prop] = 
           prop === 'marks' || prop === 'totalMarks' ? (value === '' ? null : Number(value)) : value;
       } else if (field.startsWith('lab:')) {
-        const [_, index, prop] = field.split(':');
-        const labIndex = parseInt(index);
-        
+        const [, index, prop] = field.split(':');
+        const labIndex = parseInt(index, 10);
         if (!updatedModule.labs) updatedModule.labs = [];
         if (!updatedModule.labs[labIndex]) updatedModule.labs[labIndex] = {};
-        
         updatedModule.labs[labIndex][prop] = value;
       } else if (field === 'attendedLectures' || field === 'conductedLectures') {
         updatedModule[field] = value;
@@ -190,23 +183,19 @@ function Home() {
 
   if (loading && modules.length === 0) {
     return (
-      <motion.div 
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="flex flex-col h-screen overflow-hidden text-slate-800 bg-slate-50"
-      >
+      <div className="flex flex-col h-screen overflow-hidden text-zinc-900 dark:text-zinc-100 bg-transparent">
         <Navbar />
-        <main className="flex-1 pt-20 p-8 overflow-y-auto custom-scrollbar">
+        <main className="flex-1 pt-20 p-6 sm:p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
             <DashboardWidgetsSkeleton />
-            <div className="skeleton-module-grid">
-              <ModuleCardSkeleton />
+            <div className="skeleton-module-grid mt-6">
               <ModuleCardSkeleton />
               <ModuleCardSkeleton />
               <ModuleCardSkeleton />
             </div>
           </div>
         </main>
-      </motion.div>
+      </div>
     );
   }
 
@@ -223,109 +212,131 @@ function Home() {
     ? Number(activeTab) 
     : 1;
 
-  const pageVariants = {
-    initial: { opacity: 0, y: 20 },
-    in: { opacity: 1, y: 0 },
-    out: { opacity: 0, y: -20 }
-  };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-  };
+  const currentSemSgpa = gpaData?.sgpas?.[currentTab];
 
   return (
     <motion.div 
-      initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden text-slate-800 bg-transparent"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
+      className="flex flex-col h-screen overflow-hidden text-zinc-900 dark:text-zinc-100 bg-transparent"
     >
       <Navbar />
       
-      <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar relative z-0">
-        
-        <div className="max-w-7xl mx-auto space-y-10 relative z-10">
+      <main className="flex-1 pt-20 pb-10 px-4 sm:px-8 overflow-y-auto relative z-0">
+        <div className="max-w-7xl mx-auto space-y-6">
           
-          <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/80 backdrop-blur-xl p-8 rounded-3xl border border-white/70 shadow-[0_10px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5">
-            <div>
-              <h2 className="text-3xl lg:text-5xl font-black text-slate-900 tracking-tight">
-                {getGreeting()}, {user?.firstName || 'Student'}!
-              </h2>
-              <p className="text-slate-500 mt-3 font-semibold text-lg">Here is your academic overview.</p>
+          {/* Workspace Header with Student Avatar */}
+          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-zinc-200/90 dark:border-zinc-800/90">
+            <div className="flex items-center gap-4">
+              <img 
+                src={getUserAvatar(user)} 
+                alt="Student Avatar" 
+                className="w-12 h-12 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-blue-50 object-cover shadow-xs"
+              />
+              <div>
+                <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-0.5">
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">Faculty of Engineering</span>
+                  <span>·</span>
+                  <span>{user?.registrationNumber || 'Student Record'}</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+                  {user ? `${user.firstName} ${user.lastName}` : 'Academic Overview'}
+                </h1>
+              </div>
             </div>
-            <button onClick={openAddModal} className="bg-primary text-white px-8 py-4 rounded-2xl font-bold shadow-md shadow-primary/20 hover:bg-indigo-600 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
-              <FaPlus size={18} /> Add Module
+            <button 
+              onClick={openAddModal} 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2 self-start sm:self-auto shadow-xs"
+            >
+              <FaPlus size={11} /> New Module
             </button>
           </header>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-2xl flex justify-between items-center shadow-sm z-10 relative">
-              <p className="font-bold">{error}</p>
-              <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 font-bold bg-red-100 px-4 py-2 rounded-xl transition-colors">Dismiss</button>
+            <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg text-xs font-medium flex justify-between items-center">
+              <span>{error}</span>
+              <button onClick={() => setError(null)} className="text-red-600 dark:text-red-400 hover:underline font-semibold ml-4">Dismiss</button>
             </div>
           )}
 
-          {/* Dashboard Summary Widgets */}
-          <div className="relative z-10 w-full">
-            <DashboardWidgets timetable={timetable} examSeries={examSeries} gpaData={gpaData} />
-          </div>
+          {/* Summary KPI Row */}
+          <DashboardWidgets timetable={timetable} examSeries={examSeries} gpaData={gpaData} />
 
-          <div className="w-full">
-            {/* Folder Tabs */}
-            <div className="flex w-full px-2 sm:px-6 relative z-10 gap-2">
-              {allSemesters.map(sem => {
-                const isActive = currentTab === sem;
-                return (
-                  <button
-                    key={sem}
-                    onClick={() => setActiveTab(sem)}
-                    className={`flex-1 py-3 sm:py-4 font-bold text-xs sm:text-sm md:text-base transition-all duration-300 rounded-t-xl ${
-                      isActive 
-                        ? 'bg-white/90 backdrop-blur-md text-primary border-b-2 border-primary shadow-sm z-20' 
-                        : 'bg-white/50 backdrop-blur-sm text-slate-500 hover:text-slate-700 hover:bg-white/70 z-10'
-                    }`}
-                  >
-                    <span className="hidden sm:inline">Semester </span>
-                    <span className="sm:hidden">S</span>
-                    {sem}
-                  </button>
-                );
-              })}
+          {/* Modules Section */}
+          <div className="space-y-4 pt-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              {/* Segmented Semester Bar */}
+              <div className="flex items-center gap-1 bg-zinc-100/90 dark:bg-zinc-900 p-1 rounded-lg border border-zinc-200/80 dark:border-zinc-800 overflow-x-auto">
+                {allSemesters.map(sem => {
+                  const isActive = currentTab === sem;
+                  const count = groupedModules[sem]?.length || 0;
+                  return (
+                    <button
+                      key={sem}
+                      onClick={() => setActiveTab(sem)}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1.5 shrink-0 ${
+                        isActive 
+                          ? 'bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 font-semibold shadow-xs border border-zinc-200/60 dark:border-zinc-700' 
+                          : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200'
+                      }`}
+                    >
+                      <span>Sem {sem}</span>
+                      {count > 0 && (
+                        <span className={`font-mono text-[10px] px-1.5 py-0.2 rounded ${
+                          isActive ? 'bg-blue-600 text-white' : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                        }`}>
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Semester Quick Stats */}
+              {currentSemSgpa && currentSemSgpa.credits > 0 && (
+                <div className="flex items-center gap-4 text-xs font-mono text-zinc-600 dark:text-zinc-300 bg-white dark:bg-[#121215] px-3.5 py-2 rounded-lg border border-zinc-200/90 dark:border-zinc-800/90 self-start md:self-auto">
+                  <span>
+                    Semester {currentTab} SGPA: <strong className="text-blue-600 dark:text-blue-400 font-bold">{currentSemSgpa.sgpa !== null ? currentSemSgpa.sgpa.toFixed(2) : '—'}</strong>
+                  </span>
+                  <span className="text-zinc-300 dark:text-zinc-700">|</span>
+                  <span>
+                    Credits: <strong className="text-zinc-900 dark:text-zinc-100 font-bold">{currentSemSgpa.credits}</strong>
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Folder Content Box */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-b-3xl rounded-tr-3xl p-6 sm:p-10 shadow-[0_10px_30px_rgba(0,0,0,0.03)] border border-white/70 ring-1 ring-slate-900/5 relative z-0">
-              {currentTab && (
-                <section className="animate-fadeIn">
-                  {!groupedModules[currentTab] || groupedModules[currentTab].length === 0 ? (
-                    <div className="bg-slate-50 border-dashed border-2 border-slate-200 p-12 sm:p-16 rounded-3xl flex flex-col items-center justify-center text-center">
-                      <div className="bg-primary/10 p-8 rounded-full text-primary mb-8 shadow-sm">
-                        <FaBookReader size={56} />
-                      </div>
-                      <h3 className="text-2xl sm:text-3xl font-extrabold mb-4 text-slate-900">No Modules Found</h3>
-                      <p className="text-slate-500 max-w-md mx-auto mb-10 font-medium text-base sm:text-lg leading-relaxed">
-                        Get started by adding your first module to Semester {currentTab} to track attendance, assignments, and upload lecture notes.
-                      </p>
-                      <button onClick={openAddModal} className="bg-primary text-white px-8 sm:px-10 py-3 sm:py-4 rounded-2xl font-bold shadow-md shadow-primary/20 hover:bg-indigo-600 transition-all flex items-center gap-3">
-                        <FaPlus /> Create Module
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                      {groupedModules[currentTab].map((module, index) => (
-                        <ModuleCard
-                          key={module._id}
-                          module={module}
-                          index={index}
-                          onOpenEdit={() => openEditModal(module)}
-                          onInlineUpdate={(field, value) => handleInlineUpdate(module._id, field, value)}
-                          onDelete={(moduleId) => handleDeleteModule(moduleId)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </section>
+            {/* Modules Grid */}
+            <div>
+              {!groupedModules[currentTab] || groupedModules[currentTab].length === 0 ? (
+                <div className="bg-white dark:bg-[#121215] border border-dashed border-zinc-300 dark:border-zinc-800 p-12 rounded-xl flex flex-col items-center justify-center text-center">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 border border-blue-200 dark:border-blue-800/60">
+                    <FaBookReader size={16} />
+                  </div>
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">No modules registered for Semester {currentTab}</h3>
+                  <p className="text-zinc-500 dark:text-zinc-400 max-w-sm text-xs mb-5">
+                    Add a course module to track attendance, coursework, grades, and lecture PDFs.
+                  </p>
+                  <button 
+                    onClick={openAddModal} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-colors flex items-center gap-2"
+                  >
+                    <FaPlus size={10} /> Add Semester {currentTab} Module
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groupedModules[currentTab].map((module, index) => (
+                    <ModuleCard
+                      key={module._id}
+                      module={module}
+                      index={index}
+                      onOpenEdit={() => openEditModal(module)}
+                      onInlineUpdate={(field, value) => handleInlineUpdate(module._id, field, value)}
+                      onDelete={(moduleId) => handleDeleteModule(moduleId)}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           </div>

@@ -2,30 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/navbar';
 import Footer from '../components/Footer';
-import { FaUserCircle, FaBookOpen, FaClipboardCheck, FaFlask, FaCalendarAlt, FaIdBadge } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { AVATAR_PRESETS, getUserAvatar, getDeptMeta } from '../utils/theme';
 
 function Profile() {
   const [user, setUser] = useState(null);
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAvatar, setSelectedAvatar] = useState(() => localStorage.getItem('ma_avatar_url') || AVATAR_PRESETS[0].url);
   const navigate = useNavigate();
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     fetchUserData();
     fetchUserModules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
@@ -39,11 +38,8 @@ function Profile() {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiBaseUrl}/api/modules`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
       if (response.ok) {
         const modulesData = await response.json();
         setModules(modulesData);
@@ -55,16 +51,16 @@ function Profile() {
     }
   };
 
-  const handleModuleClick = (moduleId) => {
-    navigate('/home');
+  const handleSelectAvatar = (url) => {
+    setSelectedAvatar(url);
+    localStorage.setItem('ma_avatar_url', url);
+    window.dispatchEvent(new Event('ma-avatar-changed'));
   };
 
   const groupModulesBySemester = (modulesList) => {
     const groups = {};
     modulesList.forEach(m => {
-      const code = m.moduleCode || '';
-      const match = code.match(/^[A-Za-z]+(\d)/);
-      const sem = match ? `Semester ${match[1]}` : 'Other Modules';
+      const sem = m.semester ? `Semester 0${m.semester}` : 'Unassigned';
       if (!groups[sem]) groups[sem] = [];
       groups[sem].push(m);
     });
@@ -76,147 +72,146 @@ function Profile() {
 
   const groupedModules = groupModulesBySemester(modules);
 
-  const pageVariants = {
-    initial: { opacity: 0, y: 20 },
-    in: { opacity: 1, y: 0 },
-    out: { opacity: 0, y: -20 }
-  };
-
   if (loading) {
     return (
-      <motion.div 
-        initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-        className="flex flex-col h-screen bg-slate-50 text-slate-800"
-      >
+      <div className="flex flex-col h-screen bg-transparent text-zinc-900 dark:text-zinc-100">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <span className="font-mono text-xs text-zinc-500">Loading student record...</span>
         </main>
-      </motion.div>
+      </div>
     );
   }
 
   return (
     <motion.div 
-      initial="initial" animate="in" exit="out" variants={pageVariants} transition={{ duration: 0.3 }}
-      className="flex flex-col h-screen overflow-hidden bg-transparent text-slate-800 font-sans selection:bg-primary/30"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
+      className="flex flex-col h-screen overflow-hidden bg-transparent text-zinc-900 dark:text-zinc-100 font-sans"
     >
       <Navbar />
-      <main className="flex-1 pt-28 pb-8 px-8 lg:pt-32 lg:pb-12 lg:px-12 overflow-y-auto custom-scrollbar z-0">
-        <div className="max-w-6xl mx-auto space-y-12">
+      <main className="flex-1 pt-20 pb-10 px-4 sm:px-8 overflow-y-auto">
+        <div className="max-w-5xl mx-auto space-y-6">
           
-          <header>
-            <h2 className="text-3xl lg:text-4xl font-black text-slate-900">
-              Profile Details
-            </h2>
-            <p className="text-slate-500 mt-2 font-medium">Manage your personal information and overview.</p>
-          </header>
+          {/* Student ID Card Banner */}
+          {user && (
+            <div className="bg-white dark:bg-[#121215] rounded-xl border border-zinc-200/90 dark:border-zinc-800/90 overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+              <div className="h-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-600 relative" />
+              <div className="px-6 pb-6">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-10 mb-6">
+                  <div className="flex items-end gap-4">
+                    <img 
+                      src={getUserAvatar(user)} 
+                      alt="Student Avatar" 
+                      className="w-20 h-20 rounded-2xl border-4 border-white dark:border-[#121215] bg-blue-50 object-cover shadow-md"
+                    />
+                    <div className="pb-1">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold block">
+                        University of Ruhuna · Faculty of Engineering
+                      </span>
+                      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
+                        {user.firstName} {user.lastName}
+                      </h1>
+                    </div>
+                  </div>
+                  <span className="font-mono text-xs font-bold px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-800/70 self-start sm:self-auto">
+                    {user.registrationNumber}
+                  </span>
+                </div>
 
-          <div className="bg-white/80 backdrop-blur-xl p-8 md:p-12 rounded-3xl border border-white/70 shadow-[0_10px_30px_rgba(0,0,0,0.03)] ring-1 ring-slate-900/5 relative overflow-hidden">
-            {/* Background Decorations */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>
-            
-            {/* User Info Section */}
-            <section className="mb-16">
-              <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4">
-                <FaUserCircle className="text-primary text-2xl" /> User Information
-              </h3>
-              
-              {user ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center gap-4 shadow-sm">
-                    <div className="p-3 bg-primary/10 rounded-xl text-primary"><FaUserCircle size={24} /></div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Full Name</p>
-                      <p className="text-lg font-semibold text-slate-900">{user.firstName} {user.lastName}</p>
-                    </div>
+                {/* Metadata Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/80">
+                  <div>
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">Student Name</span>
+                    <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 mt-1 block">{user.firstName} {user.lastName}</span>
                   </div>
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center gap-4 shadow-sm">
-                    <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-600"><FaIdBadge size={24} /></div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Registration Number</p>
-                      <p className="text-lg font-semibold text-slate-900">{user.registrationNumber}</p>
-                    </div>
+                  <div>
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">Registration No</span>
+                    <span className="text-xs font-mono font-bold text-zinc-900 dark:text-zinc-100 mt-1 block">{user.registrationNumber}</span>
                   </div>
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center gap-4 shadow-sm">
-                    <div className="p-3 bg-blue-500/10 rounded-xl text-blue-600"><FaBookOpen size={24} /></div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Total Modules</p>
-                      <p className="text-lg font-semibold text-slate-900">{modules.length}</p>
-                    </div>
+                  <div>
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">Registered Modules</span>
+                    <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">{modules.length} Courses</span>
                   </div>
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center gap-4 shadow-sm">
-                    <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-600"><FaCalendarAlt size={24} /></div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">Account Created</p>
-                      <p className="text-lg font-semibold text-slate-900">{new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                    </div>
+                  <div>
+                    <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 block">Record Created</span>
+                    <span className="text-xs font-mono text-zinc-700 dark:text-zinc-300 mt-1 block">
+                      {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    </span>
                   </div>
                 </div>
-              ) : (
-                <p className="text-slate-500 italic font-medium">No user information available.</p>
-              )}
-            </section>
 
-            {/* Modules Section */}
-            <section>
-              <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3 border-b border-slate-200 pb-4">
-                <FaBookOpen className="text-primary text-2xl" /> My Modules <span className="bg-slate-100 text-sm px-3 py-0.5 rounded-full text-slate-600 font-medium">{modules.length}</span>
-              </h3>
-
-              {modules.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                  <p className="text-slate-500 font-medium">No modules created yet. Start by adding your first module on the Home page!</p>
+                {/* Avatar Picker */}
+                <div className="mt-6 pt-5 border-t border-zinc-100 dark:border-zinc-800/80">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-semibold block mb-3">
+                    Choose Profile Avatar
+                  </span>
+                  <div className="flex flex-wrap gap-3">
+                    {AVATAR_PRESETS.map((preset) => {
+                      const active = selectedAvatar === preset.url;
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          onClick={() => handleSelectAvatar(preset.url)}
+                          className={`flex items-center gap-2.5 p-1.5 pr-3 rounded-xl border transition-all ${
+                            active
+                              ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/50 ring-2 ring-blue-500/20'
+                              : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-900'
+                          }`}
+                        >
+                          <img src={preset.url} alt={preset.label} className="w-8 h-8 rounded-lg object-cover" />
+                          <span className={`text-xs font-medium ${active ? 'text-blue-700 dark:text-blue-300 font-semibold' : 'text-zinc-600 dark:text-zinc-400'}`}>
+                            {preset.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              ) : (
-                <div className="space-y-10">
-                  {Object.entries(groupedModules).map(([semester, sModules]) => (
-                    <div key={semester} className="space-y-6 bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                      <h4 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        <span className="w-2 h-6 rounded-full bg-primary inline-block"></span>
-                        {semester} 
-                        <span className="text-sm font-medium text-slate-500 ml-2">({sModules.length} module{sModules.length !== 1 ? 's' : ''})</span>
-                      </h4>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {sModules.map((module) => (
-                          <div 
-                            key={module._id} 
-                            className="bg-white border border-slate-200 p-6 rounded-2xl hover:border-primary/50 transition-all cursor-pointer group shadow-sm hover:shadow-md hover:-translate-y-1"
-                            onClick={() => handleModuleClick(module._id)}
-                          >
-                            <div className="flex justify-between items-start mb-4">
-                              <div>
-                                <h4 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors">{module.moduleName}</h4>
-                                <span className="inline-block mt-2 text-xs font-bold px-2 py-1 bg-slate-100 text-slate-600 rounded uppercase tracking-wider border border-slate-200">
-                                  {module.moduleCode}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-slate-100">
-                              <div className="flex flex-col gap-1 text-center">
-                                <span className="text-xs text-slate-500 font-bold uppercase"><FaClipboardCheck className="inline mr-1" /> Att</span>
-                                <span className="text-sm font-semibold text-slate-700">
-                                  {module.attendedLectures || 0}/{module.conductedLectures || module.lectureHours || 0}
-                                </span>
-                              </div>
-                              <div className="flex flex-col gap-1 text-center border-l border-r border-slate-100">
-                                <span className="text-xs text-slate-500 font-bold uppercase"><FaBookOpen className="inline mr-1" /> Asgn</span>
-                                <span className="text-sm font-semibold text-slate-700">{module.assignments?.length || 0}</span>
-                              </div>
-                              <div className="flex flex-col gap-1 text-center">
-                                <span className="text-xs text-slate-500 font-bold uppercase"><FaFlask className="inline mr-1" /> Labs</span>
-                                <span className="text-sm font-semibold text-slate-700">{module.labs?.length || 0}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+              </div>
+            </div>
+          )}
+
+          {/* Modules Directory by Semester */}
+          <div className="space-y-5">
+            {Object.entries(groupedModules).map(([semester, sModules]) => (
+              <div key={semester} className="bg-white dark:bg-[#121215] rounded-xl border border-zinc-200/90 dark:border-zinc-800/90 overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                <div className="px-5 py-3 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200/80 dark:border-zinc-800 flex justify-between items-center">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">{semester}</span>
+                  <span className="text-xs font-mono text-zinc-400">{sModules.length} modules</span>
+                </div>
+                <div className="divide-y divide-zinc-100 dark:divide-zinc-800/70">
+                  {sModules.map((mod) => {
+                    const grade = mod.moduleResults?.[mod.moduleResults.length - 1]?.grade;
+                    const dept = getDeptMeta(mod.moduleCode);
+                    return (
+                      <div 
+                        key={mod._id}
+                        onClick={() => navigate('/home')}
+                        className="px-5 py-3 flex items-center justify-between gap-4 hover:bg-zinc-50/80 dark:hover:bg-zinc-900/60 cursor-pointer transition-colors text-xs"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className={`font-mono text-[11px] font-bold px-2 py-0.5 rounded border shrink-0 ${dept.codeBadge}`}>
+                            {mod.moduleCode}
+                          </span>
+                          <span className="font-medium text-zinc-900 dark:text-zinc-100 truncate">{mod.moduleName}</span>
+                        </div>
+                        <div className="flex items-center gap-4 shrink-0 font-mono">
+                          <span className="text-zinc-400 text-[11px]">
+                            Att: {mod.attendedLectures || 0}/{mod.conductedLectures || 0}
+                          </span>
+                          {grade && (
+                            <span className="font-bold text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded w-9 text-center">
+                              {grade}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-              )}
-            </section>
+              </div>
+            ))}
           </div>
         </div>
         <Footer />
