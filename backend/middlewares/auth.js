@@ -4,8 +4,8 @@ const prisma = require('../prismaClient');
 // 🔒 SECURITY MEASURE: JWT Authentication middleware (OWASP A02:2021 - Cryptographic Failures Fix)
 const auth = async (req, res, next) => {
   try {
-    // 🔒 Extract Bearer token from Authorization header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    // 🔒 Extract Bearer token from Authorization header or query param (for PDF inline viewing)
+    const token = req.header('Authorization')?.replace('Bearer ', '') || req.query.token;
     
     if (!token) {
       return res.status(401).json({ message: 'Access denied. No token provided.' });

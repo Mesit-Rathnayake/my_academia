@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -30,9 +30,9 @@ model UniversityConfig {
   gpaScale            Float    @default(4.0)
   rounding            Int      @default(2)
   creditRule          String   @default("MANUAL")
-  gradingScale        Json
-  classificationRules Json
-  specialGrades       Json
+  gradingScale        String
+  classificationRules String
+  specialGrades       String
   users               User[]
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -40,8 +40,8 @@ model UniversityConfig {
 
 model Module {
   id                String       @id @default(cuid())
-  moduleName        String       @db.VarChar(100)
-  moduleCode        String       @db.VarChar(20)
+  moduleName        String
+  moduleCode        String
   totalLectures     Int          @default(0)
   conductedLectures Int          @default(0)
   attendedLectures  Int          @default(0)
@@ -114,7 +114,7 @@ model Document {
 model ChatSession {
   id          String   @id @default(cuid())
   title       String   @default("New Chat")
-  documentIds Json?    // JSON array of selected document IDs
+  documentIds String?  // JSON array of selected document IDs
   moduleId    String
   module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   messages    ChatMessage[]
@@ -126,7 +126,7 @@ model ChatMessage {
   id        String   @id @default(cuid())
   role      String   // "user" or "assistant"
   content   String
-  sources   Json?    // Optional JSON array for the citations/sources
+  sources   String?  // Optional JSON array for the citations/sources
   sessionId String
   session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

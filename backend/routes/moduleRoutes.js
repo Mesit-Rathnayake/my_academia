@@ -31,6 +31,7 @@ router.delete('/:moduleId/documents/:documentId', documentController.deleteDocum
 
 // Chat routes
 const chatController = require('../controllers/chatController');
+router.post('/ai-chat', auth, chatController.proxyAiChat);
 router.get('/:moduleId/sessions', auth, chatController.getSessions);
 router.post('/:moduleId/sessions', auth, chatController.createSession);
 router.get('/:moduleId/sessions/:sessionId/chat', auth, chatController.getChatHistory);

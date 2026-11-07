@@ -1,4 +1,26 @@
 const prisma = require('../prismaClient');
+const axios = require('axios');
+
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://127.0.0.1:8000';
+const INTERNAL_SERVICE_KEY = process.env.INTERNAL_SERVICE_KEY || 'my-academia-internal-secret';
+
+// Proxy RAG chat query to AI Service
+exports.proxyAiChat = async (req, res) => {
+  try {
+    const response = await axios.post(`${AI_SERVICE_URL}/api/v1/chat`, req.body, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-token': INTERNAL_SERVICE_KEY
+      }
+    });
+    res.json(response.data);
+  } catch (error) {
+    console.error('AI Chat proxy error:', error.response?.data || error.message);
+    res.status(error.response?.status || 502).json(
+      error.response?.data || { detail: error.message }
+    );
+  }
+};
 
 // Get all chat sessions for a module
 exports.getSessions = async (req, res) => {

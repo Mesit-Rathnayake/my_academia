@@ -13,12 +13,14 @@ exports.register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const defaultUniversityConfig = await prisma.universityConfig.findFirst();
     const user = await prisma.user.create({
       data: {
         registrationNumber,
         firstName,
         lastName,
-        password: hashedPassword
+        password: hashedPassword,
+        universityConfigId: defaultUniversityConfig ? defaultUniversityConfig.id : null
       }
     });
 

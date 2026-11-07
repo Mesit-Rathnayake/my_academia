@@ -13,7 +13,22 @@ exports.getGpaData = async (req, res) => {
       }
     });
 
-    if (!user || !user.universityConfig) {
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    let config = user.universityConfig;
+    if (!config) {
+      config = await prisma.universityConfig.findFirst();
+      if (config) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { universityConfigId: config.id }
+        });
+      }
+    }
+
+    if (!config) {
       return res.status(400).json({ error: 'User does not have an assigned university config.' });
     }
 
@@ -26,7 +41,7 @@ exports.getGpaData = async (req, res) => {
     });
 
     // Run through the engine
-    const engine = new GpaEngine(user.universityConfig);
+    const engine = new GpaEngine(config);
     const performance = engine.calculatePerformance(modules);
 
     res.json(performance);
@@ -51,7 +66,22 @@ exports.calculateProjection = async (req, res) => {
       include: { universityConfig: true }
     });
 
-    if (!user || !user.universityConfig) {
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    let config = user.universityConfig;
+    if (!config) {
+      config = await prisma.universityConfig.findFirst();
+      if (config) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { universityConfigId: config.id }
+        });
+      }
+    }
+
+    if (!config) {
       return res.status(400).json({ error: 'No config found' });
     }
 
@@ -60,7 +90,7 @@ exports.calculateProjection = async (req, res) => {
       include: { moduleResults: true }
     });
 
-    const engine = new GpaEngine(user.universityConfig);
+    const engine = new GpaEngine(config);
     const performance = engine.calculatePerformance(modules);
     
     const requiredAverage = engine.calculateProjection(performance, parseFloat(targetGpa), parseInt(totalDegreeCredits, 10));
@@ -70,7 +100,7 @@ exports.calculateProjection = async (req, res) => {
       totalDegreeCredits,
       completedCredits: performance.totalCountedCredits,
       requiredAverage,
-      isPossible: requiredAverage !== null && requiredAverage <= user.universityConfig.gpaScale
+      isPossible: requiredAverage !== null && requiredAverage <= config.gpaScale
     });
 
   } catch (error) {
