@@ -38,6 +38,9 @@ frontend/build/
 *.sqlite
 *.sqlite3
 *.db
+*.db-journal
+*.db-wal
+*.db-shm
 postgres_data/
 
 # IDE & OS

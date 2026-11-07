@@ -1,16 +1,39 @@
 services:
+  # 1. Core Backend (Node.js / Express + Prisma)
   - type: web
     name: my-academia-backend
     runtime: node
+    plan: free
     rootDir: backend
-    buildCommand: npm install && node ./node_modules/prisma/build/index.js generate
-    startCommand: npm start
+    buildCommand: npm install && npx prisma generate && npx prisma db push
+    startCommand: node seed.js && npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
+        generateValue: true
+      - key: INTERNAL_SERVICE_KEY
+        value: my-academia-internal-secret
+      - key: AI_SERVICE_URL
         sync: false
-      - key: PORT
-        value: 10000
+      - key: ALLOWED_ORIGINS
+        sync: false
+
+  # 2. Frontend Static Site (React SPA)
+  - type: web
+    name: my-academia-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: REACT_APP_API_URL
+        sync: false

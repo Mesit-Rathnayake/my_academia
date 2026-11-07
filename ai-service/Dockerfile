@@ -5,7 +5,9 @@ WORKDIR /app
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=7860 \
+    CHROMA_PATH=/tmp/chroma_data \
+    CHROMA_PERSIST_DIRECTORY=/tmp/chroma_data
 
 # Install system dependencies if required for compilation / pdf processing
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -20,9 +22,15 @@ RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/wh
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-download the sentence-transformers embedding model during build for fast startup
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+
 # Copy application source code
 COPY . .
 
-EXPOSE 8000
+# Ensure writable directory for non-root containers (e.g. Hugging Face Spaces)
+RUN mkdir -p /tmp/chroma_data && chmod -R 777 /tmp/chroma_data /app
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 7860
+
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860}"]
