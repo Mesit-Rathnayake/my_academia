@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { FaArrowRight } from "react-icons/fa";
-import man1 from "../images/man1.png";
 import { AVATAR_PRESETS } from "../utils/theme";
 
 function Startup() {
@@ -32,7 +31,7 @@ function Startup() {
             {/* Student Avatar Stack */}
             <div className="flex items-center gap-3 pt-1">
               <div className="flex -space-x-2.5">
-                {AVATAR_PRESETS.slice(0, 4).map((av) => (
+                {AVATAR_PRESETS.slice(0, 5).map((av) => (
                   <img
                     key={av.id}
                     src={av.url}
@@ -64,15 +63,15 @@ function Startup() {
             </div>
           </div>
 
-          {/* Right Preview Ledger Card + Illustration */}
+          {/* Right Preview Ledger Card */}
           <div className="lg:col-span-5">
             <div className="bg-white dark:bg-[#121215] rounded-xl border border-zinc-200/90 dark:border-zinc-800/90 border-t-[3px] border-t-blue-600 shadow-sm p-6 space-y-5">
               <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-4">
                 <div className="flex items-center gap-3">
                   <img
-                    src={man1}
+                    src={AVATAR_PRESETS[0].url}
                     alt="Engineering Student"
-                    className="w-12 h-12 rounded-lg object-contain bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900 p-1"
+                    className="w-11 h-11 rounded-full object-cover bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800"
                   />
                   <div>
                     <span className="text-[10px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold block">Transcript Preview</span>

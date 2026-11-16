@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from '../components/Footer';
-import man2 from '../images/man2.png';
+import { AVATAR_PRESETS } from '../utils/theme';
 
 function LogIn() {
   const apiBaseUrl = process.env.REACT_APP_API_URL || '';
@@ -10,6 +10,11 @@ function LogIn() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Dynamic Notionists avatar seeded by the typed registration number (or default preset)
+  const avatarUrl = regNumber.trim()
+    ? `https://api.dicebear.com/9.x/notionists/svg?seed=${encodeURIComponent(regNumber.trim().toUpperCase())}&backgroundColor=dbeafe`
+    : AVATAR_PRESETS[0].url;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -43,15 +48,15 @@ function LogIn() {
       <Header />
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm bg-white dark:bg-[#121215] p-7 rounded-xl border border-zinc-200/90 dark:border-zinc-800/90 border-t-[3px] border-t-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between gap-3">
             <div>
               <span className="text-[11px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold block mb-1">Authentication</span>
               <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Sign in to My Academia</h1>
             </div>
             <img
-              src={man2}
-              alt="Student Sign In"
-              className="w-12 h-12 rounded-lg object-contain bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 p-1 shrink-0"
+              src={avatarUrl}
+              alt="Student Avatar"
+              className="w-12 h-12 rounded-full object-cover bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 shrink-0"
             />
           </div>
           
