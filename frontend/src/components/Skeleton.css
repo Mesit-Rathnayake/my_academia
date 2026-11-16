@@ -21,6 +21,16 @@
   border-radius: 8px;
 }
 
+html.dark .skeleton-base {
+  background: linear-gradient(
+    90deg,
+    #18181b 25%,
+    #27272a 37%,
+    #18181b 63%
+  );
+  background-size: 400% 100%;
+}
+
 .skeleton-text {
   height: 14px;
   margin-bottom: 8px;
@@ -46,6 +56,11 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
+html.dark .skeleton-card {
+  background: #121215;
+  border-color: #27272a;
+}
+
 /* Hero GPA Skeleton */
 .skeleton-hero {
   background: #f8fafc;
@@ -53,6 +68,11 @@
   border-radius: 20px;
   padding: 24px;
   margin-bottom: 24px;
+}
+
+html.dark .skeleton-hero {
+  background: #121215;
+  border-color: #27272a;
 }
 
 .skeleton-module-grid {

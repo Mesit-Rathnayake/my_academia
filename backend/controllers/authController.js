@@ -4,7 +4,9 @@ const bcrypt = require('bcryptjs');
 
 // Register a new user
 exports.register = async (req, res) => {
-  const { registrationNumber, firstName, lastName, password } = req.body;
+  const rawReg = req.body.registrationNumber || '';
+  const registrationNumber = rawReg.trim().toUpperCase();
+  const { firstName, lastName, password } = req.body;
 
   try {
     const existingUser = await prisma.user.findUnique({ where: { registrationNumber } });
@@ -17,8 +19,8 @@ exports.register = async (req, res) => {
     const user = await prisma.user.create({
       data: {
         registrationNumber,
-        firstName,
-        lastName,
+        firstName: (firstName || '').trim(),
+        lastName: (lastName || '').trim(),
         password: hashedPassword,
         universityConfigId: defaultUniversityConfig ? defaultUniversityConfig.id : null
       }
@@ -52,10 +54,15 @@ exports.register = async (req, res) => {
 
 // Login user
 exports.login = async (req, res) => {
-  const { registrationNumber, password } = req.body;
+  const rawReg = req.body.registrationNumber || '';
+  const normalizedReg = rawReg.trim().toUpperCase();
+  const { password } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { registrationNumber } });
+    let user = await prisma.user.findUnique({ where: { registrationNumber: normalizedReg } });
+    if (!user && rawReg.trim() !== normalizedReg) {
+      user = await prisma.user.findUnique({ where: { registrationNumber: rawReg.trim() } });
+    }
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
