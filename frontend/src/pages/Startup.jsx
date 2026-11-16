@@ -17,7 +17,7 @@ function Startup() {
           <div className="lg:col-span-7 space-y-6">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 text-[11px] font-mono uppercase tracking-wider text-blue-700 dark:text-blue-300 font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-              <span>University of Ruhuna · Engineering</span>
+              <span>Student Academic Workspace</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-900 dark:text-zinc-100 leading-[1.08] tracking-tight">
@@ -25,25 +25,8 @@ function Startup() {
             </h1>
 
             <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-xl">
-              A structured workspace for engineering undergraduates. Track lecture attendance, calculate SGPA and cumulative standing under faculty credit rules, and query your lecture PDFs with page-cited answers.
+              Track lecture attendance, calculate semester and cumulative GPA standing, manage your weekly timetable, and query your lecture notes with page-cited answers.
             </p>
-
-            {/* Student Avatar Stack */}
-            <div className="flex items-center gap-3 pt-1">
-              <div className="flex -space-x-2.5">
-                {AVATAR_PRESETS.slice(0, 5).map((av) => (
-                  <img
-                    key={av.id}
-                    src={av.url}
-                    alt={av.label}
-                    className="w-8 h-8 rounded-full border-2 border-white dark:border-zinc-900 bg-zinc-100 dark:bg-zinc-800 object-cover"
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                Built for <strong className="text-zinc-800 dark:text-zinc-200 font-semibold">EC, EE, CE, ME & IS</strong> undergraduates
-              </span>
-            </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
@@ -70,12 +53,12 @@ function Startup() {
                 <div className="flex items-center gap-3">
                   <img
                     src={AVATAR_PRESETS[0].url}
-                    alt="Engineering Student"
+                    alt="Student Avatar"
                     className="w-11 h-11 rounded-full object-cover bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800"
                   />
                   <div>
                     <span className="text-[10px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-semibold block">Transcript Preview</span>
-                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">B.Sc. Engineering (Hons)</span>
+                    <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Semester Performance</span>
                   </div>
                 </div>
                 <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">4.00 Scale</span>
@@ -97,8 +80,8 @@ function Startup() {
               </div>
 
               <div className="pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center text-xs">
-                <span className="text-zinc-500 dark:text-zinc-400">RAG Lecture PDF Indexing</span>
-                <span className="font-mono text-[11px] text-teal-700 dark:text-teal-400 font-semibold">ChromaDB + Gemini</span>
+                <span className="text-zinc-500 dark:text-zinc-400">Cumulative Standing</span>
+                <span className="font-mono text-[11px] text-teal-700 dark:text-teal-400 font-semibold">Auto-Calculated</span>
               </div>
             </div>
           </div>
